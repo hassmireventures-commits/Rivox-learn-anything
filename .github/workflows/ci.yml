@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Release hygiene gate
+        run: dart run tool/check_release_hygiene.dart
+      - run: flutter analyze
+      - run: flutter test
+      - name: Release APK compile check
+        env:
+          ALLOW_DEBUG_SIGNING: "true"
+        run: flutter build apk --release
+      - name: Release App Bundle compile check
+        env:
+          ALLOW_DEBUG_SIGNING: "true"
+        run: flutter build appbundle --release
+        # Store uploads still need a real upload keystore in CI secrets;
+        # this job only proves the AAB builds (CI uses debug signing).

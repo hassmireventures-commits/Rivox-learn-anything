@@ -1,0 +1,4 @@
+# Output of `mlc_llm package` (mlc4j + optional weight bundles).
+dist/
+*.so
+*.jar

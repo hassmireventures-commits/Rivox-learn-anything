@@ -1,0 +1,34 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "learn-anything",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=tool/.local_dart_defines.json"
+      ]
+    },
+    {
+      "name": "learn-anything (profile)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=tool/.local_dart_defines.json"
+      ]
+    },
+    {
+      "name": "learn-anything (release)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=tool/.local_dart_defines.json"
+      ]
+    }
+  ]
+}

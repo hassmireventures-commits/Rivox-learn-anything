@@ -1,0 +1,32 @@
+# Nightly quality gate for the Built-in AI generation pipeline.
+#
+# Requires a `BUILT_IN_AI_API_KEY` repository secret (Settings -> Secrets and
+# variables -> Actions) containing a valid NVIDIA NIM API key. Without it, the
+# secret expands to an empty string, so the live-probe test's own `apiKey.isEmpty`
+# check applies Dart's `skip:` mechanism and the run reports as skipped rather
+# than failing — add the secret to actually exercise the models.
+#
+# Score history (v1 scope): there is no committed log file for this. Each run's
+# stdout already contains a dated per-task score table via the test's own
+# `_printReport` function, so historical scores are tracked by browsing past
+# workflow run logs in the Actions tab. A committed JSON log with trend charts
+# could be a future enhancement.
+name: AI generation quality eval
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  live-probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Model generation live probe
+        run: flutter test test/model_generation_live_probe_test.dart --dart-define=BUILT_IN_AI_API_KEY=${{ secrets.BUILT_IN_AI_API_KEY }}

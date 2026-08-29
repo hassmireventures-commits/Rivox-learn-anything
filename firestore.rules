@@ -1,0 +1,36 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Opt-in anonymized telemetry from clients (hashed anonId only).
+    match /anon_events/{docId} {
+      allow create: if request.resource.data.keys().hasOnly([
+            'anonId', 'type', 'topicHash', 'timestamp'
+          ])
+          && request.resource.data.anonId is string
+          && request.resource.data.anonId.size() == 64
+          && request.resource.data.type is string
+          && request.resource.data.type.size() > 0
+          && request.resource.data.type.size() < 64
+          && (
+            !('topicHash' in request.resource.data)
+            || request.resource.data.topicHash == null
+            || (
+              request.resource.data.topicHash is string
+              && request.resource.data.topicHash.size() == 64
+            )
+          )
+          && request.resource.data.timestamp is timestamp;
+      allow read, update, delete: if false;
+    }
+
+    // Aggregate prompt stats — clients may read; only backends write.
+    match /global_prompt_stats/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

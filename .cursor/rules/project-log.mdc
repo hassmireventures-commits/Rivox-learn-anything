@@ -1,0 +1,31 @@
+---
+description: Read and update project logs before and after every build or fix
+alwaysApply: true
+---
+
+# Project log workflow
+
+Before making any code change in this repository:
+
+1. Read `docs/PROJECT_LOG.md`.
+2. Open the relevant section log (`docs/logs/BUGFIX_LOG.md`, `ENHANCEMENTS_LOG.md`, or `FEATURES_LOG.md`).
+3. Check **Regression risks** for the area you are editing.
+
+After completing a build, bug fix, or feature:
+
+1. Append a dated entry to the correct section log using this structure:
+
+```markdown
+## YYYY-MM-DD — Short title
+- **Type:** bugfix | enhancement | feature
+- **Area:** quiz | learn | settings | reminders | onboarding | ...
+- **Files:** ...
+- **Problem / Goal:** ...
+- **Solution:** ...
+- **Regression risks:** ...
+- **Verified:** ...
+```
+
+2. Add a row to the chronological index in `docs/PROJECT_LOG.md`.
+
+Never regress items listed under **Regression risks** without documenting the change in the log.

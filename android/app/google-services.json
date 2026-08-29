@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "943316506839",
+    "project_id": "learn-anything-43970",
+    "storage_bucket": "learn-anything-43970.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:943316506839:android:a365921c8f147433d4b892",
+        "android_client_info": {
+          "package_name": "com.aiquiz.ai_quiz_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4T5XCQAQwhp9qgiv4ZeKMwG10kIfcOH8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

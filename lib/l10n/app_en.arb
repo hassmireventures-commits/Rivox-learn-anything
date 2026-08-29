@@ -1,0 +1,1816 @@
+{
+  "@@locale": "en",
+  "appName": "Rivox",
+  "organizationName": "Hassmire Ventures",
+  "organizationTagline": "The AI App for Learning Anything",
+  "splashByOrganization": "by {organizationName}",
+  "@splashByOrganization": {
+    "placeholders": {
+      "organizationName": {
+        "type": "String"
+      }
+    }
+  },
+  "navHome": "Home",
+  "navLearn": "Learn",
+  "navPlay": "Play",
+  "navHistory": "History",
+  "settingsTooltip": "Settings",
+  "settingsTitle": "Settings",
+  "commonCancel": "Cancel",
+  "commonSave": "Save",
+  "commonClear": "Clear",
+  "commonReset": "Reset",
+  "commonDismiss": "Dismiss",
+  "commonEdit": "Edit",
+  "commonDelete": "Delete",
+  "commonRequired": "Required",
+  "commonNone": "none",
+  "commonOff": "Off",
+  "commonGoHome": "Go Home",
+  "welcomeTitle": "Welcome to Rivox",
+  "welcomeSubtitle": "Tell us a little so we can personalize your journey.",
+  "welcomeNameLabel": "Your name",
+  "welcomeNameValidation": "Please enter your name",
+  "welcomeGoalsLabel": "Goals (comma separated)",
+  "welcomeGoalsHint": "Flutter, Biology, AWS",
+  "welcomeDailyMinutes": "Daily minutes: {minutes}",
+  "@welcomeDailyMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "welcomeMinutesShort": "{minutes} min",
+  "@welcomeMinutesShort": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "welcomePreferredLanguage": "Preferred language",
+  "welcomeStartButton": "Start learning",
+  "greetingMorning": "Good morning",
+  "greetingAfternoon": "Good afternoon",
+  "greetingEvening": "Good evening",
+  "dashboardGreeting": "{greeting}, {name}",
+  "@dashboardGreeting": {
+    "placeholders": {
+      "greeting": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardLearnerFallback": "learner",
+  "dashboardAddProviderPrompt": "Add an AI provider to unlock generation",
+  "dashboardApiLimitBanner": "API limit active | retry in {minutes}m {seconds}s",
+  "@dashboardApiLimitBanner": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardLearningPulse": "Learning pulse",
+  "dashboardSuggestedTopic": "Suggested: {topic}",
+  "@dashboardSuggestedTopic": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardContinueLearn": "Continue on Learn",
+  "dashboardFocusAreaReason": "Focus area from your recent quizzes",
+  "dashboardAiUsageToday": "AI usage today",
+  "dashboardUsageEmpty": "Usage appears after your first AI generation.",
+  "dashboardProviderUsage": "{count} calls | last {latency}ms",
+  "@dashboardProviderUsage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "latency": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardSystemHealth": "System health | errors {errorRate}% | latency {latency}ms",
+  "@dashboardSystemHealth": {
+    "placeholders": {
+      "errorRate": {
+        "type": "String"
+      },
+      "latency": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardRecentQuizActivity": "Recent quiz activity",
+  "dashboardNoQuizzesYet": "No quizzes yet",
+  "dashboardRecentQuizRow": "{difficulty} | {score} | {date}",
+  "@dashboardRecentQuizRow": {
+    "placeholders": {
+      "difficulty": {
+        "type": "String"
+      },
+      "score": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardSeeAllHistory": "See all history",
+  "dashboardWeeklyActivity": "Weekly activity",
+  "dashboardActivityTrend": "Activity trend",
+  "dashboardRefreshInsights": "Refresh insights",
+  "dashboardNewQuiz": "New quiz",
+  "dashboardAchievementsTitle": "Achievements",
+  "statQuizzes": "Quizzes",
+  "statAccuracy": "Accuracy",
+  "statStreak": "Streak",
+  "statStreakDays": "{days}d",
+  "@statStreakDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "statTopics": "Topics",
+  "learnFinishCurrentPathFirst": "Finish your current path before starting a new one",
+  "learnYourLearningPath": "Your learning path",
+  "learnJourneyTitle": "Your learning journey",
+  "learnContinuePath": "Continue your path",
+  "learnPathProgress": "{title} | {current}/{total} modules",
+  "@learnPathProgress": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "learnGeneratePath": "Generate my learning path",
+  "learnTopicLabel": "Topic: {topic}",
+  "@learnTopicLabel": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      }
+    }
+  },
+  "learnContinueLearning": "Continue learning",
+  "learnPriorityTopics": "Priority topics",
+  "learnNoPriorityTopics": "No priority topics yet",
+  "learnGenerateFirstPath": "Generate your first path",
+  "learnNeedsAttentionReason": "Needs attention based on mastery",
+  "learnLearningPaths": "Learning paths",
+  "learnPathsEmpty": "Generate a path to see modules with videos and docs.",
+  "learnModulesProgress": "{current}/{total} modules",
+  "@learnModulesProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "learnPracticeFallback": "Practice",
+  "studyPathGenerateFirst": "Generate a learning path first",
+  "pathNotFound": "Path not found",
+  "pathProgressHeader": "Progress {current}/{total}",
+  "@pathProgressHeader": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "pathModuleSubtitle": "{difficulty} | {minutes} min | {status}",
+  "@pathModuleSubtitle": {
+    "placeholders": {
+      "difficulty": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "pathStatusCompleted": "Completed",
+  "pathStatusUpNext": "Up next",
+  "pathStatusUpcoming": "Upcoming",
+  "pathPracticeModuleQuiz": "Practice module quiz",
+  "pathVideoUnavailable": "Video unavailable in app",
+  "pathVideoSearchSubtitle": "Watch a tutorial video for this module",
+  "pathVideoSearchButton": "Search on YouTube",
+  "pathWatchOnYouTube": "Watch on YouTube",
+  "multiplayerTitle": "Multiplayer",
+  "multiplayerHostTitle": "Host a Quiz",
+  "multiplayerHostSubtitle": "Generate with your API key and invite friends",
+  "multiplayerJoinTitle": "Join a Room",
+  "multiplayerJoinSubtitle": "Enter a room ID or scan a QR code",
+  "multiplayerHostDefaultName": "Host",
+  "multiplayerCreateRoomFailed": "Failed to create room. Check Firebase configuration.",
+  "multiplayerStartQuizFailed": "Could not start quiz.",
+  "multiplayerHostRoomTitle": "Host Room",
+  "multiplayerUnableToCreateRoom": "Unable to create room",
+  "multiplayerShareRoomText": "Join my AI Quiz room!\nRoom ID: {roomId}\nOpen the app and join with this code.\nDeep link: aiquiz://join/{roomId}",
+  "@multiplayerShareRoomText": {
+    "placeholders": {
+      "roomId": {
+        "type": "String"
+      }
+    }
+  },
+  "multiplayerRoomReadyTitle": "Room Ready",
+  "multiplayerRoomIdCopied": "Room ID copied",
+  "multiplayerCopyRoomId": "Copy Room ID",
+  "multiplayerPlayersCount": "Players ({count})",
+  "@multiplayerPlayersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "multiplayerHostBadge": "Host",
+  "multiplayerStartQuiz": "Start Quiz",
+  "multiplayerShareRoom": "Share Room",
+  "multiplayerEnterRoomId": "Enter a room ID",
+  "multiplayerPlayerDefaultName": "Player",
+  "multiplayerJoinFailed": "Could not join room. Check the ID and Firebase setup.",
+  "multiplayerJoinRoomTitle": "Join Room",
+  "multiplayerRoomIdLabel": "Room ID",
+  "multiplayerRoomIdHint": "ABC123",
+  "multiplayerJoinButton": "Join",
+  "multiplayerHideScanner": "Hide scanner",
+  "multiplayerScanQrCode": "Scan QR code",
+  "multiplayerQuestionProgress": "{topic} | {current}/{total}",
+  "@multiplayerQuestionProgress": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      },
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "multiplayerTimerSeconds": "{seconds} s",
+  "@multiplayerTimerSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "multiplayerSubmitAnswer": "Submit Answer",
+  "multiplayerPlayerScore": "{name}: {score}",
+  "@multiplayerPlayerScore": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "multiplayerRoomTitle": "Room {roomId}",
+  "@multiplayerRoomTitle": {
+    "placeholders": {
+      "roomId": {
+        "type": "String"
+      }
+    }
+  },
+  "multiplayerWaitingForHost": "Waiting for host to start...",
+  "multiplayerLeaderboardTitle": "Leaderboard",
+  "multiplayerFinalScores": "Final Scores",
+  "multiplayerRankPrefix": "#",
+  "multiplayerShareResultsText": "AI Quiz results for {topic}\n{results}",
+  "@multiplayerShareResultsText": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      },
+      "results": {
+        "type": "String"
+      }
+    }
+  },
+  "multiplayerShareResults": "Share Results",
+  "historyClearTitle": "Clear history?",
+  "historyClearMessage": "This permanently deletes all quiz history.",
+  "historyClearAllTooltip": "Clear all",
+  "historySearchHint": "Search topics",
+  "historyEmpty": "No quizzes found",
+  "historyShowingCount": "Showing {loaded} of {total}",
+  "@historyShowingCount": {
+    "placeholders": {
+      "loaded": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "historySessionCount": "{count} sessions",
+  "@historySessionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historyAccuracyBadge": "{accuracy}%",
+  "@historyAccuracyBadge": {
+    "placeholders": {
+      "accuracy": {
+        "type": "String"
+      }
+    }
+  },
+  "historyItemSubtitle": "{difficulty} | {correct}/{total} | {date}",
+  "@historyItemSubtitle": {
+    "placeholders": {
+      "difficulty": {
+        "type": "String"
+      },
+      "correct": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "difficultyAll": "All",
+  "difficultyEasy": "Easy",
+  "difficultyMedium": "Medium",
+  "difficultyHard": "Hard",
+  "difficultyExpert": "Expert",
+  "quizNotFound": "Quiz not found",
+  "quizQuestionProgress": "Question {current}/{total}",
+  "@quizQuestionProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "quizOptionSemanticLabel": "Option {index}: {text}",
+  "@quizOptionSemanticLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "quizOpenAnswerLabel": "Your written answer",
+  "quizSubmit": "Submit",
+  "quizPrevious": "Previous",
+  "quizFinish": "Finish",
+  "quizSubmitFailed": "Could not submit quiz. Please try again.",
+  "quizModuleNotAdvanced": "Score at least 60% to unlock the next module.",
+  "quizNext": "Next",
+  "createQuizTopicRequired": "Enter a topic to generate a quiz.",
+  "createQuizNoProvider": "Add an AI provider in Settings first.",
+  "createQuizMissingApiKey": "API key missing for the default provider.",
+  "createQuizGenerateFailed": "Failed to generate quiz. Please try again.",
+  "createQuizTimeout": "Quiz generation timed out. Check your connection and try again.",
+  "generationCancel": "Cancel",
+  "generationCancelled": "Generation cancelled.",
+  "generationContinueBackground": "Continue in background",
+  "generationBuiltinQuizClamped": "Using Built-in AI without explanations for faster generation.",
+  "shellTapAgainToExit": "Tap again to exit",
+  "topicOffGoalTitle": "Topic doesn't match your goal",
+  "topicOffGoalBody": "Your current goal is {goal}. \"{topic}\" looks unrelated, so generation was blocked.",
+  "@topicOffGoalBody": {
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      },
+      "topic": {
+        "type": "String"
+      }
+    }
+  },
+  "topicBorderlineTitle": "Is this on-goal?",
+  "topicBorderlineBody": "Your goal is {goal}. \"{topic}\" may be only loosely related. Generate anyway?",
+  "@topicBorderlineBody": {
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      },
+      "topic": {
+        "type": "String"
+      }
+    }
+  },
+  "topicBorderlineConfirm": "Generate anyway",
+  "moduleSummarize": "Summarize module",
+  "moduleSummaryTitle": "Module notes",
+  "moduleSummaryLoading": "Writing structured notes...",
+  "moduleSummaryFailed": "Could not summarize this module. Try again.",
+  "moduleNotesNoTranscriptFooter": "Notes are based on the module summary and resources; video captions were unavailable.",
+  "moduleNotesFromTranscriptFooter": "Notes are based on the video captions (transcript).",
+  "moduleNotesRegenerate": "Regenerate",
+  "generationBuiltinPathClamped": "Using 4 modules for faster Built-in AI.",
+  "generationInProgressStrip": "Generating in the background...",
+  "generationOpenWhenReady": "Open",
+  "createQuizHostTitle": "Host Multiplayer Quiz",
+  "createQuizTitle": "Create Quiz",
+  "createQuizTopicLabel": "Topic",
+  "createQuizTopicHint": "e.g. a subtopic of your goals",
+  "createQuizTopicHintFromGoals": "e.g. {examples}",
+  "@createQuizTopicHintFromGoals": {
+    "placeholders": {
+      "examples": {
+        "type": "String"
+      }
+    }
+  },
+  "goalTopicsRequired": "Add at least one topic (comma-separated).",
+  "goalTooVague": "Tell us a specific subject (for example Python, UPSC History, or product design) — not just “learning”.",
+  "learnPastPathsTitle": "Completed paths",
+  "settingsDailyQuizFrequency": "Daily quizzes per day (max 3)",
+  "settingsAlarmSound": "Alarm sound",
+  "settingsAlarmSoundPreviewHint": "Tap play to preview a sound, then set it below.",
+  "settingsAlarmSoundPreviewPlay": "Preview sound",
+  "settingsAlarmSoundSet": "Set sound",
+  "interviewVoiceComingSoon": "Voice interview (Coming soon)",
+  "interviewVoiceStart": "Voice interview",
+  "interviewVoiceMicHint": "Tap the mic and speak your answer",
+  "interviewVoiceTapMic": "Record answer",
+  "interviewVoiceStop": "Stop",
+  "interviewVoiceRecording": "Recording… tap Stop when finished",
+  "interviewVoiceTranscribing": "Transcribing your answer…",
+  "interviewVoiceNoKey": "Voice interview is not available on this build.",
+  "interviewVoiceMicDenied": "Microphone permission is required for voice answers.",
+  "voiceInterviewApiKeyMenuTooltip": "Speech-to-text API key",
+  "voiceInterviewApiKeyTitle": "Your speech-to-text API key",
+  "voiceInterviewApiKeyDescription": "Uses the same Whisper Large v3 model and endpoint as Built-in — only the key changes. Leave blank to use the built-in key when available.",
+  "voiceInterviewApiKeyHint": "Paste your NVIDIA API key (nvapi-…)",
+  "voiceInterviewApiKeySave": "Save",
+  "voiceInterviewApiKeyClear": "Clear",
+  "voiceInterviewApiKeySaved": "API key saved.",
+  "voiceInterviewApiKeyCleared": "API key cleared — using built-in key.",
+  "interviewVoiceTranscribeFailed": "Could not transcribe your answer. Tap Record to try again.",
+  "interviewVoiceAnswerRequired": "Record your spoken answer before continuing.",
+  "voiceInterviewHubTitle": "Voice interview",
+  "voiceInterviewHubSubtitle": "Practice with a live mic, live captions, and AI rubric scoring. Pick your interviewer and speak your answers.",
+  "voiceInterviewFreeOnce": "Includes 1 free voice session per install",
+  "voiceInterviewUsedTitle": "Free voice session used",
+  "voiceInterviewUsedBody": "You have already used your complimentary voice interview on this device. Share feedback below or continue with text-based interview drills.",
+  "voiceInterviewPickInterviewer": "Choose your interviewer",
+  "voiceInterviewPersonaHr": "HR interviewer",
+  "voiceInterviewPersonaHrDesc": "Behavioral STAR questions, culture fit, and leadership scenarios.",
+  "voiceInterviewPersonaTech": "Technical interviewer",
+  "voiceInterviewPersonaTechDesc": "Open technical questions on systems, architecture, and problem-solving.",
+  "voiceInterviewBegin": "Begin voice interview",
+  "voiceInterviewLiveCaptions": "Live captions",
+  "voiceInterviewListening": "Listening… speak clearly, then tap Stop",
+  "voiceInterviewLiveCaptionsHint": "Your speech will appear here as captions after you stop recording.",
+  "voiceInterviewCaptionReady": "Caption ready — tap Next when you are finished.",
+  "voiceInterviewResultsHrTitle": "HR interview results",
+  "voiceInterviewResultsTechTitle": "Technical interview results",
+  "voiceInterviewResultsSubtitle": "Overall rubric score {accuracy}%. Review feedback per question below.",
+  "@voiceInterviewResultsSubtitle": {
+    "placeholders": {
+      "accuracy": {
+        "type": "int"
+      }
+    }
+  },
+  "voiceInterviewFeedbackTitle": "Help us improve voice interview",
+  "voiceInterviewWriteFeedback": "Write feedback",
+  "voiceInterviewReportIssue": "Report an issue",
+  "voiceInterviewFeedbackSubject": "Rivox — Voice interview feedback",
+  "voiceInterviewFeedbackBodyPrompt": "Tell us what worked or what we should improve in voice interview:",
+  "voiceInterviewReportSubject": "Rivox — Voice interview issue",
+  "voiceInterviewReportBodyPrompt": "Describe the issue you hit during voice interview:",
+  "goalSyllabusRequired": "Add at least one syllabus topic (comma-separated).",
+  "goalSkillsRequired": "Add at least one skill to build (comma-separated).",
+  "topicLanguageNotAllowed": "Please remove inappropriate language and try again.",
+  "goalRequiredTitle": "Set your learning goal",
+  "goalRequiredBody": "Add your topics, syllabus, or skills in Settings so quizzes stay on-goal.",
+  "goalRequiredOpenSettings": "Open goal settings",
+  "createQuizQuestionsCount": "Questions: {count}",
+  "@createQuizQuestionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "createQuizDifficulty": "Difficulty",
+  "createQuizQuestionType": "Question Type",
+  "questionTypeMcq": "MCQ",
+  "questionTypeTrueFalse": "True / False",
+  "questionTypeFillBlank": "Fill in Blank",
+  "questionTypeMixed": "Mixed",
+  "createQuizTimer": "Timer",
+  "createQuizTimerOn": "{total}s for the whole quiz ({seconds}s × {count} questions)",
+  "@createQuizTimerOn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "createQuizTimerOption": "{value}s per question",
+  "@createQuizTimerOption": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "createQuizRandomizeQuestions": "Randomize Questions",
+  "createQuizRandomizeOptions": "Randomize Options",
+  "createQuizGenerateExplanations": "Generate Explanations",
+  "createQuizLanguage": "Language",
+  "createQuizLivePreview": "Live Preview",
+  "createQuizPreviewEmpty": "Topic | {count} questions | {difficulty}",
+  "@createQuizPreviewEmpty": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "difficulty": {
+        "type": "String"
+      }
+    }
+  },
+  "createQuizPreviewFilled": "{topic} | {count} questions | {difficulty}",
+  "@createQuizPreviewFilled": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "difficulty": {
+        "type": "String"
+      }
+    }
+  },
+  "createQuizPreviewDetails": "{type} | {timer} | {language}",
+  "@createQuizPreviewDetails": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "timer": {
+        "type": "String"
+      },
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "createQuizNoTimer": "No timer",
+  "createQuizTimerPreview": "{seconds}s total for the whole quiz",
+  "@createQuizTimerPreview": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "pathGenerationTimeout": "Learning path generation timed out. Check your connection and try again.",
+  "generationJobInProgress": "Another generation is already in progress.",
+  "generationRunningInBackground": "Generation continues in the background. We'll notify you when it's ready.",
+  "createQuizGenerateButton": "Generate Quiz",
+  "resultsShareText": "I scored {correct}/{total} ({accuracy}%) on \"{topic}\" in Rivox!",
+  "@resultsShareText": {
+    "placeholders": {
+      "correct": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "accuracy": {
+        "type": "String"
+      },
+      "topic": {
+        "type": "String"
+      }
+    }
+  },
+  "resultsShareChallengeCta": "Try this quiz and beat me! Open the link below to start a Quick Quiz with the same topic.",
+  "resultsShareGetApp": "Get Rivox:",
+  "resultsNotFound": "Results not found",
+  "resultsTitle": "Results",
+  "resultsAccuracyDisplay": "{accuracy}%",
+  "@resultsAccuracyDisplay": {
+    "placeholders": {
+      "accuracy": {
+        "type": "String"
+      }
+    }
+  },
+  "resultsMeta": "{difficulty} | {count} questions",
+  "@resultsMeta": {
+    "placeholders": {
+      "difficulty": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "resultsCorrect": "Correct",
+  "resultsWrong": "Wrong",
+  "resultsTime": "Time",
+  "resultsTimeFormat": "{minutes}m {seconds}s",
+  "@resultsTimeFormat": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "resultsExplanations": "Explanations",
+  "resultsQuestionTitle": "Q{number}. {question}",
+  "@resultsQuestionTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "question": {
+        "type": "String"
+      }
+    }
+  },
+  "resultsYourAnswer": "Your answer: {answer}",
+  "@resultsYourAnswer": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "resultsNoAnswer": "Not answered",
+  "resultsCorrectAnswer": "Correct: {answer}",
+  "@resultsCorrectAnswer": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "resultsGenerateNewQuiz": "Generate New Quiz",
+  "resultsShareScore": "Share Score",
+  "settingsLearnerFallback": "Learner",
+  "settingsTapToRename": "Tap to rename",
+  "settingsAiProviders": "AI Providers",
+  "settingsNoProviders": "No providers configured",
+  "settingsProvidersSummary": "{count} saved | default: {name}",
+  "@settingsProvidersSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSupportTitle": "Support Rivox",
+  "settingsSupportSubtitle": "Watch an ad, donate, or send feedback",
+  "settingsThanksForSupport": "Thanks for supporting Rivox!",
+  "settingsLoadingAd": "Loading ad...",
+  "settingsWatchAdToSupport": "Watch ad to support",
+  "settingsHelpImproveTitle": "Help improve Rivox",
+  "settingsHelpImproveSubtitle": "Share anonymized learning signals only",
+  "settingsAppearance": "Appearance",
+  "settingsLanguage": "Language",
+  "settingsLanguageSubtitle": "App interface and AI content language",
+  "languageChangeConfirmTitle": "Change language?",
+  "languageChangeConfirmBody": "Switch the app interface to {language}?",
+  "@languageChangeConfirmBody": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "languageChangeConfirmAction": "Change",
+  "languageFontDownloadTitle": "Download fonts?",
+  "languageFontDownloadBody": "This language needs extra fonts so text displays clearly (a few MB). Download now?",
+  "languageFontDownloadAction": "Download",
+  "languageFontDownloadFailed": "Could not download fonts. Check your connection and try again.",
+  "languageFontDownloadSuccess": "Fonts ready for this language.",
+  "languageFontDownloadProgress": "Downloading fonts...",
+  "settingsReminderPermissionTitle": "Allow notifications",
+  "settingsReminderPermissionRationale": "Reminders need notification permission so we can alert you at the times you choose.",
+  "settingsReminderPermissionContinue": "Continue",
+  "settingsReminderPermissionOpenSettings": "Open settings",
+  "settingsReminderPermissionPermanentlyDenied": "Notifications are blocked. Enable them in system settings to use reminders.",
+  "settingsHelpImproveLearnMoreTitle": "About anonymized signals",
+  "settingsHelpImproveLearnMoreBody": "When enabled, Rivox may share anonymous usage signals (such as feature usage counts and crash-free metrics) to improve the app. This does not include your quizzes, API keys, personal library files, or identifiable account data.",
+  "settingsAiTokensTodayLabel": "{count} tokens today",
+  "@settingsAiTokensTodayLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "settingsExportData": "Export Data",
+  "settingsExportSubtitle": "Backup quizzes and stats (no API keys)",
+  "settingsImportData": "Import Data",
+  "settingsImportChallenge": "Import challenge",
+  "settingsImportChallengeSubtitle": "Play a friend's shared quiz questions",
+  "settingsImportChallengeReady": "Challenge loaded - good luck!",
+  "settingsImportChallengeFailed": "Could not import challenge: {error}",
+  "@settingsImportChallengeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsResetApplication": "Reset Application",
+  "settingsAbout": "About",
+  "settingsAboutVersion": "{appName} v{version}",
+  "@settingsAboutVersion": {
+    "placeholders": {
+      "appName": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsPrivacyPolicy": "Privacy Policy",
+  "settingsTerms": "Terms",
+  "settingsRenameTitle": "Rename",
+  "settingsNameLabel": "Name",
+  "settingsBackupShareText": "Rivox backup",
+  "settingsExportFailed": "Export failed: {error}",
+  "@settingsExportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsImportComplete": "Import complete. Re-add API keys in AI Providers.",
+  "settingsImportFailed": "Import failed: {error}",
+  "@settingsImportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsResetTitle": "Reset Application?",
+  "settingsResetMessage": "This deletes all local data and API keys. This cannot be undone.",
+  "providersTitle": "AI Providers",
+  "providersAddButton": "Add Provider",
+  "providersEmptyState": "Add your first AI provider.\nYour API key stays on this device.",
+  "providersDefaultBadge": "Default",
+  "providersSetDefault": "Set Default",
+  "providersAddTitle": "Add Provider",
+  "providersEditTitle": "Edit Provider",
+  "providersProviderLabel": "Provider",
+  "providersDisplayName": "Display name",
+  "providersApiKey": "API Key",
+  "providersApiKeyOptional": "API Key (leave blank to keep)",
+  "providersApiKeyRequired": "API key is required",
+  "providersBaseUrl": "Base URL",
+  "providersBaseUrlHint": "Optional override",
+  "providersBaseUrlRequired": "Base URL required for custom providers",
+  "providersDefaultModel": "Default model",
+  "providersSaveButton": "Save Provider",
+  "providersSavedSnackbar": "Provider saved on this device",
+  "providersSaveFailed": "Could not save provider: {error}",
+  "providersTestConnection": "Test connection",
+  "providersConnectionOk": "Connection successful",
+  "providersTesting": "Testing connection...",
+  "providersTestGreetingTitle": "AI connection test",
+  "providersTestGreetingSent": "You sent: Hi",
+  "providersTestGreetingReply": "AI replied:",
+  "@providersSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "supportAdNotReady": "Ad not ready yet. Try again in a moment.",
+  "supportThanksReward": "Thanks for your support! (+{amount} {type})",
+  "@supportThanksReward": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "supportTitle": "Support",
+  "supportHeadline": "Help keep Rivox free",
+  "supportSubheadline": "No forced ads. Support only if you want to.",
+  "supportWatchVideoTitle": "Watch Sponsored Video",
+  "supportLoadingAd": "Loading ad...",
+  "supportAdReady": "Video ad ready - tap to watch",
+  "supportAdUnavailable": "Ad loading... tap again shortly",
+  "supportDonateTitle": "Donate",
+  "supportDonateSubtitle": "Buy me a coffee",
+  "supportRateTitle": "Rate App",
+  "supportRateSubtitle": "Share your feedback on the Play Store",
+  "supportPlayStoreUnavailable": "Play Store listing will be available after release.",
+  "supportShareTitle": "Share App",
+  "supportShareSubtitle": "Tell a friend",
+  "supportShareText": "Check out Rivox - adaptive learning with your own AI keys!",
+  "supportReportBugTitle": "Report Bug",
+  "supportReportBugSubtitle": "Help us improve",
+  "supportBugEmailSubject": "Rivox Bug Report",
+  "supportBugEmailBody": "Describe the bug:\n\n",
+  "supportFeatureRequestTitle": "Request Feature",
+  "supportFeatureRequestSubtitle": "We read every idea",
+  "supportFeatureEmailSubject": "Rivox Feature Request",
+  "supportFeatureEmailBody": "Feature idea:\n\n",
+  "supportFaqTitle": "FAQ",
+  "supportFaqApiKeyQuestion": "Where is my API key stored?",
+  "supportFaqApiKeyAnswer": "Only on your device using encrypted secure storage. Keys are never uploaded.",
+  "supportFaqAccountQuestion": "Do I need an account?",
+  "supportFaqAccountAnswer": "No. Quizzes and learning paths work on this device. Add an AI provider when you want personalized generation.",
+  "supportFaqAdsQuestion": "Are there forced ads?",
+  "supportFaqAdsAnswer": "No forced full-screen ads. A small banner may appear on quiz results. You can optionally watch an ad from Settings or Support.",
+  "supportFaqProvidersQuestion": "Which AI providers work?",
+  "supportFaqProvidersAnswer": "OpenAI, Gemini, Claude, Grok, DeepSeek, OpenRouter, and any OpenAI-compatible endpoint.",
+  "apiLimitBarrierLabel": "API limit",
+  "apiLimitTitle": "API limit reached",
+  "apiLimitTryAgainIn": "Try again in {duration}",
+  "@apiLimitTryAgainIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "apiLimitTryAgainNow": "You can try again now",
+  "durationMinutesSeconds": "{minutes}m {seconds}s",
+  "@durationMinutesSeconds": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "durationSecondsOnly": "{seconds}s",
+  "@durationSecondsOnly": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "apiLimitAddProvider": "Add another provider",
+  "apiLimitUseFallback": "Use fallback provider",
+  "generationQuizConnecting": "Connecting to your AI tutor...",
+  "generationQuizReadingPattern": "Reading your learning pattern...",
+  "generationQuizCrafting": "Crafting questions just for you...",
+  "generationQuizPolishing": "Polishing explanations...",
+  "generationQuizChecking": "Double-checking facts...",
+  "generationQuizAlmostReady": "Almost ready - hang tight!",
+  "generationPathMapping": "Mapping your learning journey...",
+  "generationPathScanningDocs": "Scanning official documentation...",
+  "generationPathCurating": "Curating trusted resources...",
+  "generationPathFindingVideos": "Finding the best video lessons...",
+  "generationPathSequencing": "Sequencing modules for you...",
+  "generationPathBuilding": "Building your personalized path...",
+  "routerPageNotFound": "Page not found: {uri}",
+  "@routerPageNotFound": {
+    "placeholders": {
+      "uri": {
+        "type": "String"
+      }
+    }
+  },
+  "quizKindQuick": "Quick Quiz",
+  "quizKindModule": "Module Quiz",
+  "quizKindMultiplayer": "Multiplayer",
+  "quizKindMock": "Mock exam",
+  "quizKindInterview": "Interview drill",
+  "quizKindDaily": "Quiz of the day",
+  "historyFilterAll": "All",
+  "historyEmptyFiltered": "No {kind} quizzes yet",
+  "@historyEmptyFiltered": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "historyEmptyCta": "Start a quiz",
+  "createQuizQuickSubtitle": "Ad-hoc practice on any topic - not tied to your learning path.",
+  "pathModuleQuiz": "Module quiz",
+  "pathModuleLocked": "Complete the previous module first",
+  "resultsNewQuickQuiz": "New Quick Quiz",
+  "resultsNextModule": "Next module",
+  "resultsRetryModuleQuiz": "Retry module quiz",
+  "resultsReviewPath": "Review path",
+  "resultsBackToModuleStudy": "Back to module study",
+  "learnYourPathSection": "Your path",
+  "learnQuickPracticeSection": "Quick practice",
+  "resourceOpenInBrowser": "Open in browser",
+  "resourceBlocked": "This resource cannot be opened in the app.",
+  "dashboardProviderUsageDetailed": "{count} calls | {tokens} tokens | last {latency}ms",
+  "@dashboardProviderUsageDetailed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "tokens": {
+        "type": "int"
+      },
+      "latency": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardChartsTitle": "Learning insights",
+  "dashboardTopicBreakdown": "Topics",
+  "dashboardDifficultyMix": "Difficulty mix",
+  "dashboardDailyStudyGoal": "Today's study goal",
+  "dashboardDailyStudyProgress": "Today: {today} / {goal} min",
+  "@dashboardDailyStudyProgress": {
+    "placeholders": {
+      "today": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardNoChartData": "Complete a quiz to see charts",
+  "settingsResetChoose": "Choose what to reset. Both options cannot be undone.",
+  "settingsResetLearningOnly": "Clear learning data",
+  "settingsResetFull": "Full reset",
+  "settingsResetting": "Resetting your data...",
+  "settingsDailyGoalTitle": "Daily study goal",
+  "settingsDailyGoalMinutes": "Goal: {minutes} minutes per day",
+  "@settingsDailyGoalMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsDailyReminder": "Daily reminder",
+  "settingsDailyReminderTime": "Reminder at {hour}:{minute}",
+  "@settingsDailyReminderTime": {
+    "placeholders": {
+      "hour": {
+        "type": "int"
+      },
+      "minute": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsChangeReminderTime": "Change reminder time",
+  "settingsSmartReminderTitle": "Study reminders",
+  "settingsReminderActiveDays": "Active days",
+  "settingsReminderDefaultTime": "Default time: {time}",
+  "@settingsReminderDefaultTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsReminderSuggest": "Suggest best times",
+  "settingsReminderSuggestHint": "Based on when you usually study",
+  "settingsReminderSuggestNone": "Not enough session history yet",
+  "settingsReminderPerDayHint": "Long-press a day to set a custom time",
+  "settingsReminderNoActiveDays": "Select at least one day",
+  "settingsReminderDayMon": "Mon",
+  "settingsReminderDayTue": "Tue",
+  "settingsReminderDayWed": "Wed",
+  "settingsReminderDayThu": "Thu",
+  "settingsReminderDayFri": "Fri",
+  "settingsReminderDaySat": "Sat",
+  "settingsReminderDaySun": "Sun",
+  "settingsReminderSheetSubtitle": "Pick days and times for study reminders. Enable alarm mode for exact-time notifications.",
+  "settingsReminderEnabled": "Daily study reminders",
+  "settingsReminderEnabledSubtitle": "Get nudges on your chosen days",
+  "settingsReminderAlarmMode": "Alarm mode",
+  "settingsReminderAlarmModeSubtitle": "Exact-time notification with sound and snooze",
+  "settingsReminderAlarmExactDenied": "Exact alarms are blocked. Reminders will still fire, but timing may be approximate.",
+  "settingsReminderNotifTitleAlarm": "Study alarm",
+  "settingsReminderNotifTitleDaily": "Time to learn",
+  "settingsReminderNotifBodyWeak": "Focus on: {topics}",
+  "@settingsReminderNotifBodyWeak": {
+    "placeholders": {
+      "topics": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsReminderNotifBodyDefault": "A short study session keeps your streak alive.",
+  "settingsReminderNotifActionSnooze": "Snooze 10 min",
+  "dashboardTopicOther": "Other",
+  "settingsSetReminderButton": "Set reminder",
+  "settingsReminderSummaryOn": "{days} days | {time}",
+  "@settingsReminderSummaryOn": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsReminderSummaryOff": "Reminders off",
+  "settingsReminderPermissionDenied": "Notification permission is required for reminders.",
+  "dashboardMoreInsights": "More insights",
+  "dashboardMoreInsightsProviderHint": "Open Settings for detailed AI provider usage.",
+  "dashboardSeeAll": "See all",
+  "dashboardRecommendationsTitle": "Recommended for you",
+  "dashboardNoRecommendations": "No recommendations right now. Complete a quiz to get personalised suggestions.",
+  "dashboardFilterAll": "All",
+  "dashboardFilterPractice": "Practice",
+  "dashboardFilterRemedial": "Remedial",
+  "dashboardFilterNudge": "Nudge",
+  "dashboardFilterBreak": "Break",
+  "dashboardFilterMock": "Mock exam",
+  "dashboardFilterInterview": "Interview",
+  "dashboardFilterPath": "Path",
+  "dashboardFilterLayout": "Layout",
+  "goalSwitchTitle": "Switch goal",
+  "goalAddTitle": "Add goal",
+  "goalAddContextLabel": "Goal name or context",
+  "goalAddSaved": "Goal saved",
+  "goalSecondaryCount": "{count} additional goals saved",
+  "@goalSecondaryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingHabitsTitle": "Build your habit",
+  "onboardingHabitsSubtitle": "Set a daily target and optional study reminders.",
+  "onboardingStepProgress": "Step {current} of {total}",
+  "@onboardingStepProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsReminderTimeOverrideSet": "Custom time set",
+  "settingsReminderTimeOverrideClear": "Reset to default",
+  "welcomeContinueButton": "Continue",
+  "onboardingConnectAiTitle": "How should AI run?",
+  "onboardingConnectAiSubtitle": "Use Built-in AI by default, or add your own cloud provider with an API key. You can change this anytime in Settings.",
+  "onboardingLegalTitle": "Almost done",
+  "onboardingLegalSubtitle": "Please confirm you agree to the Terms and Privacy Policy. Built-in AI is ready when you continue.",
+  "onboardingConnectAiContinue": "Save & continue",
+  "onboardingSkipProvider": "Skip for now",
+  "onboardingEngineLocalTitle": "Use on-device LLM",
+  "onboardingEngineLocalSubtitle": "Runs locally on this phone. May download a model. Needs about 6 GB RAM. Works offline once ready.",
+  "onboardingEngineCloudTitle": "Add a cloud provider",
+  "onboardingEngineCloudSubtitle": "Use OpenAI, Claude, Gemini, or another API with your own key. Key stays on this device.",
+  "onboardingEngineLocalContinue": "Continue with on-device LLM",
+  "onboardingEngineBackToChoice": "Back to choices",
+  "onboardingEngineLocalDownloading": "Preparing on-device model...",
+  "onboardingEngineLocalRamError": "This device does not have enough RAM for the on-device LLM (needs about 6 GB). Please add a cloud provider instead.",
+  "onboardingEngineLocalComingSoonSubtitle": "Coming soon - use a cloud provider for now.",
+  "localLlmComingSoonSnackbar": "On-device LLM is coming soon. Use a cloud provider for now.",
+  "providersEngineSectionTitle": "AI engine",
+  "providersEngineLocal": "On-device LLM",
+  "providersEngineLocalComingSoon": "Coming soon",
+  "providersEngineCloud": "Cloud provider",
+  "providersEngineHint": "The app asks which path to use - it will not switch just because an API key exists.",
+  "providersBuiltinEngineHint": "Built-in AI is used by default. You can optionally add your own cloud provider for faster models.",
+  "providersBuiltinName": "Built-in AI",
+  "providersBuiltinSubtitle": "Default AI for this app",
+  "providersBuiltinQuotaRemaining": "{count} Built-in AI generations left today",
+  "@providersBuiltinQuotaRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "providersAddOwnButton": "Add your provider",
+  "builtinQuotaTitle": "Daily AI limit reached",
+  "builtinQuotaBody": "You've used today's Built-in AI generations. Watch a rewarded ad for +2 more, or add your own provider in Settings.",
+  "builtinQuotaWatchAd": "Watch ad for more",
+  "builtinQuotaUseOwnProvider": "Use your own provider",
+  "builtinQuotaAdFailed": "Ad could not be shown. Try again in a moment.",
+  "builtinQuotaAdNotConfigured": "Rewarded ads are not configured for this build. Add a provider key, or rebuild with PROD_REWARDED_AD_UNIT_ID.",
+  "builtinQuotaAdTimeout": "Ad took too long to load. Check your connection and try again.",
+  "builtinQuotaAdDismissed": "Watch the full ad to unlock bonus generations.",
+  "builtinQuotaAdsExhausted": "No more ad unlocks left today. Try again tomorrow or add your own provider.",
+  "onboardingConnectAiSubtitleComingSoon": "Add a cloud provider with your own key, or skip for now and use Built-in AI.",
+  "providersLocalStatusReady": "On-device model ready",
+  "providersLocalStatusMissing": "Model not downloaded",
+  "providersLocalDownload": "Download model",
+  "providersLocalDownloading": "Downloading...",
+  "providersLocalDelete": "Delete model",
+  "providersLocalDeleteConfirmTitle": "Delete on-device model?",
+  "providersLocalDeleteConfirmBody": "This removes downloaded weights from this device. You can download them again later.",
+  "providersLocalDeleted": "On-device model deleted",
+  "providersLocalPathLabel": "Stored at",
+  "providersLocalRuntimeMissing": "Model files incomplete or present, but native MLC runtime is not packaged in this build. Use cloud, or install an MLC-enabled APK.",
+  "providersLocalIncompleteWeights": "Download finished but weights are incomplete (need a full MLC zip with mlc-chat-config.json). See docs/MLC_ANDROID_SETUP.md.",
+  "providersLocalStatusOnline": "Online - on-device ready",
+  "providersLocalStatusOffline": "Offline - on-device not ready",
+  "providersLocalStatusLowRam": "Device RAM below 6 GB for on-device LLM",
+  "multiplayerUnavailableTitle": "Multiplayer unavailable",
+  "multiplayerUnavailableMessage": "Live multiplayer requires Firebase to be configured for this build.",
+  "multiplayerUnavailableHint": "Solo quizzes and learning paths still work with your own API keys.",
+  "dashboardQuizOfTheDay": "Quiz of the day",
+  "dashboardTryDemoQuiz": "Try demo quiz",
+  "dashboardQuizOfTheDayStart": "Tap to play",
+  "dashboardQuizOfTheDayCompleted": "You completed today's quiz!",
+  "dashboardQuizOfTheDayEmpty": "Generate a short daily challenge from your topics.",
+  "dashboardQuizOfTheDayGenerate": "Generate today's quiz",
+  "dashboardQuizOfTheDayGenerating": "Generating today's quiz...",
+  "dashboardQuizOfTheDayWaiting": "Your daily quiz will appear when AI is ready.",
+  "dashboardDailyQuizSlot": "Daily quiz {current} of {total}",
+  "@dashboardDailyQuizSlot": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardDailyQuizGenerateSlot": "Generate daily quiz {current} of {total}",
+  "@dashboardDailyQuizGenerateSlot": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardDailyQuizCompletedSlot": "You completed {completed} of {total} daily quizzes",
+  "@dashboardDailyQuizCompletedSlot": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsHelpImproveUnavailable": "Requires Firebase analytics configuration",
+  "settingsGoalModeTitle": "Your goal",
+  "settingsGoalModeSubtitle": "Shapes your recommendations, UI, and reminders",
+  "goalModeLearning": "Learn something new",
+  "goalModeExamPrep": "Crack an exam",
+  "goalModeCareer": "Prepare for a new role",
+  "goalExamDate": "Exam date",
+  "goalExamDateNone": "Set exam date",
+  "goalRoleLabel": "Target role",
+  "goalRolePlaceholder": "e.g. Flutter Developer, AWS Architect",
+  "goalExamNameLabel": "Exam name",
+  "goalExamNamePlaceholder": "e.g. AWS SAA, JEE Main, NEET",
+  "goalExamNameRequired": "Add your exam name to continue",
+  "goalExamDateRequired": "Set your exam date to continue",
+  "goalRoleRequired": "Add your target role to continue",
+  "goalModeSkipConfirmTitle": "Set this later?",
+  "goalModeSkipConfirmBody": "You can add exam or role details anytime in Settings. Continue without them?",
+  "goalModeSkipConfirmContinue": "Continue anyway",
+  "goalExamTypeLabel": "Exam type",
+  "goalExamTypeCert": "Certification",
+  "goalExamTypeCompetitive": "Competitive",
+  "goalExamTypeAcademic": "Academic",
+  "goalExamTypeOther": "Other",
+  "goalRoleSeniorityLabel": "Experience level",
+  "goalRoleSeniorityJunior": "Junior",
+  "goalRoleSeniorityMid": "Mid",
+  "goalRoleSenioritySenior": "Senior",
+  "onboardingGoalTitle": "What brings you here?",
+  "onboardingGoalSubtitle": "We'll shape your experience around your goal.",
+  "onboardingExamPlanTitle": "Set up your exam plan",
+  "onboardingExamPlanSubtitle": "Tell us what you're preparing for so we can pace your study.",
+  "onboardingCareerPlanTitle": "Map your target role",
+  "onboardingCareerPlanSubtitle": "We'll focus practice on the skills this role needs.",
+  "onboardingSyllabusLabel": "Syllabus topics",
+  "onboardingSyllabusHint": "Subjects or units - e.g. Algorithms, OS, Networks",
+  "onboardingSkillsLabel": "Skills to build",
+  "onboardingSkillsHint": "Skills and gaps - e.g. System design, SQL, Communication",
+  "onboardingDailyMinutesExam": "Study budget: {minutes} min / day",
+  "@onboardingDailyMinutesExam": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingDailyMinutesCareer": "Prep time: {minutes} min / day",
+  "@onboardingDailyMinutesCareer": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "goalModeSaved": "Goal updated",
+  "goalModeSaveButton": "Save goal",
+  "examStartMock": "Timed mock exam",
+  "examMockComingSoonTitle": "Mock exams coming next",
+  "examMockComingSoonBody": "Full timed mocks with pass marks land in the next update. Run a practice quiz for now, scored against your syllabus topics.",
+  "examMockConfigTitle": "Configure mock exam",
+  "examMockDurationLabel": "Exam duration",
+  "examMockDurationMinutes": "{minutes} min",
+  "@examMockDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "examMockPassMarkLabel": "Pass mark",
+  "examMockPassMarkValue": "{pct}%",
+  "@examMockPassMarkValue": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "examMockUnitsLabel": "Syllabus units",
+  "examMockUnitsHint": "Select at least one unit to include",
+  "examMockUnitsRequired": "Select at least one syllabus unit",
+  "examMockQuestionCount": "Questions",
+  "examMockDifficulty": "Difficulty",
+  "examMockGenerate": "Start timed mock",
+  "examMockGenerating": "Building your mock paper...",
+  "examMockNoUnits": "Add syllabus topics in Settings or onboarding first.",
+  "examMockNoProvider": "Add an AI provider in Settings to generate a mock.",
+  "examMockGlobalTimeLeft": "{minutes}:{seconds}",
+  "@examMockGlobalTimeLeft": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "examMockTimeUp": "Time’s up - submitting your mock",
+  "examMockPassed": "Passed - {pct}% (need {pass}%)",
+  "@examMockPassed": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      },
+      "pass": {
+        "type": "int"
+      }
+    }
+  },
+  "examMockFailed": "Below pass mark - {pct}% (need {pass}%)",
+  "@examMockFailed": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      },
+      "pass": {
+        "type": "int"
+      }
+    }
+  },
+  "examMockTrendTitle": "Recent mock scores",
+  "examMockAttemptLabel": "Attempt {n}",
+  "@examMockAttemptLabel": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "examMockRetake": "Retake mock",
+  "examWeeklyFocusTitle": "This week’s focus",
+  "recMockTitle": "Sit a timed mock",
+  "recMockReason": "Exam mode - full-length practice builds stamina and surfaces syllabus gaps.",
+  "careerMatrixTitle": "Skill matrix",
+  "careerSkillsSection": "Skills for this role",
+  "careerMatrixEmpty": "Add skills during onboarding or in Settings so we can track readiness.",
+  "careerGapLabel": "Gap: {skill}",
+  "@careerGapLabel": {
+    "placeholders": {
+      "skill": {
+        "type": "String"
+      }
+    }
+  },
+  "careerSkillOnTrack": "On track for your target",
+  "careerReadinessPct": "{pct}% role ready",
+  "@careerReadinessPct": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "careerOpenMatrix": "Open skill matrix",
+  "careerAddSkill": "Add skill",
+  "careerEditSkill": "Edit skill",
+  "careerSkillTitleLabel": "Skill name",
+  "careerEvidenceTopicLabel": "Practice topic",
+  "careerEvidenceTopicHint": "Topic used for quizzes (defaults to skill name)",
+  "careerCategoryLabel": "Category",
+  "careerTargetLevelLabel": "Target level: {pct}%",
+  "@careerTargetLevelLabel": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "careerCurrentLevelLabel": "Current level: {pct}%",
+  "@careerCurrentLevelLabel": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "careerPracticeGap": "Practice this gap",
+  "careerStartDrill": "Interview drill",
+  "careerDrillTitle": "Interview drill",
+  "careerDrillSubtitle": "Mixed MCQ + open answers scored with an AI rubric - practice for your target role.",
+  "careerDrillThemeLabel": "Drill theme",
+  "careerDrillThemeHint": "e.g. System design, Behavioral leadership",
+  "careerDrillThemeRequired": "Choose or enter a drill theme",
+  "careerDrillGenerate": "Start interview drill",
+  "careerDrillRetake": "New interview drill",
+  "careerShortAnswerHint": "Type your interview answer...",
+  "careerAiScoreLabel": "AI rubric score: {pct}%",
+  "@careerAiScoreLabel": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardExamDaysLeft": "{days} days to exam",
+  "@dashboardExamDaysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardExamSyllabusCoverage": "{pct}% syllabus covered",
+  "@dashboardExamSyllabusCoverage": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardExamRunPractice": "Run practice test",
+  "dashboardCareerReadiness": "Role readiness",
+  "dashboardCareerRole": "Target: {role}",
+  "@dashboardCareerRole": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardSkillGapCta": "Find skill gaps",
+  "dashboardUrgencyExam": "Exam in {days} days - stay focused!",
+  "@dashboardUrgencyExam": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "goalAgentSeededSnackbar": "Your AI tutor has personalised your plan",
+  "goalAgentSeeding": "Setting up your personalised plan...",
+  "settingsSectionYourGoals": "Your goals",
+  "settingsSectionStudyHabits": "Study habits",
+  "settingsSectionAiLibrary": "AI & library",
+  "settingsSectionApp": "App",
+  "settingsSectionDataPrivacy": "Data & privacy",
+  "settingsSectionAbout": "About",
+  "settingsLayoutBeginner": "Simple",
+  "settingsLayoutIntermediate": "Balanced",
+  "settingsLayoutAdvanced": "Full",
+  "createQuizTryDemo": "Try demo quiz (no API key)",
+  "aiStatusChecking": "Checking...",
+  "aiStatusConnecting": "Connecting...",
+  "aiStatusOnline": "AI Online",
+  "aiStatusOffline": "AI Offline",
+  "aiStudyPulseTitle": "Today's AI brief",
+  "aiStudyPulseLoading": "Checking your AI connection...",
+  "aiStudyPulseTapRetry": "Tap to refresh",
+  "aiStatusCheckedAt": "Checked: {time}",
+  "@aiStatusCheckedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "aiStatusNoProvider": "No provider configured",
+  "aiStatusApiKeyMissing": "API key missing",
+  "aiStatusReachable": "Reachable",
+  "examPlanTitle": "Study plan",
+  "examPlanSubtitle": "Daily focus until your exam",
+  "examPlanEmpty": "Set an exam date in Settings to generate your plan.",
+  "examPlanOpen": "Study plan",
+  "examPlanWeekRange": "{start} - {end}",
+  "@examPlanWeekRange": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "examPlanToday": "Today | {day}",
+  "@examPlanToday": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "examPlanRestDay": "No scheduled block - light review or rest.",
+  "examPlanDayMinutes": "{done} / {planned} min",
+  "@examPlanDayMinutes": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "planned": {
+        "type": "int"
+      }
+    }
+  },
+  "examPlanKindMock": "Timed mock exam",
+  "examPlanKindReview": "Review",
+  "examPlanKindReviewUnit": "Review: {unit}",
+  "@examPlanKindReviewUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "examPlanKindStudyUnit": "Study: {unit}",
+  "@examPlanKindStudyUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderExamEnabled": "Exam countdown reminders",
+  "reminderExamEnabledHint": "Notify at 30, 14, 7, and 1 day before your exam",
+  "reminderExamInDays": "{days} days until {exam}",
+  "@reminderExamInDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "exam": {
+        "type": "String"
+      }
+    }
+  },
+  "providerGuideTitle": "Get an API key for {provider}",
+  "@providerGuideTitle": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "providerGuideGetKey": "Get API key",
+  "providerGuideAlreadyHaveKey": "I already have a key",
+  "providerGuideHowTo": "How to get a key",
+  "providerGuideOpenAiSummary": "Create an API key on the OpenAI platform. Your key stays on this device and is sent only to OpenAI when you generate content.",
+  "providerGuideGeminiSummary": "Create an API key in Google AI Studio. Your key stays on this device and is sent only to Google when you generate content.",
+  "providerGuideClaudeSummary": "Create an API key in the Anthropic Console. Your key stays on this device and is sent only to Anthropic when you generate content.",
+  "providerGuideGrokSummary": "Create an API key on the xAI console. Your key stays on this device and is sent only to xAI when you generate content.",
+  "providerGuideDeepSeekSummary": "Create an API key on the DeepSeek platform. Your key stays on this device and is sent only to DeepSeek when you generate content.",
+  "providerGuideOpenRouterSummary": "Create an API key on OpenRouter to access multiple models through one key.",
+  "providerGuideCustomSummary": "Use an API key from your OpenAI-compatible endpoint provider.",
+  "providerGuideStepSignUp": "Sign up or log in to the provider's website.",
+  "providerGuideStepBilling": "Add billing or credits if the provider requires it.",
+  "providerGuideStepGoogleAccount": "Sign in with your Google account.",
+  "providerGuideStepCreateKey": "Create a new API key and copy it.",
+  "providerGuideStepPaste": "Paste the key in Rivox - we never upload it to our servers.",
+  "providerGuideStepCustomEndpoint": "Obtain an API key from your endpoint provider's dashboard.",
+  "externalLinkTitle": "Opening your browser",
+  "externalLinkBody": "You'll visit {provider}'s website to create an API key. Rivox does not collect your key until you paste it here.",
+  "@externalLinkBody": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "externalLinkContinue": "Continue",
+  "externalLinkFailed": "Could not open the link.",
+  "legalPrivacyTitle": "Privacy Policy",
+  "legalTermsTitle": "Terms of Use",
+  "legalLastUpdated": "Last updated: {date}",
+  "@legalLastUpdated": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "legalAgreeCheckbox": "I agree to the Terms of Use and Privacy Policy",
+  "legalViewTerms": "Terms",
+  "legalViewPrivacy": "Privacy",
+  "settingsHelpGuidance": "Help & guidance",
+  "settingsReplayTour": "Replay app tour",
+  "settingsWhatsNew": "What's new",
+  "settingsOpenSourceLicenses": "Open-source licenses",
+  "tourHomeTitle": "Your adaptive home",
+  "tourHomeBody": "Home adapts to your goal - daily quizzes, learning pulse, and recommendations.",
+  "tourLearnTitle": "Structured learning",
+  "tourLearnBody": "Follow AI-built paths with videos, docs, and module quizzes.",
+  "tourPlayTitle": "Play with friends",
+  "tourPlayBody": "Join multiplayer quizzes when available.",
+  "tourHistoryTitle": "Track progress",
+  "tourHistoryBody": "Review past quizzes and see how you improve.",
+  "tourSettingsTitle": "Settings & help",
+  "tourSettingsBody": "Manage goals, providers, reminders, and replay this tour anytime.",
+  "dynamicAppTitle": "Your app adapts to you",
+  "dynamicAppBody": "Rivox rearranges your home, suggestions, and study focus based on your goal - learning, exam prep, or career growth.",
+  "dynamicAppLearning": "Learning mode prioritises daily quizzes and new topics.",
+  "dynamicAppExam": "Exam mode surfaces countdown, syllabus coverage, and mocks.",
+  "dynamicAppCareer": "Career mode highlights skill gaps and interview practice.",
+  "dynamicAppSeeHow": "See how it works",
+  "whatsNewTitle": "What's new",
+  "whatsNewDashboard": "Refreshed dashboard with personalised cards and recommendations.",
+  "whatsNewGuidance": "In-app help for API keys, legal docs, and a guided tour.",
+  "helpCenterTitle": "Help center",
+  "helpCenterProviders": "Setting up AI providers",
+  "helpCenterPaths": "Learning paths",
+  "helpCenterGoals": "Goals and personalization",
+  "pathDepthTitle": "Choose path depth",
+  "pathDepthLight": "Light",
+  "pathDepthStandard": "Standard",
+  "pathDepthDeep": "Deep",
+  "pathDepthLessons": "{count} lessons",
+  "@pathDepthLessons": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "goalModeShortLearning": "Learning",
+  "goalModeShortExam": "Exam",
+  "goalModeShortCareer": "Career",
+  "learnAdaptiveBanner": "Your Learn tab complements your {goal} goal on Home.",
+  "@learnAdaptiveBanner": {
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "gettingStartedTitle": "Getting started",
+  "gettingStartedProvider": "Connect an AI provider",
+  "gettingStartedQuiz": "Complete your first quiz",
+  "gettingStartedPath": "Start a learning path",
+  "libraryTitle": "My library",
+  "librarySubtitle": "Upload study materials to ground quizzes and paths in your own content.",
+  "libraryRightsConsent": "I confirm I have the right to use this material for personal study.",
+  "libraryConsentRequired": "Please confirm you have rights to use uploaded material.",
+  "libraryUploadResume": "Upload resume",
+  "resumeUploadConsentTitle": "Upload resume for AI processing?",
+  "resumeUploadConsentBody": "Your resume will be uploaded and processed by AI to personalize career learning. It may contain personal information such as your name, contact details, and work history.",
+  "resumeUploadConsentAccept": "I agree, upload",
+  "resumeUploadConsentDecline": "Cancel",
+  "libraryUploadJd": "Upload job description",
+  "libraryUploadNotes": "Upload notes",
+  "libraryUploadBook": "Upload book or chapter",
+  "libraryAddWebsite": "Add website",
+  "libraryWebsiteUrl": "HTTPS URL",
+  "librarySourceTitle": "Title",
+  "libraryYourSources": "Your sources",
+  "libraryEmpty": "No sources yet. Upload files or add a website to get started.",
+  "libraryReindex": "Re-index",
+  "libraryEnable": "Enable",
+  "libraryDisable": "Disable",
+  "libraryIndexed": "Indexed {title}",
+  "@libraryIndexed": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryUserSiteBadge": "Your site",
+  "libraryOpenHub": "My library",
+  "libraryImportMaterial": "Import study material",
+  "libraryUploadCareerDocs": "Upload resume & job description",
+  "settingsAiLibrary": "AI & library",
+  "settingsAiTokensToday": "Tokens used today",
+  "settingsAiEconomyMode": "Economy mode",
+  "settingsAiEconomyHint": "Prefer shorter prompts and fewer modules",
+  "settingsAiSendChunks": "Send library excerpts to AI provider",
+  "settingsAiGenerationMode": "Default generation mode",
+  "settingsAiModeBlended": "Blended",
+  "settingsAiModeGrounded": "Grounded",
+  "settingsAiModeExploratory": "Exploratory",
+  "commonAdd": "Add",
+  "resultsGroundedInLibrary": "Grounded in your library",
+  "resultsSourceCitation": "From: {label}",
+  "@resultsSourceCitation": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "supportRequestSponsoredTitle": "Request sponsored ads",
+  "supportRequestSponsoredSubtitle": "Email us if you want to advertise with Rivox",
+  "supportRequestSponsoredEmailSubject": "Sponsored ads request - Rivox",
+  "supportRequestSponsoredEmailBody": "Hi, I would like to discuss sponsored ads / partnerships for Rivox.\n\nCompany:\nWebsite:\nMessage:\n",
+  "settingsReminderPlaySound": "Play sound",
+  "settingsReminderVibrate": "Vibrate",
+  "historySegmentQuizzes": "Quizzes",
+  "historySegmentNotifications": "Daily study",
+  "historyNotificationsEmpty": "No daily study picks yet. Validated articles and videos will appear here.",
+  "dailyContentReadyTitle": "Today's learning pick",
+  "dailyContentReadyBody": "A free article and video for your goals are ready.",
+  "dailyContentDetailTitle": "Today's learning pick",
+  "dailyContentCardSubtitle": "Open today's validated article and video",
+  "dailyContentTypeArticle": "Article",
+  "dailyContentTypeVideo": "Video",
+  "dailyContentOpenArticle": "Read in app",
+  "dailyContentOpenExternally": "Open externally",
+  "dailyContentEmpty": "No learning pick yet. Generate one when AI is online.",
+  "dailyContentGenerating": "Finding free article and video...",
+  "dailyContentGenerate": "Generate today's pick",
+  "dailyContentVideoSubtitle": "Watch a relevant video for {topic}",
+  "@dailyContentVideoSubtitle": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      }
+    }
+  },
+  "dailyContentVideoSubtitleForGoal": "Watch a relevant video for your goal",
+  "resultsAnswerReferences": "References",
+  "libraryErrorInvalidUrl": "Enter a valid URL (include https://).",
+  "libraryErrorHttpsOnly": "Only https links are supported.",
+  "libraryErrorEmptyPage": "That page has no readable text.",
+  "libraryErrorNotEnoughText": "Not enough text to index this source.",
+  "libraryErrorNoContent": "No content found to index.",
+  "libraryErrorInvalidUpload": "Could not read that file. Try PDF or plain text.",
+  "libraryErrorNotResume": "This file does not look like a resume.",
+  "libraryErrorNotJd": "This file does not look like a job description.",
+  "libraryErrorIndexFailed": "Indexing failed. Try again or use a different file.",
+  "learnFromMyContentTitle": "From my content",
+  "learnFromMyContentSubtitle": "Build a path grounded in your indexed library sources.",
+  "learnFromMyContentNeedLibrary": "Add and index sources in My library first.",
+  "pathCompletedGenerateAnotherTitle": "Path complete",
+  "pathCompletedGenerateAnotherBody": "Start a new learning path when you are ready.",
+  "pathCompletedGenerateAnotherCta": "Generate another path",
+  "pathCompletedDismiss": "Back to Learn",
+  "careerDrillSelfIntroTheme": "Self introduction",
+  "providersInsecureEndpointTitle": "Insecure endpoint",
+  "providersInsecureEndpointBody": "This custom URL uses http:// instead of https://. Your API key could be exposed on the network. Continue only if you trust this endpoint.",
+  "providersInsecureUseAnyway": "Use anyway",
+  "providersBaseUrlMustHttps": "Base URL must start with https://",
+  "errorSomethingWentWrong": "Something went wrong",
+  "errorTryAgain": "Try again",
+  "librarySourceMeta": "{type} · {status}",
+  "@librarySourceMeta": {
+    "placeholders": {
+      "type": {"type": "String"},
+      "status": {"type": "String"}
+    }
+  },
+  "savedArticlesTitle": "Saved articles",
+  "savedArticlesSubtitle": "Articles you bookmarked from daily picks and learning paths",
+  "savedArticlesEmpty": "No saved articles yet. Tap the bookmark icon while reading an article.",
+  "articleBookmarkSave": "Save article",
+  "articleBookmarkSaved": "Article saved",
+  "articleBookmarkRemove": "Remove bookmark",
+  "articleBookmarkRemoved": "Bookmark removed",
+  "flashcardsTitle": "Flashcards",
+  "flashcardsDueCount": "{count} due for review",
+  "@flashcardsDueCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "flashcardsEmpty": "No cards due right now. Great job staying on top of your reviews!",
+  "flashcardShowAnswer": "Show answer",
+  "flashcardAgain": "Again",
+  "flashcardHard": "Hard",
+  "flashcardGood": "Good",
+  "flashcardEasy": "Easy",
+  "resultsReviewMistakesAsFlashcards": "Review {count} mistakes as flashcards",
+  "@resultsReviewMistakesAsFlashcards": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "flashcardsCreatedSnackbar": "{count} flashcards created",
+  "@flashcardsCreatedSnackbar": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryGenerateFlashcards": "Generate flashcards from my library"
+}

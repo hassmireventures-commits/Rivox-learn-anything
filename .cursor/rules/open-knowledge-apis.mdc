@@ -1,0 +1,72 @@
+---
+description: Free/open knowledge APIs for Rivox grounding, daily pack, and quiz context — analyze codebase before integrating
+alwaysApply: false
+---
+
+# Rivox — Open Knowledge Ingestion Rules
+
+## Context
+
+Rivox (Learn Anything) is a **Flutter** app (`com.aiquiz.ai_quiz_app`). The app is built. **Do not guess** class names, routes, or schemas — read the workspace first.
+
+Existing integration points (extend these, do not duplicate):
+
+| Area | Files |
+|------|--------|
+| Org/domain grounding | `lib/core/services/topic_grounding_service.dart`, `goal_topic_resolver.dart` |
+| Open knowledge facade | `lib/core/services/open_knowledge/open_knowledge_service.dart` |
+| HTTP + 429 retry | `lib/core/network/dio_client.dart`, `rate_limit_retry_interceptor.dart` |
+| Daily pack fallbacks | `lib/core/services/daily_content_fallbacks.dart` |
+| URL allowlist | `lib/core/constants/official_learning_domains.dart`, `resource_link_validator.dart` |
+| YouTube (no API key) | `youtube_transcript_fetcher.dart` (timedtext), `resource_link_validator.dart` (oEmbed) |
+| LLM prompts | `prompt_builder.dart`, `path_prompt_builder.dart`, `daily_content_service.dart` |
+
+## Priority data sources
+
+Use these **before** asking the LLM to invent facts or URLs.
+
+1. **Wikipedia** (MediaWiki + REST summary) — general knowledge, org context, daily articles on `en.wikipedia.org`.
+   - No API key. Custom `User-Agent` via `OpenKnowledgeClient.userAgent`.
+   - Implementation: `open_knowledge/wikipedia_source.dart`.
+
+2. **Wikidata** (wbsearchentities) — entity labels/descriptions for org/product names.
+   - No API key. Implementation: `open_knowledge/wikidata_source.dart`.
+
+3. **arXiv API** — STEM preprints/abstracts for grounding quiz/path prompts.
+   - HTTP GET, no auth. Not on daily-pack allowlist — **context only**.
+   - Implementation: `open_knowledge/arxiv_source.dart`.
+
+4. **Europe PMC API** — biomedical/life-sciences literature abstracts.
+   - HTTP GET, no auth. Context only unless domain added to allowlist.
+   - Implementation: `open_knowledge/europe_pmc_source.dart`.
+
+5. **Gutendex / Open Library** — public-domain books and literature metadata.
+   - HTTP GET, no auth. Context + optional external links (not in-app webview allowlist by default).
+   - Implementation: `open_knowledge/gutendex_source.dart`.
+
+6. **YouTube**
+   - **Default (no key):** oEmbed embed check + `timedtext` captions — already in app.
+   - **YouTube Data API v3:** only if `YOUTUBE_API_KEY` dart-define is set. Prefer `videos.list` by ID; avoid expensive `search.list`.
+
+7. **Wikimedia Commons / Internet Archive** — defer until a feature needs media assets; document in BACKLOG if requested.
+
+## Execution rules
+
+- **Analyze before writing:** Match `Dio` usage, soft-fail (`catch` → empty/null), and `skipQuota: true` for auto-generation helpers.
+- **Graceful failures:** Use `OpenKnowledgeCache` (in-memory TTL). `RateLimitRetryInterceptor` on shared client. Never block quiz/daily pack on source failure — fall back to LLM or curated fallbacks.
+- **Daily pack URLs:** Must pass `ResourceLinkValidator.acceptDailyResource` and `OfficialLearningDomains` — open sources feed **prompt context**, not unvalidated links.
+- **Org domains:** Homepage meta → Wikipedia/Wikidata → arXiv/PMC by topic class → `GoalTopicResolver.deterministicFallback` — never return empty resolution.
+- **Secrets:** Only `BUILT_IN_AI_API_KEY`, `WHISPER_API_KEY`, optional `YOUTUBE_API_KEY` via `--dart-define-from-file=tool/.local_dart_defines.json` — never commit keys.
+- **Logging:** Append changes to `docs/logs/ENHANCEMENTS_LOG.md` + `docs/PROJECT_LOG.md` per project-log rule.
+
+## Topic routing (OpenKnowledgeService)
+
+| Topic signal | Sources |
+|--------------|---------|
+| Org/domain (`GoalTopicResolver.needsResolution`) | Homepage meta, Wikipedia, Wikidata |
+| Biomedical / bio-medical | Europe PMC, Wikipedia |
+| STEM / ML / physics / math | arXiv, Wikipedia |
+| Literature / classic books | Gutendex |
+| Default | Wikipedia |
+
+Inject result as `OPEN KNOWLEDGE` block in goal resolution and daily LLM prompts — not as raw user-visible error text.

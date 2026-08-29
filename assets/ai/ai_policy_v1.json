@@ -1,0 +1,43 @@
+{
+  "version": "1.0.0",
+  "maxQuestionsPerQuiz": 30,
+  "maxPathModules": 12,
+  "dailyTokenSoftCap": 200000,
+  "dailyTokenHardCap": 500000,
+  "maxTopicLength": 500,
+  "maxUploadBytes": 15728640,
+  "defaultGenerationMode": "blended",
+  "goalDefaults": {
+    "learning": { "generationMode": "blended", "ragMaxTokens": 3000 },
+    "exam_prep": { "generationMode": "grounded", "ragMaxTokens": 4000 },
+    "career": { "generationMode": "blended", "ragMaxTokens": 3500 }
+  },
+  "allowedUploadExtensions": ["txt", "md", "pdf"],
+  "blockedPromptPatterns": [
+    "ignore previous instructions",
+    "ignore all prior",
+    "you are now dan",
+    "jailbreak",
+    "system prompt",
+    "sk-[a-z0-9]{20,}"
+  ],
+  "blockedProfanityPatterns": [
+    "\\bfuck(?:ing|er|ed)?\\b",
+    "\\bshit(?:ty|ting)?\\b",
+    "\\basshole\\b",
+    "\\bbitch(?:es|ing)?\\b",
+    "\\bdick(?:head)?\\b",
+    "\\bcunt\\b",
+    "\\bpussy\\b",
+    "\\bslut\\b",
+    "\\bwhore\\b",
+    "\\bnigg(?:a|er)\\b",
+    "\\bfag(?:got)?\\b",
+    "\\bretard(?:ed)?\\b",
+    "\\bcock\\b",
+    "\\bmotherfuck(?:er|ing)?\\b",
+    "\\bbullshit\\b",
+    "\\bdumbass\\b",
+    "\\bjackass\\b"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(rm -rf \"/c/Users/hassa/AppData/Local/Temp/claude/d--Documents-App-projects-learn-anything-learn-anything/b180d207-1b9e-4019-95e5-b2a433449b84/scratchpad/l10n_backup2\")",
+      "Bash(mkdir -p \"/c/Users/hassa/AppData/Local/Temp/claude/d--Documents-App-projects-learn-anything-learn-anything/b180d207-1b9e-4019-95e5-b2a433449b84/scratchpad/l10n_backup2\")",
+      "Bash(cp lib/l10n/app_localizations*.dart \"/c/Users/hassa/AppData/Local/Temp/claude/d--Documents-App-projects-learn-anything-learn-anything/b180d207-1b9e-4019-95e5-b2a433449b84/scratchpad/l10n_backup2/\")",
+      "Bash(tasklist //FI \"IMAGENAME eq dart.exe\")",
+      "Bash(tasklist //FI \"IMAGENAME eq flutter.bat\")",
+      "Bash(wait)"
+    ]
+  }
+}

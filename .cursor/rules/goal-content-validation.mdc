@@ -1,0 +1,39 @@
+---
+description: Agentic validation gate for org/domain goals — mandatory before showing or generating content
+alwaysApply: false
+---
+
+# Rivox — Agentic Goal Content Validation
+
+## Rule
+
+Any code that surfaces **open-knowledge articles**, **resolved goal topics**, or **generation topics** for org/domain goals (e.g. `elsai.ai`) **MUST** pass through `GoalContentValidationAgent` in `lib/core/services/agentic/goal_content_validation_agent.dart`.
+
+Do **not** call `OrgContentValidator` directly from feature code — the agent wraps deterministic rules and optional LLM review.
+
+## Pipeline (fail closed)
+
+1. **Deterministic** — `OrgContentValidator` + `TopicGoalRelevanceGate` (person-name drift, biography hints, off-goal topics).
+2. **Agent** (org goals, borderline only) — lightweight LLM JSON `{approved, reason}` via `skipQuota: true`.
+3. **Fallback** — `GoalTopicResolver.deterministicFallback(goal)` when validation fails; never show unvalidated Wikipedia/topic.
+
+## Required call sites
+
+| Flow | Method |
+|------|--------|
+| Wikipedia / daily pack article | `validateOpenKnowledgeArticle` |
+| Quiz / path / daily topic string | `validateGenerationTopic` |
+| After `GoalTopicResolver.resolve` | `ensureValidResolved` |
+| Before caching resolved goal | same |
+
+## Regression cases (must stay rejected)
+
+- `elsai.ai` → Wikipedia **Elsaid Maher** (person, not company)
+- Stale weak topics (Islamic history, biomedical) when goal is an org domain
+- Quiz/path effective topic that is a person name similar to brand
+
+## Tests
+
+Add cases to `test/org_content_validator_test.dart` and `test/goal_content_validation_agent_test.dart` for every new rejection heuristic.
+
+Log changes in `docs/logs/BUGFIX_LOG.md` + `docs/PROJECT_LOG.md`.

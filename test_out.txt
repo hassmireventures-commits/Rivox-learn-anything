@@ -1,0 +1,11 @@
+﻿00:00 +0: loading C:/dev/learn-anything/test/ad_frequency_store_test.dart
+00:00 +0: C:/dev/learn-anything/test/circuit_breaker_test.dart: CircuitBreaker opens after failure threshold
+00:00 +1: C:/dev/learn-anything/test/ad_frequency_store_test.dart: AdFrequencyStore.advanceCounter shows interstitial every N completions
+00:00 +2: C:/dev/learn-anything/test/ad_frequency_store_test.dart: AdFrequencyStore.advanceCounter shows interstitial every N completions
+00:00 +3: C:/dev/learn-anything/test/ad_frequency_store_test.dart: AdFrequencyStore.advanceCounter shows interstitial every N completions
+00:01 +4: C:/dev/learn-anything/test/firebase_availability_test.dart: isFirebaseConfigured is false when placeholders remain
+00:01 +5: C:/dev/learn-anything/test/firebase_availability_test.dart: optionsAreConfigured detects placeholders
+00:03 +6: C:/dev/learn-anything/test/widget_test.dart: app constants are defined
+00:03 +7: C:/dev/learn-anything/test/widget_test.dart: quiz kinds include daily and demo
+00:03 +8: C:/dev/learn-anything/test/widget_test.dart: firebase is not configured in placeholder build
+00:03 +9: All tests passed!

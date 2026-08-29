@@ -1,0 +1,914 @@
+{
+  "@@locale": "ta",
+  "appName": "Rivox",
+  "organizationName": "Hassmire Ventures",
+  "organizationTagline": "The AI App for Learning Anything",
+  "splashByOrganization": "{organizationName} மூலம்",
+  "@splashByOrganization": {
+    "placeholders": {
+      "organizationName": {
+        "type": "String"
+      }
+    }
+  },
+  "navHome": "முகப்பு",
+  "navLearn": "கற்றல்",
+  "navPlay": "விளையாடு",
+  "navHistory": "வரலாறு",
+  "settingsTooltip": "அமைப்புகள்",
+  "settingsTitle": "அமைப்புகள்",
+  "commonCancel": "ரத்து செய்",
+  "commonSave": "சேமி",
+  "commonClear": "அழி",
+  "commonReset": "மீட்டமை",
+  "commonDismiss": "நிராகரி",
+  "commonEdit": "திருத்து",
+  "commonDelete": "நீக்கு",
+  "commonRequired": "தேவை",
+  "commonNone": "இல்லை",
+  "commonOff": "அணை",
+  "commonGoHome": "முகப்புக்கு செல்",
+  "welcomeTitle": "Rivox-க்கு வரவேற்கிறோம்",
+  "welcomeSubtitle": "உங்கள் பயணத்தை தனிப்பயனாக்க உங்களைப் பற்றி சிறிது சொல்லுங்கள்.",
+  "welcomeNameLabel": "உங்கள் பெயர்",
+  "welcomeNameValidation": "உங்கள் பெயரை உள்ளிடவும்",
+  "welcomeGoalsLabel": "இலக்குகள் (கமாவால் பிரிக்கப்பட்ட)",
+  "welcomeGoalsHint": "Flutter, Biology, AWS",
+  "welcomeDailyMinutes": "தினசரி நிமிடங்கள்: {minutes}",
+  "@welcomeDailyMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "welcomeMinutesShort": "{minutes} நிமி",
+  "@welcomeMinutesShort": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "welcomePreferredLanguage": "விருப்பமான மொழி",
+  "welcomeStartButton": "கற்றலைத் தொடங்கு",
+  "greetingMorning": "காலை வணக்கம்",
+  "greetingAfternoon": "மதிய வணக்கம்",
+  "greetingEvening": "மாலை வணக்கம்",
+  "dashboardGreeting": "{greeting}, {name}",
+  "@dashboardGreeting": {
+    "placeholders": {
+      "greeting": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardLearnerFallback": "கற்றலாளர்",
+  "dashboardAddProviderPrompt": "உருவாக்கத்தை திற AI வழங்குநரைச் சேர்க்கவும்",
+  "dashboardApiLimitBanner": "API வரம்பு செயலில் · {minutes}நி {seconds}வி-க்குள் மீண்டும் முயற்சி",
+  "@dashboardApiLimitBanner": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardLearningPulse": "கற்றல் துடிப்பு",
+  "dashboardSuggestedTopic": "பரிந்துரை: {topic}",
+  "@dashboardSuggestedTopic": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardContinueLearn": "கற்றலில் தொடரவும்",
+  "dashboardFocusAreaReason": "உங்கள் சமீபத்திய வினாடித்தொடர் தேர்வுகளிலிருந்து கவனம் தேவைப்படும் பகுதி",
+  "dashboardAiUsageToday": "இன்றைய AI பயன்பாடு",
+  "dashboardUsageEmpty": "உங்கள் முதல் AI உருவாக்கத்துக்குப் பிறகு பயன்பாடு தோன்றும்.",
+  "dashboardProviderUsage": "{count} அழைப்புகள் · கடைசி {latency}ms",
+  "@dashboardProviderUsage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "latency": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardSystemHealth": "அமைப்பு நிலை · பிழைகள் {errorRate}% · தாமதம் {latency}ms",
+  "@dashboardSystemHealth": {
+    "placeholders": {
+      "errorRate": {
+        "type": "String"
+      },
+      "latency": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardRecentQuizActivity": "சமீபத்திய வினாடித்தொடர் செயல்பாடு",
+  "dashboardNoQuizzesYet": "இன்னும் வினாடித்தொடர்கள் இல்லை",
+  "dashboardRecentQuizRow": "{topic} · {accuracy}% · {date}",
+  "@dashboardRecentQuizRow": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      },
+      "accuracy": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardWeeklyActivity": "வாராந்திர செயல்பாடு",
+  "dashboardNewQuiz": "புதிய வினாடித்தொடர்",
+  "statQuizzes": "வினாடித்தொடர்கள்",
+  "statAccuracy": "துல்லியம்",
+  "statStreak": "தொடர்",
+  "statStreakDays": "{days} நா",
+  "@statStreakDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "statTopics": "தலைப்புகள்",
+  "learnFinishCurrentPathFirst": "புதிய பாதையைத் தொடங்குவதற்கு முன் உங்கள் தற்போதைய பாதையை முடிக்கவும்",
+  "learnYourLearningPath": "உங்கள் கற்றல் பாதை",
+  "learnJourneyTitle": "உங்கள் கற்றல் பயணம்",
+  "learnContinuePath": "உங்கள் பாதையில் தொடரவும்",
+  "learnPathProgress": "{title} · {current}/{total} தொகுதிகள்",
+  "@learnPathProgress": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "learnGeneratePath": "எனது கற்றல் பாதையை உருவாக்கு",
+  "learnTopicLabel": "தலைப்பு: {topic}",
+  "@learnTopicLabel": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      }
+    }
+  },
+  "learnContinueLearning": "கற்றலைத் தொடரவும்",
+  "learnPriorityTopics": "முன்னுரிமை தலைப்புகள்",
+  "learnNoPriorityTopics": "இன்னும் முன்னுரிமை தலைப்புகள் இல்லை",
+  "learnGenerateFirstPath": "உங்கள் முதல் பாதையை உருவாக்கவும்",
+  "learnNeedsAttentionReason": "திறமையின் அடிப்படையில் கவனம் தேவை",
+  "learnLearningPaths": "கற்றல் பாதைகள்",
+  "learnPathsEmpty": "வீடியோக்கள் மற்றும் ஆவணங்களுடன் தொகுதிகளைப் பார்க்க பாதையை உருவாக்கவும்.",
+  "learnModulesProgress": "{current}/{total} தொகுதிகள்",
+  "@learnModulesProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "learnPracticeFallback": "பயிற்சி",
+  "studyPathGenerateFirst": "முதலில் கற்றல் பாதையை உருவாக்கவும்",
+  "pathNotFound": "பாதை கிடைக்கவில்லை",
+  "pathProgressHeader": "முன்னேற்றம் {current}/{total} · {source}",
+  "@pathProgressHeader": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "pathModuleSubtitle": "{difficulty} · {minutes} நிமி · {status}",
+  "@pathModuleSubtitle": {
+    "placeholders": {
+      "difficulty": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "pathStatusCompleted": "முடிந்தது",
+  "pathStatusUpNext": "அடுத்து",
+  "pathStatusUpcoming": "வரவிருக்கும்",
+  "pathPracticeModuleQuiz": "தொகுதி வினாடித்தொடரை பயிற்சி செய்",
+  "pathVideoUnavailable": "பயன்பாட்டில் வீடியோ கிடைக்கவில்லை",
+  "pathWatchOnYouTube": "YouTube-இல் பார்க்கவும்",
+  "multiplayerTitle": "பல பயனர்",
+  "multiplayerHostTitle": "வினாடித்தொடரை நடத்து",
+  "multiplayerHostSubtitle": "உங்கள் API விசையுடன் உருவாக்கி நண்பர்களை அழைக்கவும்",
+  "multiplayerJoinTitle": "அறையில் சேரவும்",
+  "multiplayerJoinSubtitle": "அறை ID-ஐ உள்ளிடவும் அல்லது QR குறியீட்டை ஸ்கேன் செய்யவும்",
+  "multiplayerHostDefaultName": "நடத்துநர்",
+  "multiplayerCreateRoomFailed": "அறையை உருவாக்க முடியவில்லை. Firebase அமைப்பைச் சரிபார்க்கவும்.",
+  "multiplayerStartQuizFailed": "வினாடித்தொடரைத் தொடங்க முடியவில்லை.",
+  "multiplayerHostRoomTitle": "நடத்துநர் அறை",
+  "multiplayerUnableToCreateRoom": "அறையை உருவாக்க முடியவில்லை",
+  "multiplayerShareRoomText": "எனது AI Quiz அறையில் சேருங்கள்!\nஅறை ID: {roomId}\nபயன்பாட்டைத் திறந்து இந்த குறியீட்டுடன் சேருங்கள்.\nஆழ இணைப்பு: aiquiz://join/{roomId}",
+  "@multiplayerShareRoomText": {
+    "placeholders": {
+      "roomId": {
+        "type": "String"
+      }
+    }
+  },
+  "multiplayerRoomReadyTitle": "அறை தயார்",
+  "multiplayerRoomIdCopied": "அறை ID நகலெடுக்கப்பட்டது",
+  "multiplayerCopyRoomId": "அறை ID நகலெடு",
+  "multiplayerPlayersCount": "வீரர்கள் ({count})",
+  "@multiplayerPlayersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "multiplayerHostBadge": "நடத்துநர்",
+  "multiplayerStartQuiz": "வினாடித்தொடரைத் தொடங்கு",
+  "multiplayerShareRoom": "அறையைப் பகிர்",
+  "multiplayerEnterRoomId": "அறை ID-ஐ உள்ளிடவும்",
+  "multiplayerPlayerDefaultName": "வீரர்",
+  "multiplayerJoinFailed": "அறையில் சேர முடியவில்லை. ID மற்றும் Firebase அமைப்பைச் சரிபார்க்கவும்.",
+  "multiplayerJoinRoomTitle": "அறையில் சேர்",
+  "multiplayerRoomIdLabel": "அறை ID",
+  "multiplayerRoomIdHint": "ABC123",
+  "multiplayerJoinButton": "சேர்",
+  "multiplayerHideScanner": "ஸ்கேனரை மறை",
+  "multiplayerScanQrCode": "QR குறியீட்டை ஸ்கேன் செய்",
+  "multiplayerQuestionProgress": "{topic} · {current}/{total}",
+  "@multiplayerQuestionProgress": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      },
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "multiplayerTimerSeconds": "{seconds} வி",
+  "@multiplayerTimerSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "multiplayerSubmitAnswer": "பதிலை சமர்ப்பி",
+  "multiplayerPlayerScore": "{name}: {score}",
+  "@multiplayerPlayerScore": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "multiplayerRoomTitle": "அறை {roomId}",
+  "@multiplayerRoomTitle": {
+    "placeholders": {
+      "roomId": {
+        "type": "String"
+      }
+    }
+  },
+  "multiplayerWaitingForHost": "நடத்துநர் தொடங்குவதற்காக காத்திருக்கிறது...",
+  "multiplayerLeaderboardTitle": "தலைசிறந்தோர் பட்டியல்",
+  "multiplayerFinalScores": "இறுதி மதிப்பெண்கள்",
+  "multiplayerRankPrefix": "#",
+  "multiplayerShareResultsText": "{topic} க்கான AI Quiz முடிவுகள்\n{results}",
+  "@multiplayerShareResultsText": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      },
+      "results": {
+        "type": "String"
+      }
+    }
+  },
+  "multiplayerShareResults": "முடிவுகளைப் பகிர்",
+  "historyClearTitle": "வரலாற்றை அழிக்கவா?",
+  "historyClearMessage": "இது அனைத்து வினாடித்தொடர் வரலாற்றையும் நிரந்தரமாக நீக்கும்.",
+  "historyClearAllTooltip": "அனைத்தையும் அழி",
+  "historySearchHint": "தலைப்புகளைத் தேடு",
+  "historyEmpty": "வினாடித்தொடர்கள் எதுவும் கிடைக்கவில்லை",
+  "historyAccuracyBadge": "{accuracy}%",
+  "@historyAccuracyBadge": {
+    "placeholders": {
+      "accuracy": {
+        "type": "String"
+      }
+    }
+  },
+  "historyItemSubtitle": "{difficulty} · {correct}/{total} · {date}",
+  "@historyItemSubtitle": {
+    "placeholders": {
+      "difficulty": {
+        "type": "String"
+      },
+      "correct": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "difficultyAll": "அனைத்தும்",
+  "difficultyEasy": "எளிது",
+  "difficultyMedium": "நடுத்தரம்",
+  "difficultyHard": "கடினம்",
+  "difficultyExpert": "நிபுணர்",
+  "quizNotFound": "வினாடித்தொடர் கிடைக்கவில்லை",
+  "quizQuestionProgress": "கேள்வி {current}/{total}",
+  "@quizQuestionProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "quizSubmit": "சமர்ப்பி",
+  "quizPrevious": "முந்தைய",
+  "quizFinish": "முடி",
+  "quizNext": "அடுத்து",
+  "createQuizTopicRequired": "வினாடித்தொடரை உருவாக்க ஒரு தலைப்பை உள்ளிடவும்.",
+  "createQuizNoProvider": "முதலில் அமைப்புகளில் AI வழங்குநரைச் சேர்க்கவும்.",
+  "createQuizMissingApiKey": "இயல்புநிலை வழங்குநருக்கு API விசை இல்லை.",
+  "createQuizGenerateFailed": "வினாடித்தொடரை உருவாக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.",
+  "createQuizHostTitle": "பல பயனர் வினாடித்தொடரை நடத்து",
+  "createQuizTitle": "வினாடித்தொடரை உருவாக்கு",
+  "createQuizTopicLabel": "தலைப்பு",
+  "createQuizTopicHint": "Flutter, AWS Bedrock, Cricket, Biology...",
+  "createQuizQuestionsCount": "கேள்விகள்: {count}",
+  "@createQuizQuestionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "createQuizDifficulty": "சிரமம்",
+  "createQuizQuestionType": "கேள்வி வகை",
+  "questionTypeMcq": "MCQ",
+  "questionTypeTrueFalse": "உண்மை / பொய்",
+  "questionTypeFillBlank": "வெற்றிடம் நிரப்பு",
+  "questionTypeMixed": "கலப்பு",
+  "createQuizTimer": "டைமர்",
+  "createQuizTimerOn": "{total}s for the whole quiz ({seconds}s × {count} questions)",
+  "@createQuizTimerOn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "createQuizTimerOption": "{value} வி",
+  "@createQuizTimerOption": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "createQuizRandomizeQuestions": "கேள்விகளை குழப்பு",
+  "createQuizRandomizeOptions": "விருப்பங்களை குழப்பு",
+  "createQuizGenerateExplanations": "விளக்கங்களை உருவாக்கு",
+  "createQuizLanguage": "மொழி",
+  "createQuizLivePreview": "நேரடி முன்னோட்டம்",
+  "createQuizPreviewEmpty": "தலைப்பு · {count} கேள்விகள் · {difficulty}",
+  "@createQuizPreviewEmpty": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "difficulty": {
+        "type": "String"
+      }
+    }
+  },
+  "createQuizPreviewFilled": "{topic} · {count} கேள்விகள் · {difficulty}",
+  "@createQuizPreviewFilled": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "difficulty": {
+        "type": "String"
+      }
+    }
+  },
+  "createQuizPreviewDetails": "{type} · {timer} · {language}",
+  "@createQuizPreviewDetails": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "timer": {
+        "type": "String"
+      },
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "createQuizNoTimer": "டைமர் இல்லை",
+  "createQuizTimerPreview": "{seconds}s total quiz timer",
+  "@createQuizTimerPreview": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "pathGenerationTimeout": "Learning path generation timed out. Check your connection and try again.",
+  "generationJobInProgress": "Another generation is already in progress.",
+  "generationRunningInBackground": "Generation continues in the background. We'll notify you when it's ready.",
+  "createQuizGenerateButton": "வினாடித்தொடரை உருவாக்கு",
+  "resultsShareText": "\"{topic}\"-இல் Rivox-இல் {correct}/{total} ({accuracy}%) பெற்றேன்!",
+  "@resultsShareText": {
+    "placeholders": {
+      "correct": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "accuracy": {
+        "type": "String"
+      },
+      "topic": {
+        "type": "String"
+      }
+    }
+  },
+  "resultsShareChallengeCta": "Try this quiz and beat me! Open the link below to start a Quick Quiz with the same topic.",
+  "resultsShareGetApp": "Get Rivox:",
+  "resultsNotFound": "முடிவுகள் கிடைக்கவில்லை",
+  "resultsTitle": "முடிவுகள்",
+  "resultsAccuracyDisplay": "{accuracy}%",
+  "@resultsAccuracyDisplay": {
+    "placeholders": {
+      "accuracy": {
+        "type": "String"
+      }
+    }
+  },
+  "resultsMeta": "{difficulty} · {count} கேள்விகள்",
+  "@resultsMeta": {
+    "placeholders": {
+      "difficulty": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "resultsCorrect": "சரி",
+  "resultsWrong": "தவறு",
+  "resultsTime": "நேரம்",
+  "resultsTimeFormat": "{minutes}நி {seconds}வி",
+  "@resultsTimeFormat": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "resultsExplanations": "விளக்கங்கள்",
+  "resultsQuestionTitle": "கே{number}. {question}",
+  "@resultsQuestionTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "question": {
+        "type": "String"
+      }
+    }
+  },
+  "resultsYourAnswer": "உங்கள் பதில்: {answer}",
+  "@resultsYourAnswer": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "goalTooVague": "Tell us a specific subject (for example Python, UPSC History, or product design) — not just “learning”.",
+  "learnPastPathsTitle": "Completed paths",
+  "settingsDailyQuizFrequency": "Daily quizzes per day (max 3)",
+  "settingsAlarmSound": "Alarm sound",
+  "interviewVoiceComingSoon": "Voice interview (Coming soon)",
+  "resultsNoAnswer": "Not answered",
+  "resultsCorrectAnswer": "சரியான பதில்: {answer}",
+  "@resultsCorrectAnswer": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "resultsGenerateNewQuiz": "புதிய வினாடித்தொடரை உருவாக்கு",
+  "resultsShareScore": "மதிப்பெண்ணைப் பகிர்",
+  "settingsLearnerFallback": "கற்றலாளர்",
+  "settingsTapToRename": "மறுபெயரிட தட்டவும்",
+  "settingsAiProviders": "AI வழங்குநர்கள்",
+  "settingsNoProviders": "வழங்குநர்கள் அமைக்கப்படவில்லை",
+  "settingsProvidersSummary": "{count} சேமிக்கப்பட்டது · இயல்புநிலை: {name}",
+  "@settingsProvidersSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSupportTitle": "Rivox-ஐ ஆதரிக்கவும்",
+  "settingsSupportSubtitle": "விளம்பரம் பாருங்கள், நன்கொடை அளியுங்கள் அல்லது கருத்து அனுப்புங்கள்",
+  "settingsThanksForSupport": "Rivox-ஐ ஆதரித்ததற்கு நன்றி!",
+  "settingsLoadingAd": "விளம்பரம் ஏற்றுகிறது...",
+  "settingsWatchAdToSupport": "ஆதரிக்க விளம்பரம் பார்",
+  "settingsHelpImproveTitle": "Rivox-ஐ மேம்படுத்த உதவுங்கள்",
+  "settingsHelpImproveSubtitle": "அடையாளமற்ற கற்றல் சமிக்கண்களை மட்டும் பகிரவும்",
+  "settingsAppearance": "தோற்றம்",
+  "settingsLanguage": "மொழி",
+  "settingsLanguageSubtitle": "பயன்பாட்டு இடைமுகம் மற்றும் AI உள்ளடக்க மொழி",
+  "themeSystem": "அமைப்பு",
+  "themeLight": "வெளிச்சம்",
+  "themeDark": "இருள்",
+  "settingsExportData": "தரவை ஏற்றுமதி செய்",
+  "settingsExportSubtitle": "வினாடித்தொடர்கள் மற்றும் புள்ளிவிவரங்களை காப்புப்பிரதி (API விசைகள் இல்லை)",
+  "settingsImportData": "தரவை இறக்குமதி செய்",
+  "settingsImportChallenge": "Import challenge",
+  "settingsImportChallengeSubtitle": "Play a friend's shared quiz questions",
+  "settingsImportChallengeReady": "Challenge loaded - good luck!",
+  "settingsImportChallengeFailed": "Could not import challenge: {error}",
+  "@settingsImportChallengeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsResetApplication": "பயன்பாட்டை மீட்டமை",
+  "settingsAbout": "பற்றி",
+  "settingsAboutVersion": "{appName} v{version}",
+  "@settingsAboutVersion": {
+    "placeholders": {
+      "appName": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsPrivacyPolicy": "தனியுரிமைக் கொள்கை",
+  "settingsTerms": "விதிமுறைகள்",
+  "settingsRenameTitle": "மறுபெயரிடு",
+  "settingsNameLabel": "பெயர்",
+  "settingsBackupShareText": "AI Quiz காப்புப்பிரதி",
+  "settingsExportFailed": "ஏற்றுமதி தோல்வி: {error}",
+  "@settingsExportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsImportComplete": "இறக்குமதி முடிந்தது. AI வழங்குநர்களில் API விசைகளை மீண்டும் சேர்க்கவும்.",
+  "settingsImportFailed": "இறக்குமதி தோல்வி: {error}",
+  "@settingsImportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsResetTitle": "பயன்பாட்டை மீட்டமைக்கவா?",
+  "settingsResetMessage": "இது அனைத்து உள்ளூர் தரவையும் API விசைகளையும் நீக்கும். இதை மீள முடியாது.",
+  "providersTitle": "AI வழங்குநர்கள்",
+  "providersAddButton": "வழங்குநரைச் சேர்",
+  "providersEmptyState": "உங்கள் முதல் AI வழங்குநரைச் சேர்க்கவும்.\nஉங்கள் API விசை இந்த சாதனத்திலேயே இருக்கும்.",
+  "providersDefaultBadge": "இயல்புநிலை",
+  "providersSetDefault": "இயல்புநிலையாக அமை",
+  "providersAddTitle": "வழங்குநரைச் சேர்",
+  "providersEditTitle": "வழங்குநரைத் திருத்து",
+  "providersProviderLabel": "வழங்குநர்",
+  "providersDisplayName": "காட்சி பெயர்",
+  "providersApiKey": "API விசை",
+  "providersApiKeyOptional": "API விசை (வைத்திருக்க வெற்றாக விடவும்)",
+  "providersApiKeyRequired": "API விசை தேவை",
+  "providersBaseUrl": "அடிப்படை URL",
+  "providersBaseUrlHint": "விருப்ப மேலெழுத்து",
+  "providersBaseUrlRequired": "தனிப்பயன் வழங்குநர்களுக்கு அடிப்படை URL தேவை",
+  "providersDefaultModel": "இயல்புநிலை மாதிரி",
+  "providersSaveButton": "வழங்குநரைச் சேமி",
+  "providersSavedSnackbar": "வழங்குநர் இந்த சாதனத்தில் சேமிக்கப்பட்டது",
+  "providersSaveFailed": "வழங்குநரைச் சேமிக்க முடியவில்லை: {error}",
+  "@providersSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "supportAdNotReady": "விளம்பரம் இன்னும் தயாராகவில்லை. சிறிது நேரம் கழித்து முயற்சிக்கவும்.",
+  "supportThanksReward": "உங்கள் ஆதரவுக்கு நன்றி! (+{amount} {type})",
+  "@supportThanksReward": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "supportTitle": "ஆதரவு",
+  "supportHeadline": "Rivox இலவசமாக இருக்க உதவுங்கள்",
+  "supportSubheadline": "கட்டாய விளம்பரங்கள் இல்லை. நீங்கள் விரும்பினால் மட்டும் ஆதரிக்கவும்.",
+  "supportWatchVideoTitle": "ஸ்பான்சர் வீடியோவைப் பார்",
+  "supportLoadingAd": "விளம்பரம் ஏற்றுகிறது...",
+  "supportAdReady": "வீடியோ விளம்பரம் தயார் - பார்க்க தட்டவும்",
+  "supportAdUnavailable": "விளம்பரம் ஏற்றுகிறது... சிறிது நேரம் கழித்து மீண்டும் முயலவும்",
+  "supportDonateTitle": "நன்கொடை",
+  "supportDonateSubtitle": "எனக்கு ஒரு காபி வாங்குங்கள்",
+  "supportRateTitle": "பயன்பாட்டை மதிப்பிடு",
+  "supportRateSubtitle": "Play Store-இல் உங்கள் கருத்தைப் பகிருங்கள்",
+  "supportPlayStoreUnavailable": "வெளியீட்டுக்குப் பிறகு Play Store பட்டியல் கிடைக்கும்.",
+  "supportShareTitle": "பயன்பாட்டைப் பகிர்",
+  "supportShareSubtitle": "நண்பருக்குச் சொல்லுங்கள்",
+  "supportShareText": "Rivox-ஐ பாருங்கள் - உங்கள் சொந்த AI விசைகளுடன் தகவமைக்கப்பட்ட கற்றல்!",
+  "supportReportBugTitle": "பிழையை அறிவி",
+  "supportReportBugSubtitle": "மேம்படுத்த உதவுங்கள்",
+  "supportBugEmailSubject": "AI Quiz பிழை அறிக்கை",
+  "supportBugEmailBody": "பிழையை விவரிக்கவும்:\n\n",
+  "supportFeatureRequestTitle": "அம்சம் கோரிக்கை",
+  "supportFeatureRequestSubtitle": "ஒவ்வொரு யோசனையையும் படிக்கிறோம்",
+  "supportFeatureEmailSubject": "AI Quiz அம்சம் கோரிக்கை",
+  "supportFeatureEmailBody": "அம்ச யோசனை:\n\n",
+  "supportFaqTitle": "அடிக்கடி கேட்கப்படும் கேள்விகள்",
+  "supportFaqApiKeyQuestion": "எனது API விசை எங்கே சேமிக்கப்படுகிறது?",
+  "supportFaqApiKeyAnswer": "இந்த சாதனத்தில் மட்டும் குறியாக்கப்பட்ட பாதுகாப்பான சேமிப்பில். விசைகள் ஒருபோதும் பதிவேற்றப்படாது.",
+  "supportFaqAccountQuestion": "எனக்கு கணக்கு தேவையா?",
+  "supportFaqAccountAnswer": "இல்லை. தனி வினாடித்தொடர்கள் உருவாக்கத்துக்குப் பிறகு முழுமையாக ஆஃப்லைனில் வேலை செய்கின்றன. பல பயனர் முறைக்கு அறை ID மட்டும் தேவை.",
+  "supportFaqAdsQuestion": "கட்டாய விளம்பரங்கள் உள்ளனவா?",
+  "supportFaqAdsAnswer": "கட்டாய முழுத்திரை விளம்பரங்கள் இல்லை. வினாடி வினா முடிவுகளில் சிறிய பேனர் தோன்றலாம். அமைப்புகள் அல்லது ஆதரவிலிருந்து விருப்பமாக விளம்பரம் பார்க்கலாம்.",
+  "supportFaqProvidersQuestion": "எந்த AI வழங்குநர்கள் வேலை செய்கின்றன?",
+  "supportFaqProvidersAnswer": "OpenAI, Gemini, Claude, Grok, DeepSeek, OpenRouter மற்றும் எந்த OpenAI-இணக்க முனையமும்.",
+  "apiLimitBarrierLabel": "API வரம்பு",
+  "apiLimitTitle": "API வரம்பை அடைந்தது",
+  "apiLimitTryAgainIn": "{duration}-க்குள் மீண்டும் முயற்சிக்கவும்",
+  "@apiLimitTryAgainIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "apiLimitTryAgainNow": "இப்போது மீண்டும் முயற்சிக்கலாம்",
+  "durationMinutesSeconds": "{minutes}நி {seconds}வி",
+  "@durationMinutesSeconds": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "durationSecondsOnly": "{seconds}வி",
+  "@durationSecondsOnly": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "apiLimitAddProvider": "மற்றொரு வழங்குநரைச் சேர்",
+  "apiLimitUseFallback": "மாற்று வழங்குநரைப் பயன்படுத்து",
+  "generationQuizConnecting": "உங்கள் AI ஆசிரியருடன் இணைக்கிறது...",
+  "generationQuizReadingPattern": "உங்கள் கற்றல் முறையைப் படிக்கிறது...",
+  "generationQuizCrafting": "உங்களுக்காக கேள்விகளை உருவாக்குகிறது...",
+  "generationQuizPolishing": "விளக்கங்களை மெருகேற்றுகிறது...",
+  "generationQuizChecking": "உண்மைகளை இருமுறை சரிபார்க்கிறது...",
+  "generationQuizAlmostReady": "ஏறக்குறைய தயார் - காத்திருங்கள்!",
+  "generationPathMapping": "உங்கள் கற்றல் பயணத்தை வரைபடமாக்குகிறது...",
+  "generationPathScanningDocs": "அதிகாரப்பூர்வ ஆவணங்களை ஸ்கேன் செய்கிறது...",
+  "generationPathCurating": "நம்பகமான ஆதாரங்களைத் தேர்ந்தெடுக்கிறது...",
+  "generationPathFindingVideos": "சிறந்த வீடியோ பாடங்களைத் தேடுகிறது...",
+  "generationPathSequencing": "உங்களுக்காக தொகுதிகளை வரிசைப்படுத்துகிறது...",
+  "generationPathBuilding": "உங்கள் தனிப்பயன் பாதையை உருவாக்குகிறது...",
+  "routerPageNotFound": "பக்கம் கிடைக்கவில்லை: {uri}",
+  "@routerPageNotFound": {
+    "placeholders": {
+      "uri": {
+        "type": "String"
+      }
+    }
+  },
+  "quizKindQuick": "விரைவு வினாடித்தொடர்",
+  "quizKindModule": "தொகுதி வினாடித்தொடர்",
+  "quizKindMultiplayer": "பல-player",
+  "historyFilterAll": "அனைத்தும்",
+  "createQuizQuickSubtitle": "எந்த தலைப்பிலும் தனி பயிற்சி - கற்றல் பாதையுடன் தொடர்பில்லை.",
+  "pathModuleQuiz": "தொகுதி வினாடித்தொடர்",
+  "pathModuleLocked": "முதலில் முந்தைய தொகுதியை முடிக்கவும்",
+  "resultsNewQuickQuiz": "புதிய விரைவு வினாடித்தொடர்",
+  "resultsNextModule": "அடுத்த தொகுதி",
+  "resultsRetryModuleQuiz": "தொகுதி வினாடித்தொடரை மீண்டும் முயற்சி",
+  "resultsReviewPath": "பாதையை மதிப்பாய்வு",
+  "resultsBackToModuleStudy": "தொகுதி படிப்புக்குத் திரும்பு",
+  "learnYourPathSection": "உங்கள் பாதை",
+  "learnQuickPracticeSection": "விரைவு பயிற்சி",
+  "resourceOpenInBrowser": "உலாவியில் திற",
+  "resourceBlocked": "இந்த ஆதாரத்தை பயன்பாட்டில் திறக்க முடியாது.",
+  "dashboardProviderUsageDetailed": "{count} அழைப்புகள் · {tokens} டோக்கன்கள் · கடைசி {latency}ms",
+  "@dashboardProviderUsageDetailed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "tokens": {
+        "type": "int"
+      },
+      "latency": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardChartsTitle": "கற்றல் நுண்ணறிவு",
+  "dashboardTopicBreakdown": "தலைப்புகள்",
+  "dashboardDifficultyMix": "சிரமை கலவை",
+  "dashboardDailyStudyGoal": "இன்றைய படிப்பு இலக்கு",
+  "dashboardDailyStudyProgress": "இன்று: {today} / {goal} நிமி",
+  "@dashboardDailyStudyProgress": {
+    "placeholders": {
+      "today": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardNoChartData": "வரைபடங்களைக் காண வினாடித்தொடர் முடிக்கவும்",
+  "settingsResetChoose": "எதை மீட்டமைப்பது என்பதைத் தேர்ந்தெடுக்கவும். இரண்டும் மீளமுடியா.",
+  "settingsResetLearningOnly": "கற்றல் தரவை அழி",
+  "settingsResetFull": "முழு மீட்டமை",
+  "settingsDailyGoalTitle": "தினசரி படிப்பு இலக்கு",
+  "settingsDailyGoalMinutes": "இலக்கு: நாளொன்றுக்கு {minutes} நிமிடங்கள்",
+  "@settingsDailyGoalMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsDailyReminder": "தினசரி நினைவூட்டல்",
+  "settingsDailyReminderTime": "நினைவூட்டல் {hour}:{minute}",
+  "@settingsDailyReminderTime": {
+    "placeholders": {
+      "hour": {
+        "type": "int"
+      },
+      "minute": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsChangeReminderTime": "நினைவூட்டல் நேரத்தை மாற்று",
+  "aiStatusChecking": "Checking...",
+  "aiStatusOnline": "AI Online",
+  "aiStatusOffline": "AI Offline",
+  "aiStatusCheckedAt": "Checked: {time}",
+  "@aiStatusCheckedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "aiStatusNoProvider": "No provider configured",
+  "aiStatusApiKeyMissing": "API key missing",
+  "aiStatusReachable": "Reachable",
+  "languageFontDownloadTitle": "எழுத்துருக்களைப் பதிவிறக்கவா?",
+  "languageFontDownloadBody": "உரை தெளிவாகத் தோன்ற இந்த மொழிக்கு கூடுதல் எழுத்துருக்கள் தேவை (சில MB). இப்போது பதிவிறக்கவா?",
+  "languageFontDownloadAction": "பதிவிறக்கு",
+  "languageFontDownloadFailed": "எழுத்துருக்களைப் பதிவிறக்க முடியவில்லை. இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+  "languageFontDownloadSuccess": "இந்த மொழிக்கான எழுத்துருக்கள் தயார்.",
+  "languageFontDownloadProgress": "எழுத்துருக்கள் பதிவிறங்குகின்றன...",
+  "dailyContentDetailTitle": "Today's learning pick",
+  "dailyContentCardSubtitle": "Open today's validated article and video",
+  "dailyContentTypeArticle": "Article",
+  "dailyContentTypeVideo": "Video",
+  "dailyContentOpenArticle": "Read in app",
+  "dailyContentOpenExternally": "Open externally",
+  "dailyContentEmpty": "No learning pick yet. Generate one when AI is online.",
+  "dailyContentGenerating": "Finding free article and video...",
+  "dailyContentGenerate": "Generate today's pick",
+  "dailyContentVideoSubtitle": "Watch a relevant video for {topic}",
+  "dailyContentVideoSubtitleForGoal": "Watch a relevant video for your goal",
+  "dashboardDailyQuizSlot": "Daily quiz {current} of {total}",
+  "@dashboardDailyQuizSlot": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardDailyQuizGenerateSlot": "Generate daily quiz {current} of {total}",
+  "@dashboardDailyQuizGenerateSlot": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardDailyQuizCompletedSlot": "You completed {completed} of {total} daily quizzes",
+  "@dashboardDailyQuizCompletedSlot": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "savedArticlesTitle": "Saved articles",
+  "savedArticlesSubtitle": "Articles you bookmarked from daily picks and learning paths",
+  "savedArticlesEmpty": "No saved articles yet. Tap the bookmark icon while reading an article.",
+  "articleBookmarkSave": "Save article",
+  "articleBookmarkSaved": "Article saved",
+  "articleBookmarkRemove": "Remove bookmark",
+  "articleBookmarkRemoved": "Bookmark removed"
+}

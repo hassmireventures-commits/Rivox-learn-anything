@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-07-09",
+  "documents": {
+    "privacy": {
+      "asset": "assets/legal/privacy_v1_en.md",
+      "titleKey": "legalPrivacyTitle",
+      "locale": "en"
+    },
+    "terms": {
+      "asset": "assets/legal/terms_v1_en.md",
+      "titleKey": "legalTermsTitle",
+      "locale": "en"
+    }
+  }
+}

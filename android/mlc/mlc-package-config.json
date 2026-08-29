@@ -1,0 +1,14 @@
+{
+  "device": "android",
+  "model_list": [
+    {
+      "model": "HF://mlc-ai/phi-2-q4f16_1-MLC",
+      "model_id": "phi-2-q4f16_1-MLC",
+      "estimated_vram_bytes": 2000000000,
+      "overrides": {
+        "context_window_size": 512,
+        "prefill_chunk_size": 128
+      }
+    }
+  ]
+}
