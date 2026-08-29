@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://learn-anything-43970.web.app/sitemap.xml

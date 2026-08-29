@@ -1,5 +1,21 @@
 # Features Log
 
+## 2026-08-29 — Website SEO audit and fixes
+
+- **Type:** enhancement
+- **Area:** hosting (website)
+- **Files:** new `hosting/robots.txt`, `hosting/sitemap.xml`; `hosting/index.html`, `hosting/privacy/index.html`, `hosting/terms/index.html`, `hosting/games/index.html`, `hosting/games/dino/index.html`, `hosting/styles.css`
+- **Problem / Goal:** User asked to audit and optimize the site to rank for "all relevant keywords." Verified via `site:learn-anything-43970.web.app` search that the site is **not indexed by Google at all** — the single biggest issue, ahead of any on-page optimization. Also found via keyword research that both brand terms collide hard with unrelated existing products: "Rivox" is used by ~6 other unrelated apps (GPS tracker, AI stock app, screen-time app, messenger, a medical trial), and "Learn Anything" collides with several existing learning-platform domains (learnanything.com/io/xyz) already ranking for that exact phrase. Bare-brand or generic head-term (#1) ranking is not realistic; long-tail feature-specific phrases are the winnable target.
+- **Solution:**
+  - Added `robots.txt` (with sitemap reference) and `sitemap.xml` (all 5 real pages) — neither existed before.
+  - Every page: added a self-referencing `<link rel="canonical">`, Open Graph `og:url`, and Twitter Card meta tags (none existed before).
+  - Homepage: added `MobileApplication` + `FAQPage` JSON-LD structured data (both validated as parseable JSON); added a real FAQ section (content sourced from `docs/store/LISTING.md`'s verified feature copy, mirrored exactly in the schema per Google's structured-data requirement); refined title/meta description to lead with winnable long-tail differentiators (BYOK AI quiz generation, AI voice interview practice) identified via keyword research, rather than only generic branding.
+  - Games pages: refined title/description toward "free browser dino game / endless runner, no download" phrasing — a genuinely winnable, high-traffic-potential niche independent of and not diluting the core app keywords.
+  - Fixed empty `alt` on two hidden (CSS `display:none`) sprite `<img>` tags on the Dino Run page.
+- **Regression risks:** None — additive metadata/pages only, no existing markup removed. Canonical URLs point at the current live `learn-anything-43970.web.app` domain (the planned `learnanything.app` custom domain isn't DNS-live yet per `app_constants.dart`'s own comment) — must be updated site-wide once that domain attaches, otherwise canonicals would point to a URL that no longer matches the served page.
+- **Verified:** JSON-LD blocks parsed with `JSON.parse` (both valid); HTML tag balance checked programmatically on all 5 touched pages; local static-server route check confirms `/robots.txt`, `/sitemap.xml`, and all pages resolve. Cannot verify actual Google indexing/rich-result eligibility from this environment — that requires Search Console (needs the site owner's Google account) after deploy.
+- **Not done (needs the user):** Google Search Console verification + sitemap submission; attaching the `learnanything.app` custom domain; any larger content build-out (blog, comparison pages) that the research flagged as what actual top-ranking competitors do at scale — flagged as a follow-up decision, not started unprompted given the scope.
+
 ## 2026-08-29 — Website: native ads, opt-in support ad, mini games (Dino Run)
 
 - **Type:** feature
