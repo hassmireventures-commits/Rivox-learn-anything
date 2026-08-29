@@ -96,13 +96,13 @@ class _MyLibraryScreenState extends ConsumerState<MyLibraryScreen> {
       );
       return;
     }
-    final result = await FilePicker.pickFiles(
+    final picked = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: const ['txt', 'md', 'pdf'],
     );
-    if (result == null || result.files.single.path == null) return;
-    final path = result.files.single.path!;
-    final title = result.files.single.name;
+    if (picked == null || picked.path == null) return;
+    final path = picked.path!;
+    final title = picked.name;
 
     setState(() => _busy = true);
     try {

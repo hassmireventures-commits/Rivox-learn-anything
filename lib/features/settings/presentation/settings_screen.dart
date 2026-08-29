@@ -561,14 +561,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _importData(BuildContext context, WidgetRef ref) async {
     final l10n = context.l10n;
-    final result = await FilePicker.pickFiles(
+    final picked = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['json'],
     );
-    if (result == null || result.files.single.path == null) return;
+    if (picked == null || picked.path == null) return;
 
     try {
-      final content = await File(result.files.single.path!).readAsString();
+      final content = await File(picked.path!).readAsString();
       final data = jsonDecode(content) as Map<String, dynamic>;
 
       if (data['profile'] is Map) {

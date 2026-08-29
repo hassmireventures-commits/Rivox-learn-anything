@@ -1,5 +1,15 @@
 # Bug Fix Log
 
+## 2026-08-29 — file_picker upgrade fixes Play Console bitmap-downsampling flag; migrates breaking API
+
+- **Type:** bugfix
+- **Area:** library, settings, deps
+- **Files:** `pubspec.yaml`, `pubspec.lock`, `my_library_screen.dart`, `settings_screen.dart`
+- **Problem / Goal:** Google Play Console flagged `com.mr.flutter.plugin.filepicker.FileUtils.compressImage` (obfuscated as `z2.i.b`, deobfuscated via `build/app/outputs/mapping/release/mapping.txt`) for calling `BitmapFactory.decodeStream` with no `inSampleSize`/downsampling — verified directly against the locked `file_picker: 12.0.0-beta.7` plugin source, not just the Play Console description. The affected code path is never actually invoked by this app (neither of our two `FilePicker.pickFiles()` calls requests images or sets `compressionQuality`), so it was zero runtime risk, but it's a real, fixable flag.
+- **Solution:** Upgraded `file_picker` to `^12.1.2`. Verified in the new version's source (now a federated plugin — Android implementation moved to a separate `android_file_picker` package) that `compressImage` now uses `BitmapFactory.Options` with a calculated `inSampleSize`, resolving the flag. This upgrade carries a breaking Dart API change: `FilePicker.pickFiles()` now returns `List<PlatformFile>` directly instead of a `FilePickerResult` wrapper with a `.files` getter. Migrated both call sites to the new single-file `FilePicker.pickFile()` API (`Future<PlatformFile?>`), which is also the more correct fit since both sites only ever picked one file.
+- **Regression risks:** None expected — same file-picking behavior (custom type, extension filter, single file), just a different return shape.
+- **Verified:** `flutter analyze --no-fatal-infos` exits 0 (35 pre-existing info issues, unchanged; the 5 new `undefined_getter`/`unnecessary_null_comparison` errors introduced by the API change were caught and fixed before this was considered done). `flutter test --exclude-tags=live` 140/140 passed.
+
 ## 2026-08-29 — Flashcards "N due for review" count never refreshed after reviewing
 
 - **Type:** bugfix
