@@ -103,6 +103,38 @@
         if (box) box.style.visibility = 'hidden';
       }
     };
+
+    // The vendored game decides touch vs. mouse controls with
+    // /Android/.test(navigator.userAgent) (plus an iOS platform check) --
+    // when a mobile browser's "Request Desktop Site" mode rewrites the
+    // user-agent, that check goes false, so the game switches to listening
+    // for mousedown instead of touchstart. Its jump logic only accepts a
+    // real touchstart event or a matching keyCode, so a screen tap then does
+    // nothing at all. This dispatches a real Space keydown/keyup on tap as a
+    // device-capability-based (not UA-based) fallback input path -- it works
+    // whether or not the vendored code's own detection misfires, and is a
+    // harmless no-op alongside working native controls (desktop mouse click
+    // "jump" would already happen from mousedown; this just also fires).
+    (function () {
+      var stage = document.querySelector('.game-stage');
+      if (!stage) return;
+
+      function dispatchSpace(type) {
+        var e = new KeyboardEvent(type, { bubbles: true, cancelable: true });
+        try {
+          Object.defineProperty(e, 'keyCode', { get: function () { return 32; } });
+          Object.defineProperty(e, 'which', { get: function () { return 32; } });
+        } catch (err) {}
+        document.dispatchEvent(e);
+      }
+
+      stage.addEventListener('pointerdown', function (evt) {
+        // Let the message box's own OK button keep its own click handling.
+        if (evt.target && evt.target.closest && evt.target.closest('.niokbutton')) return;
+        dispatchSpace('keydown');
+        dispatchSpace('keyup');
+      });
+    })();
   </script>
 </body>
 </html>

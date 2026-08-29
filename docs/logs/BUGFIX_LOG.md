@@ -1,5 +1,15 @@
 # Bug Fix Log
 
+## 2026-08-29 — Dino Run unplayable on mobile with "Request Desktop Site" enabled
+
+- **Type:** bugfix
+- **Area:** hosting (website), games
+- **Files:** `hosting/games/dino/index.html`
+- **Problem / Goal:** User-reported: the Dino Run game doesn't respond to taps on mobile when the browser's "Request Desktop Site" mode is on. Root cause confirmed directly in the vendored `index.js`: it decides mobile vs. desktop via `IS_MOBILE = /Android/.test(navigator.userAgent) || IS_IOS` (an iOS platform check) — "Request Desktop Site" rewrites the user-agent/platform to look like a desktop browser, so `IS_MOBILE` evaluates false even on a real touchscreen phone. The game then binds `mousedown` listeners instead of `touchstart`, and its jump logic only accepts a genuine `touchstart` event or a matching keyboard `keyCode` — a screen tap satisfies neither, so nothing happens.
+- **Solution:** Did not touch the vendored `index.js` (keeps license/attribution integrity, avoids risking well-tested third-party game logic). Instead added a small, capability-independent fallback in the page's own script: a `pointerdown` listener on `.game-stage` that dispatches a real `keydown`/`keyup` pair with `keyCode`/`which` forced to 32 (Space, via `Object.defineProperty` — reliable across browsers, unlike relying on the `KeyboardEvent` constructor's init-dict `keyCode` support) on `document`, which the vendored code's own (always-bound, UA-independent) keyboard listener picks up correctly regardless of which branch its internal `IS_MOBILE` check took.
+- **Regression risks:** None — the fallback is harmless-redundant in every already-working scenario (native touch, native mouse) since the game's jump call is internally guarded against re-triggering mid-jump; it only adds a working input path for the one previously-broken scenario.
+- **Verified:** Inline script extracted and syntax-checked with `new Function()` (parses clean); HTML tag/script balance checked programmatically. No browser available in this environment to manually reproduce "Request Desktop Site" and confirm the fix firsthand — verification is by direct source-code tracing of the vendored game's actual event-binding logic, not a live test.
+
 ## 2026-08-29 — file_picker upgrade fixes Play Console bitmap-downsampling flag; migrates breaking API
 
 - **Type:** bugfix
