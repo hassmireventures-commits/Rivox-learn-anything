@@ -2,13 +2,22 @@
 
 Copy into Play Console. Hosted legal URLs must match live pages before production.
 
+**2026-08-29 ASO revision:** the 2026-08-29 SEO audit found "Rivox" and "Learn
+Anything" both collide with unrelated existing products in search (see
+`docs/logs/FEATURES_LOG.md`). Retitled/re-described below to lead with
+differentiator keywords instead of the collision-prone generic phrase.
+Character counts verified programmatically against Google's real current
+limits (title 30, short description 80, full description 4000 — confirmed via
+Google's own Play Console help docs; an externally-sourced "ASO report" this
+session claimed the title limit was 50, which is wrong).
+
 ## Short description (max 80 characters)
 
-Rivox: AI quizzes & learning paths that adapt to your goals — study smarter, offline-first.
+Generate personalized AI study plans, quizzes, and voice interview drills. (74 chars)
 
 ## Play Store title (max 30 characters)
 
-Rivox: Learn Anything
+Rivox: AI Study Plan & Quiz (27 chars)
 
 ## Full description
 
@@ -130,3 +139,50 @@ Education
 - `assets/legal/terms_v1_en.md`
 - `assets/legal/legal_manifest.json`
 - Hosted URLs in `AppConstants`: `https://learn-anything-43970.web.app/privacy` and `/terms` (switch to learnanything.app after custom domain)
+
+## ASO / Play Console action items (2026-08-29, fact-checked)
+
+An externally-sourced "ASO strategy report" was reviewed this session. Most of
+it was real Google documentation; a couple of claims were fabricated or
+outdated. Verified against Google's own current docs before acting on any of
+it — see `docs/logs/FEATURES_LOG.md` for the full fact-check.
+
+**Real, worth doing (manual Play Console steps — not code):**
+- **Custom Store Listings**: Play Console supports up to 50 CSLs, and one real
+  targeting option is "Organic Search: users who discover your app on Play
+  using specific search terms" (confirmed on Google's own CSL help page).
+  Worth creating one CSL targeted at a term like "voice interview
+  preparation" with creative emphasizing that feature — this is a
+  post-search-click conversion lever (which listing/screenshots a searcher
+  sees), **not** a keyword-ranking mechanism. Manual step in Play Console →
+  Grow → Store presence → Custom store listings.
+- **Android Vitals thresholds** (confirmed real, current): bad-behavior
+  thresholds are user-perceived crash rate **< 1.09%** and ANR rate **<
+  0.47%**, evaluated over a rolling 28-day window. Worth a periodic manual
+  check in Play Console → Quality → Android vitals — not something to
+  automate from this repo.
+- **Target SDK 36 (Android 16)**: confirmed real requirement, deadline
+  **2026-08-31** for new app updates. Already satisfied — `android/app/build.gradle.kts`
+  uses Flutter's dynamic `flutter.targetSdkVersion`/`flutter.compileSdkVersion`
+  (not a hardcoded old value), and the installed Flutter 3.47.1 defaults both
+  to **36**. No action needed unless a future Flutter downgrade changes that.
+
+**Fabricated/outdated — do not implement:**
+- **"Firebase App Indexing"** (the report's suggested `Indexables.noteDigitalDocumentBuilder()`
+  / `FirebaseAppIndex.getInstance().update()` code): this library is
+  discontinued — Firebase's own docs state it's "no longer the recommended
+  way of indexing content" and the Google Search app no longer uses it. The
+  real 2026 equivalent is **Android App Links** (`autoVerify="true"` intent
+  filter + a `.well-known/assetlinks.json` Digital Asset Links file on the
+  website). **Deliberately not implemented this session** — the website's
+  actual pages (`/privacy`, `/terms`, `/games`, `/games/dino`, `/`) don't
+  correspond to any real in-app route, so enabling site-wide App Links right
+  now would hijack real visitors' taps (from Search results or shared links)
+  into a broken in-app screen instead of showing the actual page. Revisit
+  only once there's a genuine shareable in-app destination (e.g. a public
+  quiz-share landing page) that both the site and app agree on — likely a new
+  reserved path prefix (e.g. `/open/*`) with a real web fallback, not the
+  whole domain.
+- The report's claimed **50-character title limit** — the real limit is
+  **30 characters** (Google's own listing-requirements page), matching what
+  this doc already had before the report's claim.

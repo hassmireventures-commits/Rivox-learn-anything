@@ -1,5 +1,20 @@
 # Features Log
 
+## 2026-08-29 — ASO report fact-check; Play Store listing revision
+
+- **Type:** enhancement
+- **Area:** store listing (docs only — no app/website code)
+- **Files:** `docs/store/LISTING.md`
+- **Problem / Goal:** User pasted an externally-sourced "ASO strategy report" covering Play Store metadata, Android Vitals thresholds, "Firebase App Indexing," and Custom Store Listings. Several claims looked fabricated or outdated (particularly the Firebase App Indexing section, which cited what looked like a defunct API and a garbled file path) — fact-checked every concrete, falsifiable claim against Google's own current docs before acting on any of it, rather than implementing on faith.
+- **Findings (fact-checked against real Google docs):**
+  - **Confirmed real:** Android Vitals bad-behavior thresholds (crash rate <1.09%, ANR rate <0.47%, rolling 28-day window); target SDK 36 (Android 16) requirement by 2026-08-31; Custom Store Listings support up to 50 listings, and organic-search-term targeting for a CSL is a real (if misdescribed) option — it's a post-click conversion lever, not a ranking mechanism, contrary to how the report framed it.
+  - **Confirmed fabricated/outdated:** "Firebase App Indexing" (the `Indexables.noteDigitalDocumentBuilder()`/`FirebaseAppIndex.getInstance().update()` code) — this library was discontinued years ago per Firebase's own docs; the real 2026 replacement is Android App Links + a `.well-known/assetlinks.json` file, not any Firebase SDK call. The report's claimed 50-character Play Store title limit is also wrong — the real limit is 30 (confirmed on Google's listing-requirements page), matching what this repo's docs already had.
+  - **Target SDK already compliant:** confirmed `android/app/build.gradle.kts` uses Flutter's dynamic `flutter.targetSdkVersion`, and the installed Flutter 3.47.1 defaults it to 36 — no code change needed.
+  - **App Links deliberately not implemented:** traced the app's actual `DeepLinkHandler`/router and found no in-app route matches the website's real pages (`/privacy`, `/terms`, `/games`, `/games/dino`, `/`). Enabling site-wide Android App Links as the report described would hijack real visitors' taps into a broken in-app screen instead of the actual page. User confirmed: skip for now, revisit only with a genuine shareable in-app destination and a narrower reserved path.
+- **Solution:** Revised the Play Store title/short description in `docs/store/LISTING.md` toward differentiator keywords ("Rivox: AI Study Plan & Quiz" / "Generate personalized AI study plans, quizzes, and voice interview drills.") — both lengths verified programmatically against the real limits (27/30, 74/80) — consistent with the 2026-08-29 SEO audit's finding that "Learn Anything" branding collides with unrelated existing products. Documented the real, actionable Play Console items (CSL targeting, Vitals monitoring) as manual next steps, and explicitly recorded what NOT to implement so the fabricated advice doesn't get acted on later.
+- **Regression risks:** None — docs only, no app or website code changed this pass.
+- **Verified:** All 5 concrete claims individually checked against Google's own current documentation (not assumed); title/description candidate lengths measured programmatically, not eyeballed.
+
 ## 2026-08-29 — Website SEO audit and fixes
 
 - **Type:** enhancement
