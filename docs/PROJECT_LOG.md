@@ -15,6 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-08-29 | release | Website deployed live to Firebase Hosting (learn-anything-43970.web.app) — mini games, ads, SEO fixes | — |
 | 2026-08-29 | enhancement | Website SEO audit and fixes (site was not indexed at all) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-08-29 | feature | Website: native ads, opt-in support ad, mini games (Dino Run) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-08-29 | release | Rivox 1.0.5 (build 6) — see [RELEASE_NOTES_1.0.5.md](RELEASE_NOTES_1.0.5.md) | — |
