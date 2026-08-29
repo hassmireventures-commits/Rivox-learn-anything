@@ -1,5 +1,18 @@
 # Features Log
 
+## 2026-08-29 — Website: native ads, opt-in support ad, mini games (Dino Run)
+
+- **Type:** feature
+- **Area:** hosting (website, not the app)
+- **Files:** `hosting/ads.js`, `hosting/index.html`, `hosting/styles.css`, `hosting/privacy/index.html`, `hosting/terms/index.html` (cache-bust bump only), new `hosting/games/index.html`, `hosting/games/dino/index.html`, `hosting/games/vendor/trex/*` (vendored third-party)
+- **Problem / Goal:** Add native ads and an opt-in "support Rivox" ad placement to the marketing site, plus a mini endless-runner game (Dino Run) with a non-disruptive ad below it.
+- **Solution:**
+  - `ads.js` gained 3 new configurable slot keys (`native`, `support`, `gamesBottom`) — all placeholders requiring a real AdSense **In-article** ad unit to be created per slot (documented in the file's own header, matching the existing `homeBottom` placeholder pattern). Refactored the ad-wiring logic into a shared `wireAndPush()` used both by the page-load pass and a new `LA_ADSENSE.reveal(key, container)` for lazy, on-demand ad loading.
+  - Homepage: added a native (in-article) ad between Features and Support, and a "View a sponsor message" button in the Support section that lazily loads a dedicated ad unit only when clicked — an honest, AdSense-policy-safe interpretation of "support by watching an ad" (no click-baiting language, no gated/rewarded content, since standard AdSense has no rewarded-video mechanic the way AdMob does in the app).
+  - New `/games` hub and `/games/dino` — a real, working Dino Run endless runner. Vendored (unmodified) from `wayou/t-rex-runner` (BSD-3-Clause, itself based on Chromium's offline dinosaur game) under `hosting/games/vendor/trex/`, with the original `LICENSE` file kept alongside and credited on the game page. A native ad sits below the game in normal page flow (not an overlay), so it never interrupts gameplay.
+- **Regression risks:** The 3 new ad slots stay inert (hidden via `hideBanner`) until real AdSense In-article unit IDs are pasted into `ads.js` — no broken ad requests ship. Vendored game assets add ~6KB (sprites) + ~90KB (game JS, mostly embedded base64 audio) to the site; not part of the Flutter app build.
+- **Verified:** Local static-server route check (`/games`, `/games/dino`, all vendored asset paths) all resolve 200 under Firebase Hosting's `cleanUrls` convention; HTML tag balance checked programmatically (div/main/body/html open/close counts match) on all 3 touched/new pages — no visual/browser test possible from this environment.
+
 ## 2026-08-25 — Article bookmarks
 
 - **Type:** feature

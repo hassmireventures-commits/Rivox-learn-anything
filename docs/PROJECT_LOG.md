@@ -15,6 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-08-29 | feature | Website: native ads, opt-in support ad, mini games (Dino Run) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-08-29 | release | Rivox 1.0.5 (build 6) — see [RELEASE_NOTES_1.0.5.md](RELEASE_NOTES_1.0.5.md) | — |
 | 2026-08-29 | bugfix | file_picker upgrade fixes Play Console bitmap-downsampling flag; migrates breaking API | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-08-29 | enhancement | Achievement slide carousel sorted by progress; native ad on Support | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |

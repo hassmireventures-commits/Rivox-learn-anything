@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260824c">
+  <link rel="stylesheet" href="styles.css?v=20260829">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5325876102788151" crossorigin="anonymous"></script>
 </head>
 <body class="home">
@@ -28,6 +28,7 @@
       <nav class="nav" aria-label="Primary">
         <a class="is-active" href="/">Home</a>
         <a href="#features">Features</a>
+        <a href="/games">Games</a>
         <a href="/privacy">Privacy</a>
         <a href="/terms">Terms</a>
         <a href="#support">Contact</a>
@@ -90,11 +91,21 @@
         </article>
       </section>
 
+      <aside class="ad-banner ad-banner--pending" aria-label="Advertisement">
+        <ins class="adsbygoogle" style="display:block" data-la-slot="native" data-ad-layout="in-article" data-ad-format="fluid"></ins>
+      </aside>
+
       <section class="support" id="support">
         <p class="support-kicker">Support</p>
         <h2>Questions about the app?</h2>
         <p class="support-lede">Publisher Hassmire Ventures — we typically reply within 1–2 business days.</p>
         <a class="support-mail" href="mailto:hassmireventures@gmail.com">hassmireventures@gmail.com</a>
+
+        <div class="support-ad">
+          <p class="support-ad-lede">Rivox stays free thanks to ads. If you'd like to help out, you can view a sponsor message below — no signup, no cost to you.</p>
+          <button type="button" class="btn-ghost" id="support-ad-btn">View a sponsor message</button>
+          <div class="support-ad-slot" id="support-ad-slot" hidden></div>
+        </div>
       </section>
     </main>
 
@@ -108,6 +119,20 @@
     </footer>
   </div>
 
-  <script src="/ads.js?v=20260824c" defer></script>
+  <script src="/ads.js?v=20260829" defer></script>
+  <script>
+    (function () {
+      var btn = document.getElementById('support-ad-btn');
+      var slot = document.getElementById('support-ad-slot');
+      if (!btn || !slot) return;
+      btn.addEventListener('click', function () {
+        var ok = window.LA_ADSENSE && window.LA_ADSENSE.reveal('support', slot);
+        if (!ok) return;
+        slot.hidden = false;
+        btn.disabled = true;
+        btn.textContent = 'Thanks for the support!';
+      });
+    })();
+  </script>
 </body>
 </html>
