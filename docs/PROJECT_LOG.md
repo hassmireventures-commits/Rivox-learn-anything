@@ -15,6 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-08-29 | bugfix | Flashcards "N due for review" count never refreshed after reviewing | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-08-29 | bugfix | CI `flutter analyze` step always failed; cleaned up real pre-existing warnings | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-08-29 | bugfix | AI eval CI gate failed on single-model flake, not a real regression | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-08-29 | enhancement | Backlog batch: mark-for-review, achievement badges, AI eval CI, generation UX contract (B12/B14/B16/B17) | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |

@@ -150,6 +150,7 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen>
           )
           .toList();
       await ref.read(flashcardRepositoryProvider).addCards(cards);
+      ref.invalidate(flashcardsDueCountProvider(profile.goalMode));
       if (!mounted) return;
       context.push('/flashcards?goal=${profile.goalMode}');
     } finally {

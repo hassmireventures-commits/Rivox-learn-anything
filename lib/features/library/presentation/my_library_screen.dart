@@ -224,6 +224,7 @@ class _MyLibraryScreenState extends ConsumerState<MyLibraryScreen> {
       if (!mounted) return;
       final l10n = context.l10n;
       if (count > 0) {
+        ref.invalidate(flashcardsDueCountProvider(_goalMode));
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.flashcardsCreatedSnackbar(count))),
         );

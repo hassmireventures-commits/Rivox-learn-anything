@@ -462,7 +462,9 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
                         title: Text(l10n.flashcardsTitle),
                         subtitle: Text(l10n.flashcardsDueCount(dueFlashcards)),
                         trailing: const Icon(Icons.chevron_right_rounded),
-                        onTap: () => context.push('/flashcards?goal=$goalMode'),
+                        onTap: () => context
+                            .push('/flashcards?goal=$goalMode')
+                            .then((_) => ref.invalidate(flashcardsDueCountProvider(goalMode))),
                       ),
                     ),
                     SizedBox(height: layout.sectionGap * 0.5),

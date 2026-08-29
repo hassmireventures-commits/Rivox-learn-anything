@@ -1,5 +1,15 @@
 # Bug Fix Log
 
+## 2026-08-29 — Flashcards "N due for review" count never refreshed after reviewing
+
+- **Type:** bugfix
+- **Area:** learn, flashcards
+- **Files:** `learn_screen.dart`, `results_screen.dart`, `my_library_screen.dart`
+- **Problem / Goal:** User-reported: reviewed flashcards, but Learn screen's "N due for review" count stayed stuck at the old value. `flashcardsDueCountProvider` is a plain (non-autoDispose) `FutureProvider.family`, so once Learn screen (a kept-alive shell tab) first watches it, the cached value never refreshes on its own — nothing called `ref.invalidate` after a review or after new cards were added.
+- **Solution:** Invalidate `flashcardsDueCountProvider(goalMode)` at every point the due count can change: after `context.push('/flashcards?...')` returns on the Learn screen entry point (`.then(...)`), and immediately after `addCards`/`generateFromLibrary` on the results-screen "review mistakes" and library "generate from library" flows.
+- **Regression risks:** None — invalidation only forces a refetch of a cheap `countDue` query, no behavior change otherwise.
+- **Verified:** `flutter analyze` (0 new issues), `flutter test --exclude-tags=live` 140/140 passed.
+
 ## 2026-08-29 — CI `flutter analyze` step always failed; cleaned up real pre-existing warnings
 
 - **Type:** bugfix
