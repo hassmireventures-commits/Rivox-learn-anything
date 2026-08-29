@@ -125,7 +125,7 @@ class GeneratedQuestion {
     return GeneratedQuestion(
       text: text.trim(),
       options: options,
-      correctIndex: correctIndex as int,
+      correctIndex: correctIndex,
       type: isOpen ? (type == 'behavioral' ? 'behavioral' : 'short_answer') : type,
       explanation: explanation,
       referencesJson: referencesJson,

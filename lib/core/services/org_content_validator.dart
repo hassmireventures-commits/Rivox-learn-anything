@@ -17,7 +17,6 @@ class OrgContentValidator {
 
     final t = title.toLowerCase().trim();
     final s = summary.toLowerCase().trim();
-    final hay = '$t $s';
 
     if (_isOffBrandPersonHit(brand: brand, title: title, summary: summary)) {
       return false;

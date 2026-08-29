@@ -1,9 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/local/isar_service.dart';
 import '../../data/local/models/knowledge_source.dart';
 import '../../data/local/repositories/knowledge_repository.dart';
-import '../../data/vector/knowledge_vector_store.dart';
 import '../ai_platform/ai_audit_log.dart';
 import '../ai_platform/ai_consent_gate.dart';
 import '../ai_platform/ai_policy_registry.dart';

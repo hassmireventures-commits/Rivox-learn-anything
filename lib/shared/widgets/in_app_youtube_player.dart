@@ -99,15 +99,6 @@ class _InAppYoutubePlayerState extends State<InAppYoutubePlayer> {
     super.dispose();
   }
 
-  Future<void> _openYouTube() async {
-    final id = widget.videoId;
-    final uri = id != null
-        ? Uri.parse('https://www.youtube.com/watch?v=$id')
-        : Uri.parse(
-            'https://www.youtube.com/results?search_query=${Uri.encodeComponent(widget.title)}');
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
-  }
-
   Future<void> _searchYouTube() async {
     final query = Uri.encodeComponent('${widget.title} tutorial');
     final uri = Uri.parse('https://www.youtube.com/results?search_query=$query');
@@ -229,42 +220,6 @@ class _VideoSearchCard extends StatelessWidget {
               onPressed: onSearch,
               icon: const Icon(Icons.play_arrow_rounded, color: Colors.white),
               label: Text(l10n.pathVideoSearchButton, style: const TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _VideoUnavailableCard extends StatelessWidget {
-  const _VideoUnavailableCard({required this.onWatch, this.l10n});
-
-  final VoidCallback onWatch;
-  final dynamic l10n;
-
-  @override
-  Widget build(BuildContext context) {
-    final strings = l10n ?? context.l10n;
-    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
-    return InAppYoutubeFrame(
-      child: ColoredBox(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.videocam_off_outlined, size: 40, color: muted),
-            const SizedBox(height: 8),
-            Text(
-              strings.pathVideoUnavailable,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: muted),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: onWatch,
-              icon: const Icon(Icons.open_in_new_rounded),
-              label: Text(strings.pathWatchOnYouTube),
             ),
           ],
         ),

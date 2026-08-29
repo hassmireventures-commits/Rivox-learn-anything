@@ -17,7 +17,9 @@ jobs:
       - run: flutter pub get
       - name: Release hygiene gate
         run: dart run tool/check_release_hygiene.dart
-      - run: flutter analyze
+      # --no-fatal-infos: info-level lints (style suggestions) stay visible in
+      # the log but don't fail the build; only real errors/warnings do.
+      - run: flutter analyze --no-fatal-infos
       - run: flutter test
       - name: Release APK compile check
         env:

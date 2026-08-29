@@ -1,5 +1,15 @@
 # Bug Fix Log
 
+## 2026-08-29 — CI `flutter analyze` step always failed; cleaned up real pre-existing warnings
+
+- **Type:** bugfix
+- **Area:** ci, code quality
+- **Files:** `analysis_options.yaml`, `.github/workflows/ci.yml`, 11 source/test files (unused imports/declarations, one unnecessary cast, one unnecessary null comparison, two unnecessary `!`, and one genuine bug: a missing `await` before `return BuiltInAiRouter.withModelFallback(...)` in `openai_compatible_provider.dart` meant a `DioException` from that path could skip the method's own `on DioException` mapping).
+- **Problem / Goal:** First-ever `ci.yml` run on this repo failed at `flutter analyze`. Investigation found `flutter analyze` defaults to `--fatal-infos=true` in this Flutter SDK — it exits 1 whenever **any** issue exists, including info-level style notes, not just errors/warnings. Since this repo had no git history before this session (first commit was made this session), this was never actually run before, so nobody had seen it. 2162 of ~2213 issues were info-level noise in `lib/l10n/app_localizations*.dart` (generated, "do not edit by hand") that isn't part of `**/*.g.dart` and so wasn't already excluded; the remaining 16 were genuine (if mostly cosmetic) warnings in hand-written code.
+- **Solution:** Excluded the generated l10n Dart files from analysis in `analysis_options.yaml` (same treatment as `.g.dart`). Fixed all 16 real warnings directly (unused imports/private declarations removed, unnecessary cast/null-check removed, missing `await` added). Added `--no-fatal-infos` to `ci.yml`'s `flutter analyze` step so remaining info-level style notes (35, all pre-existing, e.g. `use_null_aware_elements`, deprecated Flutter API usage) stay visible in logs without failing the build.
+- **Regression risks:** None expected — every removed declaration was confirmed to have zero call sites before deletion; the `await` addition only changes which `catch` clause handles a `DioException` from the Built-in AI path (now correctly mapped via `ProviderErrorMapper`, previously would have escaped unmapped).
+- **Verified:** `flutter analyze --no-fatal-infos` exits 0 (35 info-only issues, 0 errors/warnings). `flutter test --exclude-tags=live` — 140/140 passed, no regressions.
+
 ## 2026-08-29 — AI eval CI gate failed on single-model flake, not a real regression
 
 - **Type:** bugfix

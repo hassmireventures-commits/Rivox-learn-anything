@@ -481,22 +481,6 @@ class ResourceLinkValidator {
     ];
   }
 
-  static Future<ResourceLink?> _fallbackDocForModule(
-    String moduleTitle, {
-    Set<String> excludeUrls = const {},
-    String pathContext = '',
-    String pathTitle = '',
-  }) async {
-    final docs = await _fallbackDocsForModule(
-      moduleTitle,
-      excludeUrls: excludeUrls,
-      pathContext: pathContext,
-      pathTitle: pathTitle,
-      limit: 1,
-    );
-    return docs.isEmpty ? null : docs.first;
-  }
-
   static Future<String?> _fallbackYouTubeForModule(String moduleTitle) async {
     final item = await DailyContentFallbacks.pick(
       type: 'video',

@@ -497,10 +497,6 @@ class DailyContentFallbacks {
     ];
   }
 
-  static List<String> _wikiSearchQueries(String topic) {
-    return LearningArticleResolver.buildSearchQueries(topic: topic);
-  }
-
   static List<({String url, String title, String summary, bool trusted})>
       _articleCandidates(String topic) {
     final trimmed = topic.trim();

@@ -21,6 +21,9 @@ analyzer:
     - windows/**
     - macos/**
     - linux/**
+    # Generated from ARB by tool/generate_l10n.py — "do not edit by hand".
+    - lib/l10n/app_localizations.dart
+    - lib/l10n/app_localizations_*.dart
 
 linter:
   # The lint rules applied to this project can be customized in the

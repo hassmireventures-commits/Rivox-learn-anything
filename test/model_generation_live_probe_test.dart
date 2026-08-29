@@ -85,7 +85,7 @@ class _ModelProbe {
   );
 
   Future<List<_ProbeResult>> runAllViaRouter() async {
-    _dio.options.headers!['Authorization'] = 'Bearer $apiKey';
+    _dio.options.headers['Authorization'] = 'Bearer $apiKey';
     return [
       await _runViaRouter('pulse', _pulsePrompts(), _scorePulse, maxTokens: 256),
       await _runViaRouter('quiz', _quizPrompts(), _scoreQuiz, maxTokens: 1800),
@@ -151,7 +151,7 @@ class _ModelProbe {
   }
 
   Future<List<_ProbeResult>> runAll() async {
-    _dio.options.headers!['Authorization'] = 'Bearer $apiKey';
+    _dio.options.headers['Authorization'] = 'Bearer $apiKey';
     return [
       await _runTask('pulse', _pulsePrompts(), _scorePulse, maxTokens: 256),
       await _runTask('quiz', _quizPrompts(), _scoreQuiz, maxTokens: 1800),

@@ -8,7 +8,6 @@ import '../../../core/constants/supported_languages.dart';
 import '../../../core/locale/app_localizations_ext.dart';
 import '../../../core/locale/language_change_coordinator.dart';
 import '../../../core/providers/app_providers.dart';
-import '../../../core/providers/ai_platform_providers.dart';
 import '../../../core/providers/home_refresh.dart';
 import '../../../core/services/ai_study_pulse_service.dart';
 import '../../../core/services/exam_notification_scheduler.dart';

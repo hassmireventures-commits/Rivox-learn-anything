@@ -132,7 +132,7 @@ class _DailyContentDetailScreenState extends ConsumerState<DailyContentDetailScr
         _videoSearchOnly = false;
       });
       unawaited(_markPackOpened());
-      if (pack != null) unawaited(_prepareVideoDisplay(pack));
+      unawaited(_prepareVideoDisplay(pack));
     } catch (_) {
       if (!mounted) return;
       setState(() => _loading = false);

@@ -62,7 +62,7 @@ class OpenAiCompatibleProvider implements AiProvider {
 
     try {
       if (providerType == AiProviderType.builtin) {
-        return BuiltInAiRouter.withModelFallback(
+        return await BuiltInAiRouter.withModelFallback(
           configuredModel: model,
           attempt: (activeModel) async {
             final content = await _completeWithModel(

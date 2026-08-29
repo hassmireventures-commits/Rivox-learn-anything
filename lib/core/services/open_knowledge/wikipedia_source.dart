@@ -50,13 +50,6 @@ class WikipediaSource {
     }
   }
 
-  Future<({String title, String extract, String url})?> _fetchSummary(
-    String searchTerm,
-  ) async {
-    final list = await _fetchSummaries(searchTerm, limit: 1);
-    return list.isEmpty ? null : list.first;
-  }
-
   Future<List<({String title, String extract, String url})>> _fetchSummaries(
     String searchTerm, {
     required int limit,
