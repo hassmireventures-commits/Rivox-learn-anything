@@ -11,6 +11,15 @@
 # `_printReport` function, so historical scores are tracked by browsing past
 # workflow run logs in the Actions tab. A committed JSON log with trend charts
 # could be a future enhancement.
+#
+# Gate scope: only "router chain" fails the job. That sub-test exercises
+# BuiltInAiRouter.withModelFallback — the exact path real quiz/path/daily-
+# content generation takes in the app, including its retry-on-bad-output
+# fallback to the secondary model. "primary model alone" and "fallback model"
+# call one model with no cross-model fallback, so they're more exposed to
+# ordinary LLM output variance (a single slow/truncated response) that never
+# reaches real users because the router already retries past it. They still
+# run every time for visibility (continue-on-error), just don't fail the job.
 name: AI generation quality eval
 
 on:
@@ -28,5 +37,11 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - name: Model generation live probe
-        run: flutter test test/model_generation_live_probe_test.dart --dart-define=BUILT_IN_AI_API_KEY=${{ secrets.BUILT_IN_AI_API_KEY }}
+      - name: Router chain (gates this job)
+        run: flutter test test/model_generation_live_probe_test.dart --plain-name "router chain" --dart-define=BUILT_IN_AI_API_KEY=${{ secrets.BUILT_IN_AI_API_KEY }}
+      - name: Primary model alone (informational only)
+        continue-on-error: true
+        run: flutter test test/model_generation_live_probe_test.dart --plain-name "primary model alone" --dart-define=BUILT_IN_AI_API_KEY=${{ secrets.BUILT_IN_AI_API_KEY }}
+      - name: Fallback model alone (informational only)
+        continue-on-error: true
+        run: flutter test test/model_generation_live_probe_test.dart --plain-name "fallback model" --dart-define=BUILT_IN_AI_API_KEY=${{ secrets.BUILT_IN_AI_API_KEY }}

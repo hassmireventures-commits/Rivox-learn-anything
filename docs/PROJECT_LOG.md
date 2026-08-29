@@ -15,6 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-08-29 | bugfix | AI eval CI gate failed on single-model flake, not a real regression | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-08-29 | enhancement | Backlog batch: mark-for-review, achievement badges, AI eval CI, generation UX contract (B12/B14/B16/B17) | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
 | 2026-08-29 | feature | MoSCoW feature research pass — B11–B21 added to backlog | [BACKLOG](BACKLOG.md) |
 | 2026-08-29 | bugfix | Leftover agent debug logger ran on every generation in production | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
