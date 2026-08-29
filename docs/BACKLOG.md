@@ -1,6 +1,6 @@
 # Learn Anything — Product backlog
 
-Living list of **not-built, coming-soon, or partial** work. Grounded in shipped logs, explicit Coming soon UI, the 2026-08-23 user-reported batch, and — for B11–B21 — a 2026-08-29 research pass (internal `docs/reviews/*` roadmap docs + external 2026 AI-learning-app market scan) prioritized by MoSCoW. Not a speculative roadmap beyond what's cited per item.
+Living list of **not-built, coming-soon, or partial** work. Grounded in shipped logs, explicit Coming soon UI, the 2026-08-23 user-reported batch, and — for B11–B26 — 2026-08-29 research passes (internal `docs/reviews/*` roadmap docs + external 2026 AI-learning-app market scan for B11–B21; the site's own SEO audit + a fact-checked external ASO report for B22–B26) prioritized by MoSCoW. Not a speculative roadmap beyond what's cited per item.
 
 Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item. When an item ships, move a dated note to the section log and mark status **done** here (do not delete the row).
 
@@ -16,7 +16,7 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 | B8 | Device QA for 2026-08-23 batch | backlog | qa | — |
 | B9 | Confirm production ad fill on device | backlog | ads | — |
 | B10 | Hosting AdSense display slot IDs | done | hosting | — |
-| B11 | Spaced-repetition flashcards from library/mistakes | in progress (2026-08-29) | learn, library, ai | Must have |
+| B11 | Spaced-repetition flashcards from library/mistakes | done (2026-08-29) | learn, library, ai | Must have |
 | B12 | Automated AI generation quality eval gate | done (2026-08-29) | ai, ci, qa | Must have |
 | B13 | Optional encrypted account + cross-device backup/sync | backlog (proposed 2026-08-29) | accounts, infra | Must have |
 | B14 | Global AI-generation error-recovery UX contract | done (2026-08-29) | ux, quiz, learn | Must have |
@@ -27,6 +27,11 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 | B19 | Home-screen widget (streak / daily quiz) | backlog (proposed 2026-08-29) | platform, retention | Could have |
 | B20 | Neurodiversity-aware adaptive pacing | backlog (proposed 2026-08-29) | ai, accessibility | Could have |
 | B21 | Marketplace / enterprise SKU / learning-intelligence API | backlog (proposed 2026-08-29) | growth, enterprise | Won't have (this cycle) |
+| B22 | Google Search Console verification + sitemap submission | backlog (proposed 2026-08-29) | seo, hosting | Must have |
+| B23 | Attach `learnanything.app` custom domain | backlog (proposed 2026-08-29) | hosting, branding | Should have |
+| B24 | Custom Store Listing targeted at "voice interview preparation" | backlog (proposed 2026-08-29) | aso, marketing | Should have |
+| B25 | Content build-out for long-tail SEO keywords (blog / comparison pages) | backlog (proposed 2026-08-29) | hosting, content, seo | Could have |
+| B26 | Scoped Android App Links (reserved app-deep-link path) | backlog (proposed 2026-08-29) | mobile, hosting, deep-linking | Could have |
 
 ---
 
@@ -136,9 +141,10 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
 
 ### B11 — Spaced-repetition flashcards from library/mistakes
 
-- **Status:** backlog (proposed 2026-08-29)
+- **Status:** done (2026-08-29)
 - **Area:** learn, library, ai
 - **MoSCoW:** Must have
+- **Shipped:** New `Flashcard` Isar collection with a tested, pure SM-2 implementation (`SpacedRepetition.review`); free/instant cards from quiz mistakes (`QuizRepository.getWrongQuestions` + `FlashcardRepository.fromWrongQuestion`, no AI call) and AI-generated cards from the library (`FlashcardGenerationService`, quota-gated like other generation); review screen at `/flashcards`; entry points on Learn, Library, and Results screens. Covered by `test/flashcard_repository_test.dart` (7 tests). A follow-up bugfix (2026-08-29, see `docs/logs/BUGFIX_LOG.md`) fixed the due-count display never refreshing after a review.
 - **Why it exists:** Confirmed gap — grep of `lib/` found no flashcard or spaced-repetition code (only a dead `multiplayerLeaderboardTitle` l10n string from the removed multiplayer feature). Every major 2026 competitor (Quizlet AI Study Tools, Knowt, Anki-style apps) leads with "turn your notes/mistakes into spaced-repetition cards"; research cited 3.2× retention vs. drill-only apps. This app already has the two building blocks: the Personal Knowledge Base (RAG uploads) and per-question quiz history — a flashcard mode is mostly a new prompt template + a scheduling field on top of existing infra, not a new subsystem.
 - **Suggested next step:** Generate flashcards from (a) library chunks the user opted into RAG on, and (b) previously-missed quiz questions. Add a `nextReviewAt`/`easeFactor` pair to the question/answer model (SM-2-style) and a lightweight review queue screen. Reuse `LlmManager` + `AiOutputGate` for generation; reuse Built-in quota accounting.
 - **Risks:** Another Isar schema change; scheduling logic needs its own tests (must not silently starve review queues); should not compete with quiz generation for the same daily quota without a clear UX split.
@@ -249,3 +255,53 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
 - **Suggested next step:** Explicitly deferred. Do not start scaffolding for any of the three until B13 (accounts), a real payments/entitlements layer, and R14's policy work exist. Revisit only after B11–B17 ship and prove retention.
 - **Risks:** The main risk is scope sprawl (`risk-register.md` R13) — starting any of these now would pull effort from the Must/Should items above before product-market fit on the core app is proven.
 - **Source:** `docs/reviews/billion-dollar-roadmap.md`, `risk-register.md` R13/R14.
+
+### B22 — Google Search Console verification + sitemap submission
+
+- **Status:** backlog (proposed 2026-08-29)
+- **Area:** seo, hosting
+- **MoSCoW:** Must have
+- **Why it exists:** The 2026-08-29 SEO audit confirmed via `site:learn-anything-43970.web.app` that the website is **not indexed by Google at all** — the single highest-leverage SEO fix available, ahead of any on-page work. `robots.txt`/`sitemap.xml` now exist and are deployed live, but nothing has told Google to actually crawl them; there is also currently no way to monitor indexing status, crawl errors, or search performance at all (confirmed: no Search Console verification, no Analytics, anywhere in the repo).
+- **Suggested next step:** Verify the domain in Google Search Console (HTML meta tag or DNS TXT record — either works with the current `learn-anything-43970.web.app` domain), then submit `https://learn-anything-43970.web.app/sitemap.xml`. Requires the site owner's Google account — not something an agent can do.
+- **Risks:** None — purely additive, no downside to doing this immediately.
+- **Source:** `docs/logs/FEATURES_LOG.md` 2026-08-29 SEO audit.
+
+### B23 — Attach `learnanything.app` custom domain
+
+- **Status:** backlog (proposed 2026-08-29)
+- **Area:** hosting, branding
+- **MoSCoW:** Should have
+- **Why it exists:** The site currently lives on the generic Firebase subdomain `learn-anything-43970.web.app`; `learnanything.app` is already the documented intended domain (`lib/core/constants/app_constants.dart`'s own comment: "Switch back to https://learnanything.app/... after custom domain DNS is live") but DNS was never attached. Every day on the throwaway subdomain delays building real domain authority, and canonical tags / Search Console verification / all backlinks accumulated before the switch would need to be redirected (301) to preserve any SEO value already built.
+- **Suggested next step:** Attach the domain in Firebase Hosting (Console → Hosting → Add custom domain), configure DNS, then update canonical/OG URLs across `hosting/*.html`, `hosting/sitemap.xml`, `hosting/robots.txt`, `AppConstants`'s privacy/terms URLs, and the Play Store listing URLs in `docs/store/LISTING.md` — all in one pass, with 301 redirects from the old domain, not a partial switch.
+- **Risks:** A domain migration is itself a real SEO event — must be done as a clean cutover with redirects, not left half-migrated (some canonicals pointing one way, live traffic serving another).
+- **Source:** `lib/core/constants/app_constants.dart` comment; `docs/PLAY_STORE_CHECKLIST.md` item 3; 2026-08-29 SEO audit.
+
+### B24 — Custom Store Listing targeted at "voice interview preparation"
+
+- **Status:** backlog (proposed 2026-08-29)
+- **Area:** aso, marketing
+- **MoSCoW:** Should have
+- **Why it exists:** Confirmed real (fact-checked against Google's own Custom Store Listings help page, not assumed) during the 2026-08-29 ASO report review: Play Console supports up to 50 Custom Store Listings, including one genuinely targetable at "Organic Search: users who discover your app on Play using specific search terms." Voice interview practice with live captions was independently identified by the earlier keyword research as one of the most winnable long-tail terms for this app (open niche, no dominant incumbent).
+- **Suggested next step:** Create a CSL in Play Console (Grow → Store presence → Custom store listings) targeted at organic search term "voice interview preparation" (or similar), with creative/screenshots emphasizing that feature specifically rather than the general app pitch. Manual Play Console step, not code.
+- **Risks:** Low — this only changes which listing/creative a searcher sees after they already searched that term (a conversion lever), not search rankings themselves; don't oversell it internally as an SEO ranking mechanism.
+- **Source:** `docs/store/LISTING.md` 2026-08-29 ASO revision; Google Play Console Custom Store Listings help docs.
+
+### B25 — Content build-out for long-tail SEO keywords (blog / comparison pages)
+
+- **Status:** backlog (proposed 2026-08-29)
+- **Area:** hosting, content, seo
+- **MoSCoW:** Could have
+- **Why it exists:** The 2026-08-29 keyword research found that real top-ranking competitors in this space win via scale — e.g. PracticeMock-style programmatic SEO (one indexed page per exam/topic, ~500+ pages) and RemNote-style long-form comparison posts ("Best Anki Alternatives" with tables, named competitors, FAQ sections). A handful of static marketing pages cannot compete head-on with that; winnable long-tail phrases (BYOK AI quiz generation, local-first flashcards, AI quiz for competitive exams) need actual content to rank for, not just better meta tags on the homepage.
+- **Suggested next step:** Do not build this speculatively or all at once. Scope a small first batch (e.g. 3-5 pages) targeting the highest-winnability phrases from the research (`docs/logs/FEATURES_LOG.md` keyword research notes), each a real, substantive page — not thin SEO filler — before deciding whether to invest further.
+- **Risks:** Largest scope item on this list — real ongoing content-writing effort, not a one-time code change. Thin/low-quality pages built purely for SEO can actively hurt rankings (Google's stated policy against "scaled content abuse") — any page built here must be genuinely useful on its own merits.
+- **Source:** `docs/logs/FEATURES_LOG.md` 2026-08-29 SEO audit keyword research.
+
+### B26 — Scoped Android App Links (reserved app-deep-link path)
+
+- **Status:** backlog (proposed 2026-08-29)
+- **Area:** mobile, hosting, deep-linking
+- **MoSCoW:** Could have
+- **Why it exists:** An externally-sourced ASO report's "Firebase App Indexing" section was confirmed fake/outdated (that library was discontinued years ago); the real 2026 equivalent is Android App Links (`autoVerify="true"` + `.well-known/assetlinks.json`). Investigated implementing it directly this session and found the app's actual `DeepLinkHandler`/router has no route matching any of the website's real pages (`/privacy`, `/terms`, `/games`, `/games/dino`, `/`) — enabling it site-wide as the report described would hijack real visitors' Search-result taps into a broken in-app screen instead of the actual page. Deliberately not implemented; the SHA-256 fingerprint needed for `assetlinks.json` was already extracted from `android/upload-keystore.jks` this session if/when this is picked up (note: if Play App Signing is enabled, the real fingerprint needed is the **app signing key** from Play Console → Setup → App integrity, not the upload key — confirm which before shipping).
+- **Suggested next step:** Design a reserved path prefix (e.g. `/open/*`) that's exclusively for app deep links, with a real web fallback page for users without the app installed, before touching `AndroidManifest.xml`'s `autoVerify` intent filter. Do not scope App Links to the whole domain.
+- **Risks:** Doing this wrong (site-wide, without matching app routes) actively breaks the live site's UX for real visitors — this is the one item on this list where the risk of a rushed implementation is worse than not doing it at all.
+- **Source:** `docs/store/LISTING.md` 2026-08-29 ASO fact-check section; `lib/core/services/deep_link_handler.dart` investigation this session.

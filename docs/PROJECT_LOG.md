@@ -15,6 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-08-29 | feature | Backlog updated: B11 marked done, B22–B26 added (SEO/ASO follow-ups, MoSCoW) | [BACKLOG](BACKLOG.md) |
 | 2026-08-29 | enhancement | ASO report fact-check; Play Store listing revision (title/desc + corrected fake advice) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-08-29 | bugfix | Dino Run unplayable on mobile with "Request Desktop Site" enabled | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-08-29 | release | Website deployed live to Firebase Hosting (learn-anything-43970.web.app) — mini games, ads, SEO fixes | — |
