@@ -8,6 +8,7 @@ import '../../../core/locale/app_localizations_ext.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/app_card.dart';
+import '../../../shared/widgets/bottom_native_ad_slot.dart';
 
 class SupportScreen extends ConsumerStatefulWidget {
   const SupportScreen({super.key});
@@ -156,6 +157,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           _FaqTile(q: l10n.supportFaqAccountQuestion, a: l10n.supportFaqAccountAnswer),
           _FaqTile(q: l10n.supportFaqAdsQuestion, a: l10n.supportFaqAdsAnswer),
           _FaqTile(q: l10n.supportFaqProvidersQuestion, a: l10n.supportFaqProvidersAnswer),
+          const ScrollableNativeAdSlot(slotId: 'support'),
         ],
       ),
     );

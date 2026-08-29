@@ -1,5 +1,15 @@
 ﻿# Enhancements Log
 
+## 2026-08-29 — Achievement slide carousel sorted by progress; native ad on Support
+
+- **Type:** enhancement
+- **Area:** dashboard, gamification, ads, support
+- **Files:** `achievement_badges.dart`, `support_screen.dart`
+- **Problem / Goal:** User feedback on the shipped B16 achievement grid: (1) wanted a swipeable slide view instead of a static wrap, with the closest-to-unlocking badge leading; (2) wanted a native ad below the FAQ on the Support screen (support currently only has an opt-in thank-you interstitial, no inline native ad).
+- **Solution:** Added a `progress: double Function(DashboardStats)` (0.0-1.0) field to `AchievementDef` for all 8 badges. `AchievementBadgesSection` is now a `StatefulWidget` wrapping a `PageView.builder` (viewportFraction 0.42) with a small dot-page indicator, sorting a copy of `kAchievements` by `progress` descending each build — unlocked badges evaluate to exactly 1.0 so they naturally lead, followed by the most-progressed in-progress badge. Added `ScrollableNativeAdSlot(slotId: 'support')` (the same dismissible inline native-ad widget used elsewhere, e.g. `daily_content_detail_screen.dart`) right after the last FAQ tile in `support_screen.dart`'s existing `ListView`.
+- **Regression risks:** None expected — `AchievementDef` gained a required field but every existing definition was updated in the same change; the ad slot reuses an already-shipped, already-tested widget.
+- **Verified:** `flutter analyze --no-fatal-infos` exits 0 (35 pre-existing info issues, unchanged); `flutter test --exclude-tags=live` 140/140 passed.
+
 ## 2026-08-29 — Backlog batch: mark-for-review, achievement badges, AI eval CI, generation UX contract
 
 - **Type:** enhancement
