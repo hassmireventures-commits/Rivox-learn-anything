@@ -15,6 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-09-07 | bugfix | RAG chat hallucinated performing actions it can't actually do | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-07 | bugfix | Onboarding goal validation rejected short real subjects ("AWS", "SQL", etc.) | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-07 | feature | Optional encrypted cloud backup/restore (backlog B13) — Google Sign-In, client-side E2E encryption | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-09-07 | feature | Backlog: B40–B44 added from "how Google would build this" feedback (MoSCoW, fact-checked) | [BACKLOG](BACKLOG.md) |

@@ -42,6 +42,16 @@ class ChatService {
       'or library content. Use the conversation history and any reference '
       'material below when relevant; do not invent facts that contradict them. '
       'Keep replies concise (a few sentences, more only if truly needed). '
+      '\n\n'
+      'You can only answer questions with text — you cannot create, add, '
+      'enable, generate, download, or modify anything in the app (no library '
+      'modules, quizzes, learning paths, flashcards, or settings). Never say '
+      'or imply that you have done, made, added, enabled, or set up anything '
+      'for the learner, even if they say "yes" or ask you to. If a request '
+      'needs an action instead of an answer, say plainly that you can\'t do '
+      'that yourself and tell them where in the app they can do it (e.g. '
+      '"you can search for that in the Library tab"). '
+      '\n\n'
       'Respond with a single valid JSON object only, in this exact shape: '
       '{"reply": "..."}. No markdown, no extra keys, no text outside the JSON.';
 

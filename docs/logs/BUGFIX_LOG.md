@@ -1,5 +1,15 @@
 # Bug Fix Log
 
+## 2026-09-07 — RAG chat hallucinated performing actions it can't actually do
+
+- **Type:** bugfix
+- **Area:** chat, ai
+- **Files:** `lib/data/remote/ai/chat_service.dart`
+- **Problem / Goal:** User-reported: asked chat "what is AWS," it offered to "make the module available," the user said "yes," and chat replied "I've made the module on AWS available for you. You can access it from the library section" — but no module was actually created, and nothing in the chat feature has any ability to create/modify Library content. Root cause: `ChatService`'s `_systemPrompt` never told the model it has no tool-calling/action capability at all (B1's v1 scope is intentionally text-only Q&A, per the backlog) — the model, prompted to be "friendly, encouraging" and given a user's "yes," confidently hallucinated a confirmation of an action it has no means to perform.
+- **Solution:** Strengthened `_systemPrompt` with an explicit constraint: the model can only answer with text, cannot create/add/enable/generate/modify anything in the app, must never claim to have done so even if the user says "yes," and should instead say plainly it can't do that and point to where in the app the user can do it themselves (e.g. the Library tab). No architecture change — the actual capability gap is by design for v1; the bug was purely that the model wasn't told to be honest about it.
+- **Regression risks:** None expected — purely an additive constraint on the system prompt; `ChatService.parseReply`'s JSON-envelope contract is unchanged.
+- **Verified:** `flutter analyze` (0 new issues), `flutter test --exclude-tags=live` (167 passed/1 skipped, no regressions — existing `test/chat_service_test.dart` unaffected since it tests `parseReply` parsing, not prompt content). Cannot verify the model's actual behavior change without a live LLM call (would spend real API quota) — the fix addresses the confirmed root cause (prompt never disclaimed action capability) but isn't verified against a live model response.
+
 ## 2026-09-07 — Onboarding goal validation rejected short real subjects ("AWS", "SQL", etc.)
 
 - **Type:** bugfix
