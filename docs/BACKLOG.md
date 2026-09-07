@@ -1,6 +1,6 @@
 # Learn Anything — Product backlog
 
-Living list of **not-built, coming-soon, or partial** work. Grounded in shipped logs, explicit Coming soon UI, the 2026-08-23 user-reported batch, and — for B11–B26 — 2026-08-29 research passes (internal `docs/reviews/*` roadmap docs + external 2026 AI-learning-app market scan for B11–B21; the site's own SEO audit + a fact-checked external ASO report for B22–B26) prioritized by MoSCoW. Not a speculative roadmap beyond what's cited per item.
+Living list of **not-built, coming-soon, or partial** work. Grounded in shipped logs, explicit Coming soon UI, the 2026-08-23 user-reported batch, and — for B11–B26 — 2026-08-29 research passes (internal `docs/reviews/*` roadmap docs + external 2026 AI-learning-app market scan for B11–B21; the site's own SEO audit + a fact-checked external ASO report for B22–B26) prioritized by MoSCoW. B27–B39 come from a 2026-09-07 early-beta user feedback report, with every item verified against the app's actual current code before being scoped (several beta asks turned out to already be shipped or redundant with an existing algorithm — documented as such rather than re-implemented). Not a speculative roadmap beyond what's cited per item.
 
 Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item. When an item ships, move a dated note to the section log and mark status **done** here (do not delete the row).
 
@@ -32,6 +32,19 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 | B24 | Custom Store Listing targeted at "voice interview preparation" | backlog (proposed 2026-08-29) | aso, marketing | Should have |
 | B25 | Content build-out for long-tail SEO keywords (blog / comparison pages) | backlog (proposed 2026-08-29) | hosting, content, seo | Could have |
 | B26 | Scoped Android App Links (reserved app-deep-link path) | backlog (proposed 2026-08-29) | mobile, hosting, deep-linking | Could have |
+| B27 | Onboarding is already API-key-free; remove dead BYOK onboarding step | backlog (proposed 2026-09-07) | onboarding, ux | Won't have (already satisfied) |
+| B28 | Export quiz results / learning path as a shareable image | backlog (proposed 2026-09-07) | quiz, learn, sharing | Should have |
+| B29 | Achievement unlock celebration + persisted unlock history | backlog (proposed 2026-09-07) | gamification, dashboard | Could have |
+| B30 | Ad-free premium subscription (IAP) for unlimited Built-in AI | backlog (proposed 2026-09-07) | monetization | Should have |
+| B31 | Classroom quiz-code sharing for teacher-led groups | backlog (proposed 2026-09-07) | social, career, accounts | Could have |
+| B32 | ASO: beta-suggested title change is invalid/redundant — no action | backlog (proposed 2026-09-07) | aso, marketing | Won't have |
+| B33 | Launch Loop: demo video + community feedback posts | backlog (proposed 2026-09-07) | marketing, growth | Could have |
+| B34 | Camera-to-Quiz (OCR ingestion into Library) | backlog (proposed 2026-09-07) | library, ai, ocr | Should have |
+| B35 | Daily Pack: timestamped video chapters/summary | backlog (proposed 2026-09-07) | learn, daily content | Could have |
+| B36 | Local `.rivox` encrypted export/import (no-cloud sharing) | backlog (proposed 2026-09-07) | learn, sharing, privacy | Should have |
+| B37 | Voice interview: speech-delivery feedback + persona-aware scoring | backlog (proposed 2026-09-07) | career, ai, voice | Should have |
+| B38 | Flashcards already use SM-2 (superset of Leitner) — no algorithm change | backlog (proposed 2026-09-07) | learn, flashcards | Won't have (algorithm) |
+| B39 | Learning path visual mind-map view | backlog (proposed 2026-09-07) | learn, ux | Could have |
 
 ---
 
@@ -305,3 +318,152 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
 - **Suggested next step:** Design a reserved path prefix (e.g. `/open/*`) that's exclusively for app deep links, with a real web fallback page for users without the app installed, before touching `AndroidManifest.xml`'s `autoVerify` intent filter. Do not scope App Links to the whole domain.
 - **Risks:** Doing this wrong (site-wide, without matching app routes) actively breaks the live site's UX for real visitors — this is the one item on this list where the risk of a rushed implementation is worse than not doing it at all.
 - **Source:** `docs/store/LISTING.md` 2026-08-29 ASO fact-check section; `lib/core/services/deep_link_handler.dart` investigation this session.
+
+### B27 — Onboarding is already API-key-free; remove dead BYOK onboarding step
+
+- **Status:** backlog (proposed 2026-09-07)
+- **Area:** onboarding, ux
+- **MoSCoW:** Won't have (already satisfied)
+- **Why it exists:** Beta feedback: "Don't push API keys right away. Give us a flawless, simple free tier first." Verified against the actual live flow (`app_router.dart:66-67` → `splash_screen.dart` → `welcome_screen.dart`): the real onboarding is a 4-page flow (identity → goal mode → daily-minutes habit → legal consent) that never asks for an API key. The "Continue" action on the legal page calls `ref.read(providerRepositoryProvider).ensureBuiltInSeeded()` (`welcome_screen.dart:468-471`) and routes straight to `/dashboard` — Built-in AI is silently seeded with zero user input. **This beta ask is already true today.**
+- **The one real gap found:** `lib/features/onboarding/presentation/onboarding_provider_step.dart` — a "Cloud AI vs. skip (use Built-in)" + BYOK-key-entry widget — exists in the codebase but is **not referenced anywhere** (confirmed: the only repo-wide match for `OnboardingProviderStep` is its own definition). It's dead code, disconnected from `app_router.dart`/`welcome_screen.dart`, and could confuse a future maintainer into thinking onboarding still gates on it.
+- **Suggested next step:** No product/UX change needed. Either (a) delete `onboarding_provider_step.dart` outright (confirmed zero call sites), or (b) repurpose it as an optional "Add your own API key" entry point surfaced later — e.g. a one-time dismissible card on the dashboard's first visit, or just left as the existing `/settings/providers` (`providers_screen.dart`) entry point, which already covers this need for the small minority of users who want BYOK. Recommend (a): delete the dead file; BYOK already has a real, working entry point at `/settings/providers`.
+- **Risks:** None — this is a documentation/cleanup item, not a behavior change. Deleting dead code cannot regress the live flow since nothing calls it.
+- **Source:** `lib/core/router/app_router.dart:66-67`, `lib/features/onboarding/presentation/welcome_screen.dart:172,468-471`, `lib/features/onboarding/presentation/onboarding_provider_step.dart` (verified dead via repo-wide grep), 2026-09-07 beta feedback report.
+
+### B28 — Export quiz results / learning path as a shareable image
+
+- **Status:** backlog (proposed 2026-09-07)
+- **Area:** quiz, learn, sharing
+- **MoSCoW:** Should have
+- **Why it exists:** Beta feedback: "Let us export custom quizzes or learning paths as clean images/PDFs so we can show them off on social media." Verified: `pubspec.yaml:24` already has `share_plus: ^13.2.0`, but the only existing usage is plain-text sharing (`results_screen.dart:115-131`, a score string + deep link, no rendered artifact). No `screenshot`, `pdf`, or `printing` package exists; no export button exists on `path_detail_screen.dart` or `achievement_badges.dart`. This is a real, unaddressed gap and the single highest-leverage low-cost virality lever in the whole feedback report — every other social-media share today is a plain link.
+- **Suggested next step (start here — easiest high-impact item on this list):**
+  - Add the `screenshot: ^3.0.0` package (renders any widget subtree to a `Uint8List` PNG without a native platform channel — pairs directly with the already-present `share_plus`).
+  - New shared widget `lib/shared/widgets/share_card.dart` — a fixed-size, brand-styled `RepaintBoundary`-wrapped card (app logo, gradient background matching `AppTheme.purpleStart`/`purpleEnd`, score/topic/date for quiz results, or module list + completion % for a path) rendered off-screen, captured via `ScreenshotController().captureFromWidget(...)`, then shared with `SharePlus.instance.share(ShareParams(files: [XFile(pngPath)]))`.
+  - Two call sites: a "Share as image" button next to the existing text-share button on `results_screen.dart` (reuse the same score/topic data already in scope there), and a new one on `path_detail_screen.dart`'s app bar (module list + `steps` completion state already available at `path_detail_screen.dart:374-618`).
+  - No new Isar schema needed — the card is rendered from data already loaded on-screen (`QuizSession`, `LearningPath`/steps), not a new persisted concept.
+  - PDF export explicitly deferred to a v2 if users ask for it specifically — image share alone satisfies the stated "show off on social media" use case with far less effort (no `pdf`/`printing` package, no multi-page layout logic).
+- **Risks:** Low — additive UI + one new lightweight package; no existing schema or provider touched. Widget-to-image rendering must run off the visible tree (or briefly overlay) to capture a fixed layout regardless of the user's current scroll position — a known `screenshot` package pattern, not a novel risk.
+- **Source:** 2026-09-07 beta feedback report; `pubspec.yaml:24` (`share_plus` already present); `results_screen.dart:115-131` (current text-only share, confirmed via grep no image/PDF path exists anywhere in `lib/`).
+
+### B29 — Achievement unlock celebration + persisted unlock history
+
+- **Status:** backlog (proposed 2026-09-07)
+- **Area:** gamification, dashboard
+- **MoSCoW:** Could have
+- **Why it exists:** Beta feedback: "Gamify the dashboard: build visual streaks and milestone badges." Verified this is **substantially already shipped**: `dashboard_screen.dart:594-599` shows a streak stat tile with a flame icon and `currentStreak`; `lib/shared/widgets/dashboard/achievement_badges.dart` renders 8 live-computed milestone badges (B16, done 2026-08-29), keyed on `longestStreak` so an earned badge isn't revoked. The real gap versus the feedback is narrow: B16's own backlog entry explicitly deferred unlock-history persistence and a first-unlock celebration moment — badges are recomputed live every time, so a user gets no distinct "you just unlocked X!" moment, only a static grid that happens to include a new badge next time they open the dashboard.
+- **Suggested next step:** Add a small `UnlockedAchievement` Isar collection (`id`, `achievementKey` (String, matches `AchievementDef.id`), `unlockedAt` (DateTime)) written once, the first time `AchievementBadgesSection`'s live computation detects a badge crossing from not-unlocked to unlocked (compare against the persisted set on each dashboard load — no polling needed). On a newly-detected unlock, show a one-time celebration (a `showDialog`/`showModalBottomSheet` with confetti-style animation or a simple scale-in badge reveal) instead of silently updating the grid. Optionally fire a local notification (reusing `NotificationService`'s existing channel pattern) for milestone unlocks that happen while the app is backgrounded (e.g. a streak threshold crossed via `background_daily_tasks.dart`).
+- **Risks:** Low — additive Isar collection, no existing schema modified; must guard against re-showing the celebration on every app open (read-before-write against the persisted set solves this).
+- **Source:** 2026-09-07 beta feedback report; `docs/BACKLOG.md` B16 (already shipped, explicitly deferred this exact gap); `lib/shared/widgets/dashboard/achievement_badges.dart`, `lib/features/dashboard/presentation/dashboard_screen.dart:594-599`.
+
+### B30 — Ad-free premium subscription (IAP) for unlimited Built-in AI
+
+- **Status:** backlog (proposed 2026-09-07)
+- **Area:** monetization
+- **MoSCoW:** Should have
+- **Why it exists:** Beta feedback: "A low-cost, ad-free subscription for unlimited built-in AI generations would be worth paying for." Verified there is **zero subscription/IAP infrastructure today** — `pubspec.yaml` has `google_mobile_ads: ^9.0.0` but no `in_app_purchase`/`purchases_flutter`/equivalent anywhere in `lib/`; monetization is currently 100% ads (native slots) + BYOK. This is the same underlying need as the already-proposed **B15 — Freemium hosted AI tier with budget guardrails**, which explicitly names the current `BuiltInAiQuota` rolling-24h-window system "a prototype of this already" and gates any wider hosted tier on a not-yet-designed server-side spend-cap system (`risk-register.md` R12) — because removing the quota for paying users means Rivox, not the user, pays NVIDIA per generation, and that exposure must be capped before it ships.
+- **Suggested next step:** Do not build this as a separate system from B15 — B30 is the shippable product wrapping B15's prerequisite spend-safety design. Once R12's server-side budget/spend-cap gateway exists: add `in_app_purchase` (official Flutter Foundation package, Play Billing on Android), a `PremiumEntitlement` local cache (Isar or a simple signed local flag re-verified against Play's purchase-token API periodically — do not trust an unverified local flag alone for a paid feature), gate `ScrollableNativeAdSlot` rendering and `BuiltInAiQuota.freeGenerationsPerDay`'s cap behind `isPremium`, and add a Settings entry point (`settings_screen.dart`, alongside the existing Support section) to purchase/restore.
+- **Risks:** Real financial exposure if the Built-in AI side ships without B15/R12's spend caps first (same risk B15 already documents) — this is a strict superset of B15's risk, not a new one. Also: any local-only entitlement flag is trivially spoofable; server-side (or at minimum Play purchase-token) verification is required before gating a paid feature on it.
+- **Source:** 2026-09-07 beta feedback report; `docs/BACKLOG.md` B15 (extends, does not duplicate); `lib/core/services/built_in_ai_config.dart:63-70`, `built_in_ai_quota.dart` (existing quota prototype); `docs/reviews/risk-register.md` R12.
+
+### B31 — Classroom quiz-code sharing for teacher-led groups
+
+- **Status:** backlog (proposed 2026-09-07)
+- **Area:** social, career, accounts
+- **MoSCoW:** Could have
+- **Why it exists:** Beta feedback: "Let teachers build a quiz on Rivox and export a quick code or file for an entire group of students." Verified there is **no accounts, backend identity, or group concept anywhere today** — all data is local-only Isar (per B13); the only existing cross-device mechanism is `DeepLinkHandler` pre-filling a quiz-create screen with a topic (`results_screen.dart`'s text share), not a shared quiz/session, invite code, or join code. This is functionally the same ask as the already-proposed **B18 — Shared / cohort learning packs**, which explicitly says "do not start before B13 (accounts) lands."
+- **Suggested next step:** Do not start before B13 (optional accounts) ships — same dependency B18 already documents. When picked up, scope narrowly as B18's own suggested v1: a read-only exported/imported quiz pack (not a live classroom session, no real-time student tracking, no moderation system) — a teacher exports a quiz pack (could reuse **B36**'s `.rivox` file format below, or a lightweight numeric/word join code resolved through the B13 accounts backend once it exists) and students import it. Do not build any live/real-time group feature in v1.
+- **Risks:** Same as B18 — content moderation, spam, and abuse surface area once any code/link is shareable beyond a single device; the reason this stays Could have, not Should have, until B13 exists.
+- **Source:** 2026-09-07 beta feedback report; `docs/BACKLOG.md` B18 (extends, same dependency), B13 (blocking prerequisite).
+
+### B32 — ASO: beta-suggested title change is invalid/redundant — no action
+
+- **Status:** backlog (proposed 2026-09-07)
+- **Area:** aso, marketing
+- **MoSCoW:** Won't have
+- **Why it exists:** Beta feedback: "Change the store title to something like 'Rivox: AI Quiz Maker & Study Planner' to capture real search traffic." Fact-checked against the current live listing (`docs/store/LISTING.md:20`, already revised 2026-08-29 per the earlier ASO fact-check pass): the current title is `Rivox: AI Study Plan & Quiz` at **27 characters** (Play Store's real limit is 30). The beta-suggested alternative, `Rivox: AI Quiz Maker & Study Planner`, is **36 characters** — it **exceeds the 30-character limit** and would be truncated or rejected in Play Console, not simply "different." Content-wise it's also largely redundant with what's already live: both lead with "Rivox:", both contain "AI," "Quiz," and "Study Plan(ner)" — the suggestion just reorders those same words and adds "Maker"/"-ner" suffixes that don't fit.
+- **Suggested next step:** No title change needed as literally proposed. If keyword-order testing is still wanted, any candidate must be verified character-count-first (as the 2026-08-29 revision already was) before considering it — e.g. reordering to lead with "Quiz Maker" instead of "Study Plan" would need to drop something else to stay ≤30 chars. Not worth spending effort on without evidence the current order under-performs; this item exists mainly to record the fact-check so a future pass doesn't blindly implement the beta-suggested (invalid) string.
+- **Risks:** None from not acting. The risk this item guards against is the opposite: implementing the suggested string as-is would break Play Console validation.
+- **Source:** 2026-09-07 beta feedback report; `docs/store/LISTING.md:10,20` (current title + documented 30-char limit).
+
+### B33 — Launch Loop: demo video + community feedback posts
+
+- **Status:** backlog (proposed 2026-09-07)
+- **Area:** marketing, growth
+- **MoSCoW:** Could have
+- **Why it exists:** Beta feedback: "Package a clean video demo to share on communities like r/AndroidApps and r/SideProject for direct feedback." This is a genuine, low-cost distribution lever with no code dependency — but it is **not a coding task**: it requires the app owner to record a real screen-capture demo, write community-appropriate copy (both subreddits have strict self-promotion rules — r/SideProject expects a maker's personal story, r/AndroidApps expects a direct, no-hype feature demo), and post/monitor it personally. An agent cannot execute this step.
+- **Suggested next step:** Record a 30-60s screen capture covering the actual "aha!" moment (per B27's finding: onboarding → first Built-in AI generation, zero key entry) rather than a feature-tour montage — matches what both communities respond to best. Post to r/SideProject first (maker-story framing) once B28 (shareable results) ships, since a visual export is exactly the kind of asset that performs well as a post's hero image/clip. Track referral traffic via the site's existing (or to-be-added, see B22) Search Console / basic analytics, not vanity upvote counts.
+- **Risks:** None to the codebase — purely a marketing action item. Main risk is reputational (rule-breaking self-promo posts get removed/banned) if community norms aren't followed; not an engineering risk.
+- **Source:** 2026-09-07 beta feedback report.
+
+### B34 — Camera-to-Quiz (OCR ingestion into Library)
+
+- **Status:** backlog (proposed 2026-09-07)
+- **Area:** library, ai, ocr
+- **MoSCoW:** Should have
+- **Why it exists:** Beta feedback: "Give us Camera-to-Quiz (OCR scanning of physical pages)." Verified: **zero OCR/camera capability exists anywhere today** — `pubspec.yaml` has only `file_picker: ^12.1.2`; no `camera`, `image_picker`, or `google_mlkit_text_recognition` package; Library ingestion (`my_library_screen.dart:99-101`) is strictly `FilePicker.pickFile(type: FileType.custom, allowedExtensions: ['txt','md','pdf'])`. This is the most-requested genuinely new capability in the report and a real product differentiator (turns physical textbooks/notes into quiz material, not just already-digital files) — a ground-up feature with no existing scaffolding.
+- **Suggested next step (structural plan):**
+  - **Packages:** `camera: ^0.11.x` (capture) + `google_mlkit_text_recognition: ^0.15.x` (on-device OCR, no network call needed — consistent with this app's local-first/privacy stance, unlike a cloud OCR API).
+  - **Permissions:** `android.permission.CAMERA` in `AndroidManifest.xml`; runtime permission request via the existing permission-handling pattern already used for mic access (Whisper voice interview) — mirror that, don't invent a new pattern.
+  - **New screen:** `lib/features/library/presentation/camera_scan_screen.dart` — live camera preview, capture button, optional multi-page capture (a running list of captured page images before final OCR), a review step showing extracted text per page with basic manual-edit capability (OCR is never perfect — do not silently trust it) before committing.
+  - **New service:** `lib/core/services/ocr_service.dart` — wraps `TextRecognizer(script: TextRecognitionScript.latin)`, takes an `InputImage` per captured page, returns concatenated recognized text.
+  - **Ingestion:** the extracted (and user-reviewed) text feeds into the **existing** Library ingestion path — no new Isar schema needed; it should ultimately produce the same `LibrarySource`/chunk shape `file_picker`-based `.txt` ingestion already produces (check `lib/data/local/models/` for the exact existing source-content model and reuse its constructor, don't fork a parallel model for "camera-sourced" content).
+  - **Entry point:** a "Scan pages" button next to the existing "Upload file" button on `my_library_screen.dart`.
+- **Risks:** OCR accuracy varies with lighting/handwriting (works best on printed text) — the mandatory review-before-commit step exists specifically to prevent bad-quality quizzes being silently generated from misread text. `google_mlkit_text_recognition` increases APK size (ML Kit native libraries) — measure the size delta before committing, and check it doesn't conflict with the Play Console bitmap-downsampling concern already fixed for `file_picker` (B-fix 2026-08-29) — camera-captured images should be downsampled the same way before OCR/storage.
+- **Source:** 2026-09-07 beta feedback report; `pubspec.yaml` (confirmed no existing OCR/camera package), `lib/features/library/presentation/my_library_screen.dart:99-101` (confirmed file-only ingestion).
+
+### B35 — Daily Pack: timestamped video chapters/summary
+
+- **Status:** backlog (proposed 2026-09-07)
+- **Area:** learn, daily content
+- **MoSCoW:** Could have
+- **Why it exists:** Beta feedback: "Clickable YouTube video summaries/timestamps in our Daily Packs." Verified the Daily Pack already does real, embedded, tap-to-play YouTube video (`lib/shared/widgets/in_app_youtube_player.dart`, `youtube_player_flutter`) with an AI-selected video (`daily_content_service.dart:409-426`) and a short caption-style subtitle (2026-08-26 log) — not just a link-out. A `YoutubeTranscriptFetcher` (`lib/data/remote/ai/youtube_transcript_fetcher.dart`) already fetches full caption text via YouTube's public `timedtext` endpoint, but only for module summarization (`learning_orchestrator.dart:606`) — its own `_stripTimedText` helper explicitly **discards timing data**, and there is no in-app timestamp display, chapter list, or "jump to timestamp" UI anywhere. This is a real gap, but a moderate one since the hardest part (fetching transcripts at all) is already solved.
+- **Suggested next step:** `_stripTimedText`'s discarded timing data is the actual blocker — `timedtext`'s XML response already contains per-line `start`/`dur` attributes; keep them instead of stripping (return a `List<TranscriptLine>` with `text`/`startSeconds` rather than a flat string) and feed the full timed transcript into a new LLM prompt asking for 3-5 chapter markers (`{"timestampSeconds": N, "label": "..."}`), reusing the existing JSON-forcing `LlmManager.completeJson` path (same pattern as B1/chat's `{"reply": "..."}` envelope — don't add a new plain-text completion path). UI: a small chapter-chip row below `InAppYoutubePlayer` in `daily_content_detail_screen.dart`; tapping a chip seeks the embedded `YoutubePlayer` controller to that timestamp (the package already exposes `seekTo`).
+- **Risks:** Transcript availability/quality varies by video (auto-captions can be poor or missing entirely) — must degrade gracefully to today's plain-video experience (no chapter row) when no usable transcript exists, not block video display. One extra LLM call per Daily Pack video adds latency/cost — should be cached alongside the existing Daily Pack sidecar file, not re-fetched every view.
+- **Source:** 2026-09-07 beta feedback report; `lib/data/remote/ai/youtube_transcript_fetcher.dart` (existing, timing data discarded), `lib/shared/widgets/in_app_youtube_player.dart` (existing embedded player, confirmed `seekTo`-capable via `youtube_player_flutter`).
+
+### B36 — Local `.rivox` encrypted export/import (no-cloud sharing)
+
+- **Status:** backlog (proposed 2026-09-07)
+- **Area:** learn, sharing, privacy
+- **MoSCoW:** Should have
+- **Why it exists:** Beta feedback: "Let us export a lightweight, encrypted file format (.rivox) to share custom modules with classmates over WhatsApp without cloud syncing." Unlike B13/B18/B31 (which need accounts + a backend), this is genuinely **cloud-free** and fits this app's existing "local-first, privacy-focused" positioning better than any other item in this report — a real differentiator, not a compromise. `quiz_repository.dart:350`'s existing `exportData()` already produces a JSON shape of sessions/questions (currently a raw local-backup format, not a shareable/encrypted artifact) — a real, if partial, starting point.
+- **Suggested next step (structural plan):**
+  - **File format:** a `.rivox` file = AES-256-GCM-encrypted JSON payload (a learning path or quiz, in the same shape `exportData()`/`LearningPath`'s existing serialization already produces — do not invent a new schema, reuse the existing `toJson()` on whatever model is being shared) + a small unencrypted header (format version, content type, a human-readable title) so the app can show "Alice shared 'Intro to Biology' with you" before decrypting.
+  - **Encryption:** derive a key from a short share-code (e.g. a 6-digit PIN shown to the sharer, entered by the receiver) via PBKDF2 — avoids needing any server-issued key exchange; add the `cryptography` or `pointycastle` package (check for an existing crypto dependency first — `secure_key_storage.dart` may already pull one in for the BYOK key storage, reuse it rather than adding a second crypto library).
+  - **Export flow:** a "Share module" button on `path_detail_screen.dart` → generates the PIN, writes the `.rivox` file to a temp path, shares it via the **already-present** `share_plus` (`SharePlus.instance.share(ShareParams(files: [...]))`) — WhatsApp/any share-sheet target works automatically, no WhatsApp-specific integration needed.
+  - **Import flow:** register `.rivox` as a recognized file type for `FilePicker.pickFile` on an existing "Import" entry point (or a new one on `my_library_screen.dart`/`path_detail_screen.dart`), prompt for the PIN, decrypt, validate the header's content type, then insert via the existing Isar repository write path for that content type (no new schema — imported content becomes an ordinary local `LearningPath`/`Quiz`, indistinguishable from one generated locally).
+- **Risks:** A weak PIN is brute-forceable if the file is intercepted — acceptable for the stated "share with a classmate over WhatsApp" threat model (casual sharing, not a security-hardened credential store), but must not be described as more secure than it is. Must validate imported content strictly (author-controlled JSON is untrusted input) before writing to Isar — reuse whatever validation `exportData()`'s import counterpart (if one exists) or the existing quiz-import path already does, rather than trusting the decrypted JSON blindly.
+- **Source:** 2026-09-07 beta feedback report; `lib/data/local/repositories/quiz_repository.dart:350` (`exportData()`, existing partial JSON export); `pubspec.yaml` (`share_plus` already present); app's own "local-first" README positioning.
+
+### B37 — Voice interview: speech-delivery feedback + persona-aware scoring
+
+- **Status:** backlog (proposed 2026-09-07)
+- **Area:** career, ai, voice
+- **MoSCoW:** Should have
+- **Why it exists:** Beta feedback: "Give us feedback on our speaking pace and filler words, and let us choose different interviewer personas (Strict vs. Friendly)." Verified B2 ("Voice interview agent," partial/STT-shipped) is transcribe-then-score-**text**-only: `whisper_stt_service.dart:344-361` requests `response_format: 'json'` and reads only `data['text']` — NVIDIA's Whisper endpoint supports `verbose_json` for word/segment timestamps, but it's never requested, so **no timing data exists even latently**; `interview_rubric_scorer.dart:26-93` scores substance/relevance only, with zero pace/WPM/filler-word logic anywhere. `voice_interview_speech_coaching.dart` is static canned copy, not derived from actual speech. Persona **does** exist and is real (`InterviewPersona` `hr`/`tech`, `interview_persona.dart:2-16`, wired through `PromptBuilder._interviewInstruction`) — but it only changes which questions get generated, never flows into the scorer, so "Strict vs. Friendly" tone in feedback doesn't exist today despite persona selection already being live.
+- **Suggested next step:**
+  - **Delivery metrics (the larger half of this item):** switch the Whisper request to `response_format: 'verbose_json'` in `whisper_stt_service.dart`, parse the returned segment/word timestamps, and compute: words-per-minute (word count ÷ total spoken duration from first-to-last segment), filler-word count (simple regex/wordlist match against "um," "uh," "like," "you know" on the transcript — cheap, no ML needed), and total pause time (gaps between segments above a threshold). Surface these as a small stats row on the results screen alongside the existing rubric score — additive, not a replacement for the substance score.
+  - **Persona-aware scoring:** thread `interviewPersona` (already available at the call site, `voice_interview_hub_screen.dart:157`) into `InterviewRubricScorer.scoreOpenAnswers`, and add a persona-conditioned tone instruction to the judge prompt (`interview_rubric_scorer.dart:55-66`) — e.g. `strict` = terse, critical, no encouragement; `friendly` = warm, leads with a strength before a critique. This only changes the LLM prompt's tone instruction, not the underlying rubric criteria — low risk to scoring accuracy.
+  - Do not add "Strict vs Friendly" as new personas distinct from the existing `hr`/`tech` — reframe the existing personas' scoring tone instead, or add a separate, orthogonal `ScoringTone` enum if the user wants persona (question mix) and tone (feedback style) to vary independently — a genuine design decision worth confirming before implementing, not assumed here.
+- **Risks:** Filler-word detection via wordlist is crude (false positives on words used meaningfully, e.g. "like" as a verb) — set expectations as directional feedback, not a precise linguistic analysis. `verbose_json` may increase response payload size/latency slightly — measure before shipping.
+- **Source:** 2026-09-07 beta feedback report; `lib/core/services/whisper_stt_service.dart:344-361`, `lib/data/remote/ai/interview_rubric_scorer.dart:26-93`, `lib/core/constants/interview_persona.dart:2-16`, `lib/data/remote/ai/prompt_builder.dart:103-127` (all confirmed via direct read this session).
+
+### B38 — Flashcards already use SM-2 (superset of Leitner) — no algorithm change
+
+- **Status:** backlog (proposed 2026-09-07)
+- **Area:** learn, flashcards
+- **MoSCoW:** Won't have (algorithm)
+- **Why it exists:** Beta feedback: "Upgrade the new flashcards to automatically handle Spaced Repetition (Leitner system)." Verified B11 (done 2026-08-29) already ships a textbook **SM-2** implementation, not a simpler fixed-interval system: `lib/data/local/models/flashcard.dart:28-35` stores `easeFactor` (default 2.5), `intervalDays`, `repetitions`, `nextReviewAt`; `flashcard_repository.dart`'s `SpacedRepetition` class implements the standard SM-2 ease-factor formula and 1/6/interval×EF progression. SM-2's continuous per-card ease/interval model is functionally a **superset** of Leitner's simpler discrete-box approximation of the same idea — implementing Leitner on top would be a regression in scheduling sophistication, not an upgrade. **This beta ask is already satisfied, and the literal request (swap to Leitner) should not be implemented.**
+- **Suggested next step:** No algorithm change. If the real underlying want is *visibility* into the schedule (Leitner's boxes are more visually intuitive than an opaque ease-factor number), consider a small presentation-only addition: show "Reviewing again in {intervalDays} days" and a coarse difficulty label (e.g. derived from `easeFactor` bands: "hard"/"medium"/"easy") on the flashcard review UI, instead of changing the underlying scheduling math. Purely additive UI if pursued — no schema or repository change needed (`easeFactor`/`intervalDays` already exist).
+- **Risks:** None from not acting. The risk this item guards against is a future pass literally implementing "Leitner" as requested, which would replace already-good SM-2 with a strictly less sophisticated system.
+- **Source:** 2026-09-07 beta feedback report; `docs/BACKLOG.md` B11 (already shipped); `lib/data/local/models/flashcard.dart:28-35`, `lib/data/local/repositories/flashcard_repository.dart` `SpacedRepetition` class (verified via direct read this session).
+
+### B39 — Learning path visual mind-map view
+
+- **Status:** backlog (proposed 2026-09-07)
+- **Area:** learn, ux
+- **MoSCoW:** Could have
+- **Why it exists:** Beta feedback: "Turn the modules into a visual, interactive mind map." Verified `path_detail_screen.dart:374-618` renders modules as a plain `ListView` of expandable `AppCard`/`ListTile` rows — no graph/canvas/positioning logic exists, and a repo-wide search for "mind map"/"graph"/"TreeView"/"node" in `lib/` returns zero matches. This is a large, genuinely greenfield UI gap with no existing groundwork (no node/edge model, no graph-rendering package) — the highest-effort, most speculative item in this report, appropriately Could have rather than Should/Must.
+- **Suggested next step:** Do not build a from-scratch graph-layout engine. Evaluate an existing package first (e.g. `graphview` on pub.dev, force-directed or tree layout) against this app's actual data shape — a learning path's modules are already a linear/sequential dependency chain (each step locks until the previous completes, per `path_detail_screen.dart`'s existing lock/check/play icon logic), not a general graph, so a **tree** layout (not a free-form mind map) is the honest fit for the data that exists today. Scope v1 as an alternate view toggle next to the existing list (not a replacement — the list view works and is simpler to navigate linearly), reusing the same step/lock/progress data already loaded, no new Isar schema.
+- **Risks:** Real UX risk of building a novelty visualization that's harder to use than the existing linear list for actually working through a path in order — mitigate by keeping it an optional view toggle, not a replacement, and by being honest that the underlying data is a sequential chain, not a rich graph, so the "mind map" framing may not fit as well as the beta user imagines once built.
+- **Source:** 2026-09-07 beta feedback report; `lib/features/learn/presentation/path_detail_screen.dart:374-618` (confirmed linear list, no graph structure); repo-wide grep confirming no existing graph/mind-map code.
