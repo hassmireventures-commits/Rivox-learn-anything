@@ -1,5 +1,15 @@
 # Bug Fix Log
 
+## 2026-09-07 — Onboarding goal validation rejected short real subjects ("AWS", "SQL", etc.)
+
+- **Type:** bugfix
+- **Area:** onboarding, ux
+- **Files:** `lib/core/services/learner_goal_guard.dart`, `lib/features/onboarding/presentation/welcome_screen.dart`, new `test/learner_goal_guard_test.dart`
+- **Problem / Goal:** User-reported: selected "Learn something new" on onboarding step 2, typed "AWS" into Goals, but Continue kept showing "Tell us a specific subject... — not just 'learning'" and wouldn't proceed. Root-caused to `LearnerGoalGuard._isTooVague()`: `if (t.length < 4) return true;` rejected any topic under 4 characters *before* even checking the actual vague-word list — collateral damage since every real entry in `_vagueGoals` ("learning", "study", "skills", etc.) is already 5+ characters, so the length check was doing no real work while blocking legitimate short subjects like "AWS", "SQL", "Git", "Vue", "Go", "R", "C".
+- **Solution:** Removed the arbitrary length threshold; vagueness is now determined solely by membership in the explicit `_vagueGoals` set (plus the existing empty-string check), which is what the check was actually meant to guard against. Also added a missing `onChanged` handler on the Goals `TextField` (`welcome_screen.dart`) to clear `_goalModeError` live as the user types, matching the existing exam-name/role fields' behavior — previously a stale error stayed visible until the next Continue press re-validated (not the root cause here, but a related staleness gap on the same screen).
+- **Regression risks:** None expected — the length check was redundant with the word-list for its intended targets; removing it only stops rejecting inputs that were never actually vague.
+- **Verified:** `flutter analyze` (0 new issues), `flutter test --exclude-tags=live` (167 passed/1 skipped, up from 161 — 6 new tests in `learner_goal_guard_test.dart` covering short real subjects, generic filler words, empty input, and `validateDraft` end-to-end).
+
 ## 2026-09-07 — Daily study shows the same Wikipedia article every day
 
 - **Type:** bugfix

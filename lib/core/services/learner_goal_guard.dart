@@ -81,7 +81,6 @@ class LearnerGoalGuard {
   static bool _isTooVague(String topic) {
     final t = topic.toLowerCase().replaceAll(RegExp(r'[^a-z0-9\s]'), '').trim();
     if (t.isEmpty) return true;
-    if (t.length < 4) return true;
     return _vagueGoals.contains(t);
   }
 

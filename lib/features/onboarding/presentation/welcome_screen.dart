@@ -652,6 +652,9 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               AppCard(
                 child: TextField(
                   controller: _goalsController,
+                  onChanged: (_) {
+                    if (_goalModeError != null) setState(() => _goalModeError = null);
+                  },
                   decoration: InputDecoration(
                     labelText: switch (_goalMode) {
                       'exam_prep' => l10n.onboardingSyllabusLabel,
