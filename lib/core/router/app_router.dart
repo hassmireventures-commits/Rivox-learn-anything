@@ -5,6 +5,7 @@ import '../locale/app_localizations_ext.dart';
 import '../services/daily_content_service.dart';
 
 import '../../features/career/presentation/drill_create_screen.dart';
+import '../../features/chat/presentation/chat_screen.dart';
 import '../../features/career/presentation/voice_interview_hub_screen.dart';
 import '../../features/career/presentation/skill_matrix_screen.dart';
 import '../../features/dashboard/presentation/dashboard_screen.dart';
@@ -237,6 +238,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/support',
       pageBuilder: (context, state) => _pushPage(child: const SupportScreen()),
+    ),
+    GoRoute(
+      path: '/chat',
+      pageBuilder: (context, state) => _pushPage(child: const ChatScreen()),
     ),
   ],
   errorBuilder: (context, state) {

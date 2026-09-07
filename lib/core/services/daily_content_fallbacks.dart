@@ -16,9 +16,15 @@ class DailyContentFallbacks {
     required String topic,
     required String dateKey,
     bool trustedOnly = false,
+    Set<String> excludeUrls = const {},
   }) async {
     if (trustedOnly) {
-      return _guaranteedMinimum(type: type, topic: topic, dateKey: dateKey);
+      return _guaranteedMinimum(
+        type: type,
+        topic: topic,
+        dateKey: dateKey,
+        excludeUrls: excludeUrls,
+      );
     }
 
     if (GoalTopicResolver.needsResolution(topic)) {
@@ -26,12 +32,16 @@ class DailyContentFallbacks {
         type: type,
         topic: topic,
         dateKey: dateKey,
+        excludeUrls: excludeUrls,
       );
       if (orgPick != null) return orgPick;
     }
 
     if (type != 'video') {
-      final generic = await LearningArticleResolver.resolve(topic: topic);
+      final generic = await LearningArticleResolver.resolve(
+        topic: topic,
+        excludeUrls: excludeUrls,
+      );
       if (generic != null) {
         return DailyContentItem(
           dateKey: dateKey,
@@ -53,6 +63,7 @@ class DailyContentFallbacks {
         ? _videoCandidates(topic)
         : _articleCandidates(topic);
     for (final c in candidates) {
+      if (excludeUrls.contains(c.url)) continue;
       final accepted = await ResourceLinkValidator.acceptDailyResource(
         type: type,
         url: c.url,
@@ -71,7 +82,12 @@ class DailyContentFallbacks {
         youtubeVideoId: accepted.youtubeVideoId,
       );
     }
-    return _guaranteedMinimum(type: type, topic: topic, dateKey: dateKey);
+    return _guaranteedMinimum(
+      type: type,
+      topic: topic,
+      dateKey: dateKey,
+      excludeUrls: excludeUrls,
+    );
   }
 
   static Future<DailyContentItem?> _pickCodingArticle({
@@ -104,6 +120,7 @@ class DailyContentFallbacks {
     required String type,
     required String topic,
     required String dateKey,
+    Set<String> excludeUrls = const {},
   }) async {
     if (type == 'article') {
       final brand = TopicGroundingService.wikipediaSearchTerm(topic);
@@ -121,6 +138,7 @@ class DailyContentFallbacks {
         final wiki = await _grounding.findWikipediaArticle(
           q,
           validateForGoal: topic,
+          excludeUrls: excludeUrls,
         );
         if (wiki == null) continue;
         final accepted = await ResourceLinkValidator.acceptDailyResource(
@@ -143,6 +161,7 @@ class DailyContentFallbacks {
         );
       }
       for (final c in _orgDomainArticleCandidates(topic)) {
+        if (excludeUrls.contains(c.url)) continue;
         final accepted = await ResourceLinkValidator.acceptDailyResource(
           type: 'article',
           url: c.url,
@@ -189,9 +208,14 @@ class DailyContentFallbacks {
     required String type,
     required String topic,
     required String dateKey,
+    Set<String> excludeUrls = const {},
   }) async {
     if (type == 'article') {
-      final wikiPick = await topicAwareMinimumArticle(topic: topic, dateKey: dateKey);
+      final wikiPick = await topicAwareMinimumArticle(
+        topic: topic,
+        dateKey: dateKey,
+        excludeUrls: excludeUrls,
+      );
       final accepted = await ResourceLinkValidator.acceptDailyResource(
         type: 'article',
         url: wikiPick.url,
@@ -199,7 +223,7 @@ class DailyContentFallbacks {
         title: wikiPick.title,
         trustedFallback: true,
       );
-      if (accepted.ok) {
+      if (accepted.ok && !excludeUrls.contains(accepted.url)) {
         return DailyContentItem(
           dateKey: dateKey,
           type: 'article',
@@ -212,6 +236,7 @@ class DailyContentFallbacks {
 
       final candidates = _articleCandidates(topic);
       for (final c in candidates) {
+        if (excludeUrls.contains(c.url)) continue;
         final ok = await ResourceLinkValidator.acceptDailyResource(
           type: 'article',
           url: c.url,
@@ -229,6 +254,10 @@ class DailyContentFallbacks {
           topic: topic,
         );
       }
+      // Last resort: every candidate has been shown recently. Returning the
+      // Wikipedia pick anyway keeps the pack complete rather than empty.
+      // TODO: rotate through subtopics (see DailyContentService._pickTopic)
+      // so a single-goal learner gets genuinely new topics, not just new URLs.
       return wikiPick;
     }
 
@@ -236,13 +265,16 @@ class DailyContentFallbacks {
   }
 
   /// Offline last resort — topic-specific Wikipedia or slug when possible.
+  /// [excludeUrls] skips URLs shown recently (daily-pack recent-URL history)
+  /// so a fixed topic doesn't resolve to the same article every day.
   static Future<DailyContentItem> topicAwareMinimumArticle({
     required String topic,
     required String dateKey,
+    Set<String> excludeUrls = const {},
   }) async {
     final trimmed = topic.trim();
     for (final q in LearningArticleResolver.buildSearchQueries(topic: trimmed)) {
-      final wiki = await _grounding.findWikipediaArticle(q);
+      final wiki = await _grounding.findWikipediaArticle(q, excludeUrls: excludeUrls);
       if (wiki == null) continue;
       return DailyContentItem(
         dateKey: dateKey,

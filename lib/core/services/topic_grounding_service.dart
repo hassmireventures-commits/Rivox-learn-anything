@@ -125,13 +125,18 @@ class TopicGroundingService {
   }
 
   /// Public Wikipedia lookup for daily-pack fallbacks and org goals.
+  /// [excludeUrls] skips articles already shown recently (e.g. the daily
+  /// pack's recent-URL history) so a fixed topic doesn't return the same
+  /// article every time.
   Future<({String title, String extract, String url})?> findWikipediaArticle(
     String searchTerm, {
     String? validateForGoal,
+    Set<String> excludeUrls = const {},
   }) async {
     final candidates = await _wikipedia.searchArticles(searchTerm.trim(), limit: 5);
     for (final hit in candidates) {
       if (hit.url == null) continue;
+      if (excludeUrls.contains(hit.url)) continue;
       if (validateForGoal != null &&
           !_validator
               .validateOpenKnowledgeArticle(

@@ -7,6 +7,8 @@ import 'core/providers/app_providers.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
+import 'shared/widgets/chat_entry_fab.dart';
+import 'shared/widgets/generation_top_banner.dart';
 
 class AiQuizApp extends ConsumerWidget {
   const AiQuizApp({super.key});
@@ -45,6 +47,13 @@ class AiQuizApp extends ConsumerWidget {
         return const Locale('en');
       },
       routerConfig: appRouter,
+      builder: (context, child) => Stack(
+        children: [
+          ?child,
+          const GenerationTopBanner(),
+          const ChatEntryFab(),
+        ],
+      ),
     );
   }
 }

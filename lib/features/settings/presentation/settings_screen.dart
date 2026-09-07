@@ -39,6 +39,7 @@ import '../../../core/models/saved_goal.dart';
 import '../../../data/local/path_steps_storage.dart';
 import '../../../shared/widgets/ai_status_badge.dart';
 import '../../../shared/widgets/app_card.dart';
+import '../../../shared/widgets/bottom_native_ad_slot.dart';
 import '../../../shared/widgets/dashboard/dashboard_page_scaffold.dart';
 import '../../../shared/widgets/settings_leading_icon.dart';
 import '../../../shared/widgets/hassmire_logo.dart';
@@ -478,6 +479,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   const SizedBox(height: AppTheme.cardGap),
                 ],
               ),
+              const ScrollableNativeAdSlot(slotId: 'settings'),
             ]),
           ),
         ),

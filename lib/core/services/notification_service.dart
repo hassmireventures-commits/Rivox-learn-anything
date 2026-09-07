@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:isar_community/isar.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
@@ -35,6 +38,7 @@ class NotificationService {
   static const generationReadyId = 4100;
   static const generationFailedId = 4101;
   static const dailyContentId = 2100;
+  static const supportNagId = 5100;
 
   final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
   bool _initialized = false;
@@ -166,18 +170,26 @@ class NotificationService {
       description: 'Daily article or video recommendations',
       importance: Importance.defaultImportance,
     );
+    const supportNagChannel = AndroidNotificationChannel(
+      'support_nag',
+      'Support us',
+      description: 'An occasional weekly nudge to support the app',
+      importance: Importance.low,
+    );
     final androidPlugin =
         _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
     await androidPlugin?.createNotificationChannel(qotdChannel);
     await androidPlugin?.createNotificationChannel(examChannel);
     await androidPlugin?.createNotificationChannel(generationChannel);
     await androidPlugin?.createNotificationChannel(dailyContentChannel);
+    await androidPlugin?.createNotificationChannel(supportNagChannel);
     await _deleteObsoleteAndroidChannels();
 
     _initialized = true;
     await ReminderPreferencesStore.instance.load();
     await _ensureCurrentSoundChannels();
     await scheduleDailyReminder();
+    await scheduleSupportNag();
   }
 
   /// Legacy unsuffixed channels kept the first-registered (often silent) sound.
@@ -553,6 +565,85 @@ class NotificationService {
       candidate = candidate.add(const Duration(days: 1));
     }
     return candidate;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Weekly "support us" nag
+  // ---------------------------------------------------------------------------
+
+  /// Fixed schedule (not user-configurable): Sunday mid-morning.
+  static const _supportNagWeekday = DateTime.sunday;
+  static const _supportNagHour = 10;
+  static const _supportNagMinute = 0;
+
+  static Future<File> _supportNagStateFile() async {
+    final dir = await getApplicationDocumentsDirectory();
+    return File('${dir.path}/support_nag_state.json');
+  }
+
+  /// True once [scheduleSupportNag] has successfully registered the recurring
+  /// notification - persisted so app restarts don't re-register it.
+  static Future<bool> _supportNagAlreadyScheduled() async {
+    try {
+      final file = await _supportNagStateFile();
+      if (!await file.exists()) return false;
+      final json = jsonDecode(await file.readAsString());
+      if (json is! Map) return false;
+      return json['scheduled'] == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<void> _markSupportNagScheduled() async {
+    try {
+      final file = await _supportNagStateFile();
+      await file.writeAsString(jsonEncode({'scheduled': true}));
+    } catch (_) {}
+  }
+
+  /// Schedules a once-a-week "support us" nudge that opens the Support screen.
+  /// Not user-configurable, and guarded to only ever `zonedSchedule` once -
+  /// subsequent calls (e.g. on every app launch) are no-ops.
+  Future<void> scheduleSupportNag() async {
+    if (!_initialized) return;
+    if (await _supportNagAlreadyScheduled()) return;
+
+    tz.TZDateTime now;
+    try {
+      now = tz.TZDateTime.now(tz.local);
+    } catch (_) {
+      return;
+    }
+
+    final scheduled = _nextOccurrenceForWeekday(
+      now,
+      _supportNagWeekday,
+      _supportNagHour,
+      _supportNagMinute,
+    );
+
+    await _plugin.zonedSchedule(
+      id: supportNagId,
+      title: 'Enjoying Rivox?',
+      body: 'A small show of support helps keep the app going. Tap to see how.',
+      scheduledDate: scheduled,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'support_nag',
+          'Support us',
+          channelDescription: 'An occasional weekly nudge to support the app',
+          importance: Importance.low,
+          priority: Priority.low,
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+      payload: '/support',
+    );
+
+    await _markSupportNagScheduled();
   }
 
   /// Returns a varied motivational body that optionally mentions a weak topic.

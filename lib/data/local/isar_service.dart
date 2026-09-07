@@ -8,6 +8,7 @@ import 'models/ai_provider_config.dart';
 import 'models/ai_usage_daily.dart';
 import 'models/app_settings.dart';
 import 'models/career_skill.dart';
+import 'models/chat_message.dart';
 import 'models/daily_stat.dart';
 import 'models/document_chunk.dart';
 import 'models/embedding_chunk.dart';
@@ -79,6 +80,7 @@ class IsarService {
         DocumentChunkSchema,
         UserWebsiteSchema,
         FlashcardSchema,
+        ChatMessageSchema,
       ],
       directory: dir.path,
       name: 'learn_anything_db',
@@ -141,6 +143,7 @@ class IsarService {
       await db.documentChunks.clear();
       await db.userWebsites.clear();
       await db.flashcards.clear();
+      await db.chatMessages.clear();
     });
   }
 

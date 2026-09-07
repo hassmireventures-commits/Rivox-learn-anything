@@ -1,5 +1,15 @@
 # Bug Fix Log
 
+## 2026-09-07 — Daily study shows the same Wikipedia article every day
+
+- **Type:** bugfix
+- **Area:** learn, daily content
+- **Files:** `daily_content_service.dart`, `daily_content_fallbacks.dart`, `topic_grounding_service.dart`, new `test/daily_content_article_exclusion_test.dart`
+- **Problem / Goal:** User-reported: the daily study article repeats day after day. Root-caused to two compounding gaps: (1) `_pickTopic()`'s single-goal fallback (`goals[DateTime.now().day % goals.length]`) always resolves to the same topic string for the common single-goal user; (2) nothing in the fallback article-pick chain (`DailyContentFallbacks.pick()` → `topicAwareMinimumArticle()` → `TopicGroundingService.findWikipediaArticle()`) excluded previously-shown URLs, so a fixed topic deterministically returned the same first search hit every time.
+- **Solution:** `findWikipediaArticle()` now accepts `excludeUrls` and skips any hit already shown; threaded through `DailyContentFallbacks.pick()`/`_pickForOrgDomain()`/`_guaranteedMinimum()`/`topicAwareMinimumArticle()`. `DailyContentPack` gained a persisted `recentArticleUrls` list (last 14, deduped, evicted oldest-first) read across day boundaries and passed into every article-producing call in `ensureTodaysContent()`; the LLM-generated primary path is rejected and retried once if it returns a duplicate URL. The topic-collapse issue (gap 1) is intentionally not solved here — noted as a follow-up in `docs/BACKLOG.md` if repeats are still noticeable after this fix, since it needs real product design (which subtopics, how often) rather than a mechanical fix.
+- **Regression risks:** None expected — `recentArticleUrls` defaults to `[]` for legacy cached packs (backward-compatible JSON), and exclusion only narrows which article is picked, never blocks a pick outright (falls through when all candidates are excluded).
+- **Verified:** `flutter analyze` (0 new issues), `flutter test --exclude-tags=live` (145 passed/1 skipped at the time, later 156/1 after the full 6-item batch), 5 new tests covering exclusion skip/all-excluded/no-exclusion/JSON round-trip/legacy-default.
+
 ## 2026-08-29 — Dino Run unplayable on mobile with "Request Desktop Site" enabled
 
 - **Type:** bugfix

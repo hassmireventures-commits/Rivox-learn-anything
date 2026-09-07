@@ -6,7 +6,7 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 
 | ID | Title | Status | Area | MoSCoW |
 |----|-------|--------|------|--------|
-| B1 | In-app learning chatbot | backlog | chat, learn, ai | Should have |
+| B1 | In-app learning chatbot | done (2026-09-07) | chat, learn, ai | Should have |
 | B2 | Voice interview agent | partial (STT shipped) | career / interview | Should have |
 | B3 | On-device / local LLM | coming soon | ai, llm | Won't have (this cycle) |
 | B4 | Persist and translate 2026-08-23 l10n keys | done | l10n | — |
@@ -37,12 +37,12 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 
 ## B1 — In-app learning chatbot
 
-- **Status:** backlog
+- **Status:** done (2026-09-07)
 - **Area:** chat, learn, ai
 - **Why it exists:** User request #26 (2026-08-23). Feasibility researched and logged; **not built**. Users want follow-up questions on modules, quizzes, and uploaded library files.
-- **Suggested next step:** Design a thread UI + persistence. Reuse Built-in/BYOK `LlmManager.completeJson`, RAG from `AiRequestPipeline` + library chunks, and the rolling 24h generation quota (or add a separate chat budget). Gate as premium or quota later. Do not ship in the current release.
-- **Risks:** Cost / quota burn per turn; hallucination unless grounded; new persistence model for threads.
-- **Source:** [FEATURES_LOG](logs/FEATURES_LOG.md) 2026-08-23 chatbot note.
+- **Shipped:** Single continuous RAG chat thread (`ChatMessage` Isar collection, `ChatRepository`, `ChatScreen` at `/chat`). Reuses `LlmManager.completeJson` (model replies `{"reply": "..."}`, parsed back out — no new plain-text completion path added to hardened provider code) and the existing `AiRequestPipeline`/`RagContextBuilder` for consent gating, RAG retrieval, and audit logging. Gated by a new, fully independent `BuiltInChatQuota` (8 free messages/24h + rewarded-ad bonus) — never reads/writes the generation quota (`BuiltInAiQuota`). Global entry point: a floating action button wired once in `lib/app.dart`, hidden on onboarding/quiz-play/the chat screen itself/the providers screen (which has its own FAB).
+- **Risks:** Cost / quota burn per turn (mitigated by the new independent quota); hallucination unless grounded (mitigated by reusing the existing RAG pipeline, not a new one); live chat replies not tested end-to-end (would burn real API quota) — unverified by a live probe, consistent with how other new AI features ship without one unless asked.
+- **Source:** [FEATURES_LOG](logs/FEATURES_LOG.md) 2026-09-07 RAG chat entry.
 
 ## B2 — Voice interview agent
 

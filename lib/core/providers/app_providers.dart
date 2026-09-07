@@ -8,6 +8,7 @@ import '../../data/local/models/app_settings.dart';
 import '../../data/local/models/learner_profile.dart';
 import '../../data/local/models/quiz_session.dart';
 import '../../data/local/models/user_profile.dart';
+import '../../data/local/repositories/chat_repository.dart';
 import '../../data/local/repositories/flashcard_repository.dart';
 import '../../data/local/repositories/goal_progress_repository.dart';
 import '../../data/local/repositories/learner_repository.dart';
@@ -17,6 +18,7 @@ import '../../data/local/repositories/quiz_repository.dart';
 import '../../data/local/repositories/stats_repository.dart';
 import '../../data/ml/feature_engineering_service.dart';
 import '../../data/ml/recommendation_engine.dart';
+import '../../data/remote/ai/chat_service.dart';
 import '../../data/remote/ai/learning_orchestrator.dart';
 import '../../data/remote/analytics/anon_analytics_sync.dart';
 import '../../data/secure/secure_key_storage.dart';
@@ -76,6 +78,20 @@ final statsRepositoryProvider = Provider<StatsRepository>((ref) {
 
 final flashcardRepositoryProvider = Provider<FlashcardRepository>((ref) {
   return FlashcardRepository(ref.watch(isarServiceProvider));
+});
+
+final chatRepositoryProvider = Provider<ChatRepository>((ref) {
+  return ChatRepository(ref.watch(isarServiceProvider));
+});
+
+/// B1 in-app RAG chat — reuses [llmManagerProvider] / [aiRequestPipelineProvider]
+/// (defined in ai_platform_providers.dart, imported above).
+final chatServiceProvider = Provider<ChatService>((ref) {
+  return ChatService(
+    llmManager: ref.watch(llmManagerProvider),
+    aiPipeline: ref.watch(aiRequestPipelineProvider),
+    chatRepository: ref.watch(chatRepositoryProvider),
+  );
 });
 
 final flashcardsDueCountProvider =

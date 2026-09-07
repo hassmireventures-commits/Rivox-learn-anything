@@ -1,5 +1,19 @@
 ﻿# Enhancements Log
 
+## 2026-09-07 — Native ads on Settings/Home/Learn; daily quota 5→1; global generation banner; weekly support nag
+
+- **Type:** enhancement
+- **Area:** ads, ai quota, ux, notifications
+- **Files:** `settings_screen.dart`, `dashboard_screen.dart`, `learn_screen.dart` (added `ScrollableNativeAdSlot`); `built_in_ai_config.dart`; new `generation_top_banner.dart`, `app.dart`; `notification_service.dart`
+- **Problem / Goal:** User-requested batch: (1) native ads on Settings/Home/Learn matching History's existing swipe-to-dismiss pattern; (2) reduce the free Built-in AI daily quota from 5 to 1 generation/day (ads unlock more, unchanged); (3) a persistent indicator so users don't feel they need to start another generation while one is already running in the background; (4) a weekly notification directing to the Support screen.
+- **Solution:**
+  - **Ads:** `ScrollableNativeAdSlot(slotId: 'settings'|'home'|'learn')` inserted near the bottom of each screen's existing scroll view — same single AdMob native ad unit ID already used elsewhere, no new ad-console setup.
+  - **Quota:** `built_in_ai_config.dart:64` `freeGenerationsPerDay` 5 → 1 (single edit point; no other hardcoded "5" anywhere in code or l10n).
+  - **Generation banner:** No shared `AppBar` exists across the app, so added `MaterialApp.router`'s previously-unused `builder:` callback in `app.dart`, wrapping the router outlet in a `Stack` with a new `GenerationTopBanner` — a `ConsumerStatefulWidget` watching `generationJobServiceProvider`, showing an animated gradient pill only when `job.isRunning && !job.uiAttached` (i.e. specifically when a job is backgrounded and the user has navigated away; the originating screen already has its own full-screen `GenerationOverlay`).
+  - **Weekly nag:** New `support_nag` Android channel + `NotificationService.scheduleSupportNag()`, modeled on the existing `scheduleDailyReminder()` (`zonedSchedule` with `matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime`), Sunday 10:00 AM, payload `/support` (an existing route, so no new navigation plumbing), guarded by a persisted JSON flag so it's scheduled once, wired into `init()` right after the existing daily-reminder scheduling.
+- **Regression risks:** None expected — ad slots and banner are additive UI; quota change only affects free-tier generation count (BYOK/own-key users unaffected); the notification uses a previously-unused id (`5100`) confirmed not to collide with any existing reserved id block.
+- **Verified:** `flutter analyze` (0 new issues), `flutter test --exclude-tags=live` (140/140 passed at the time this landed, later 156/1 after the full 6-item batch).
+
 ## 2026-08-29 — Achievement slide carousel sorted by progress; native ad on Support
 
 - **Type:** enhancement

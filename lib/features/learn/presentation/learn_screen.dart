@@ -23,6 +23,7 @@ import '../../../shared/widgets/built_in_quota_dialog.dart';
 import '../../../shared/widgets/guidance/adaptive_ui_banner.dart';
 import '../../../shared/widgets/guidance/empty_state_guide.dart';
 import '../../../shared/widgets/app_card.dart';
+import '../../../shared/widgets/bottom_native_ad_slot.dart';
 import '../../../shared/widgets/dashboard/dashboard_page_scaffold.dart';
 import '../../../shared/widgets/dashboard/dashboard_section_header.dart';
 import '../../../shared/widgets/dashboard/horizontal_feature_card.dart';
@@ -770,6 +771,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
                       SizedBox(height: layout.sectionGap),
                       AppCard(child: Text(_summary!)),
                     ],
+                    const ScrollableNativeAdSlot(slotId: 'learn'),
                     SizedBox(height: AppTheme.cardGap),
                   ]),
                 ),

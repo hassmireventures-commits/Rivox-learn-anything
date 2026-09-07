@@ -131,6 +131,16 @@ class BuiltInQuotaExceededException extends AppException {
   ]);
 }
 
+/// Independent from [BuiltInQuotaExceededException] — chat has its own,
+/// separate rolling quota (see `BuiltInChatQuota`) that never shares state
+/// with the generation quota above.
+class BuiltInChatQuotaExceededException extends AppException {
+  const BuiltInChatQuotaExceededException([
+    super.message =
+        'Daily chat limit reached. Watch an ad for more, or add your own provider.',
+  ]);
+}
+
 /// Typed library/upload failures mapped to l10n in the UI.
 class LibraryException extends AppException {
   const LibraryException(this.code, [String? message])

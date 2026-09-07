@@ -27,6 +27,7 @@ import '../../../shared/navigation/study_path_navigation.dart';
 import '../../../shared/widgets/api_limit_banner.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/ai_status_badge.dart';
+import '../../../shared/widgets/bottom_native_ad_slot.dart';
 import '../../../shared/widgets/ai_study_pulse_card.dart';
 import '../../../core/services/ai_status_service.dart';
 import '../../../shared/widgets/metric_honesty_banner.dart';
@@ -161,6 +162,7 @@ class DashboardScreen extends ConsumerWidget {
                               statsAsync: statsAsync,
                               providersAsync: providersAsync,
                             ),
+                            const ScrollableNativeAdSlot(slotId: 'home'),
                             SizedBox(height: AppTheme.cardGap),
                           ];
                           return SliverList(delegate: SliverChildListDelegate(children));

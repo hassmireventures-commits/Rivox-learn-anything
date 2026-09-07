@@ -15,6 +15,10 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-09-07 | feature | In-app RAG chat (backlog B1) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
+| 2026-09-07 | enhancement | Native ads on Settings/Home/Learn; daily quota 5→1; global generation banner; weekly support nag | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
+| 2026-09-07 | bugfix | Daily study shows the same Wikipedia article every day | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
+| 2026-09-07 | feature | Backlog updated: B1 marked done (RAG chat shipped) | [BACKLOG](BACKLOG.md) |
 | 2026-08-29 | feature | Backlog updated: B11 marked done, B22–B26 added (SEO/ASO follow-ups, MoSCoW) | [BACKLOG](BACKLOG.md) |
 | 2026-08-29 | enhancement | ASO report fact-check; Play Store listing revision (title/desc + corrected fake advice) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-08-29 | bugfix | Dino Run unplayable on mobile with "Request Desktop Site" enabled | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |

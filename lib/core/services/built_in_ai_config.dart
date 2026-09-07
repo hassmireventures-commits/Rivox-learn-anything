@@ -61,7 +61,7 @@ class BuiltInAiConfig {
   static const Duration pulseTimeout = Duration(seconds: 45);
 
   /// Daily free generations before ads.
-  static const int freeGenerationsPerDay = 5;
+  static const int freeGenerationsPerDay = 1;
 
   /// Generations granted per successful rewarded ad.
   static const int bonusPerRewardedAd = 2;

@@ -1,5 +1,21 @@
 # Features Log
 
+## 2026-09-07 — In-app RAG chat (backlog B1)
+
+- **Type:** feature
+- **Area:** chat, learn, ai
+- **Files (all new except the additive registrations):** `chat_message.dart` (+ generated `.g.dart`), `chat_repository.dart`, `built_in_chat_quota.dart`, `chat_service.dart`, `chat_screen.dart`, `test/built_in_chat_quota_test.dart`, `test/chat_service_test.dart`; additive edits to `app_router.dart` (+1 route), `app_providers.dart` (+2 providers), `isar_service.dart` (+1 schema), `app_exception.dart` (+1 subclass); `app.dart` (new `ChatEntryFab` wired into the global `Stack` alongside `GenerationTopBanner`), new `chat_entry_fab.dart`.
+- **Problem / Goal:** Ship backlog B1 — an in-app assistant for follow-up questions on the learner's modules, quizzes, and library content, without duplicating the existing hardened AI-provider/quota/RAG infrastructure.
+- **Solution:**
+  - **Scope (v1):** one continuous chat thread per user, not multiple named threads — matches B1's actual ask, avoids thread-management UI.
+  - **Persistence:** new `ChatMessage` Isar collection (`role`, `text`, `createdAt`, optional `contextRef`), registered additively in `IsarService`'s schema list and `clearLearningData()`. `ChatRepository` mirrors `FlashcardRepository`'s shape (`getHistory`, `appendMessage`).
+  - **LLM call:** reuses `LlmManager.completeJson` unchanged — the chat system prompt instructs the model to reply `{"reply": "..."}` only, and `ChatService.parseReply` extracts it. Deliberately avoids adding a parallel plain-text completion path across every provider file, since this project has invested heavily in the existing JSON-forcing path being reliable. RAG grounding, consent gating, and audit logging are delegated to the existing `AiRequestPipeline`/`RagContextBuilder` (`sanitizeTopic` → `ensureTokenBudget` → `buildRag` → `completeJson`), matching how the real call sites (`learning_orchestrator.dart`, `background_daily_tasks.dart`) already use the pipeline's granular methods rather than its unused `execute()` wrapper (which hardcodes the generation quota — incompatible with a separate chat quota).
+  - **Quota:** new `BuiltInChatQuota` — structurally mirrors `BuiltInAiQuota` (rolling 24h window, persisted JSON sidecar, rewarded-ad bonus) but is fully independent, with its own state file (`built_in_chat_quota.json`) and allowance (8 free messages/day, +3 per rewarded ad, up to 3 ads/day). Never reads or writes `BuiltInAiQuota`'s state — the just-reduced 1/day generation quota is untouched by chat usage. BYOK providers are not limited by this, matching existing precedent.
+  - **UI:** `ChatScreen` at route `/chat` — message bubbles, composer, loading/typing state, empty state.
+  - **Global entry point:** a `ChatEntryFab`, wired once into `app.dart`'s existing `Stack` (added alongside item 3's `GenerationTopBanner` specifically to avoid touching Home/Learn/Settings screen files, which a parallel change in the same batch was editing). Listens to the app's `GoRouter` directly (`appRouter.routerDelegate`) to hide itself on onboarding, the chat screen itself, active quiz play, and the providers screen (which already has its own bottom-right FAB), and to clear the bottom nav bar's height on the Home/Learn/History shell routes.
+- **Regression risks:** None expected — every touched shared file (`app_router.dart`, `app_providers.dart`, `isar_service.dart`, `app_exception.dart`) only gained new, additive members; no existing route, provider, schema entry, or exception was changed. `AppException` is a `sealed class`, so the new `BuiltInChatQuotaExceededException` had to live in `app_exception.dart` itself rather than a new file — the only non-new-file edit besides the registrations.
+- **Verified:** `flutter analyze` (0 new issues), `flutter test --exclude-tags=live` (156 passed/1 skipped/0 failed, up from 145 before this item — 15 new tests: 9 for `BuiltInChatQuota` allowance/rollover/bonus math, 6 for `{"reply": "..."}` parsing including markdown-fence and non-JSON fallback cases). Live chat replies not tested end-to-end (would burn real API quota) — a known, disclosed limitation, not a gap in the automated suite.
+
 ## 2026-08-29 — ASO report fact-check; Play Store listing revision
 
 - **Type:** enhancement

@@ -64,12 +64,18 @@ class DailyContentPack {
     required this.topic,
     this.article,
     this.video,
+    this.recentArticleUrls = const [],
   });
 
   final String dateKey;
   final String topic;
   final DailyContentItem? article;
   final DailyContentItem? video;
+
+  /// Article URLs shown in recent daily packs (oldest first, capped), kept
+  /// across days so a fixed topic doesn't resolve to the same article every
+  /// time. See [DailyContentService.kMaxRecentArticleUrls].
+  final List<String> recentArticleUrls;
 
   bool get isComplete =>
       article != null &&
@@ -87,6 +93,7 @@ class DailyContentPack {
         'topic': topic,
         'article': article?.toJson(),
         'video': video?.toJson(),
+        'recentArticleUrls': recentArticleUrls,
       };
 
   factory DailyContentPack.fromJson(Map<String, dynamic> json) {
@@ -110,11 +117,16 @@ class DailyContentPack {
     if (v is Map) {
       video = DailyContentItem.fromJson(Map<String, dynamic>.from(v));
     }
+    final recentRaw = json['recentArticleUrls'];
+    final recentArticleUrls = recentRaw is List
+        ? recentRaw.map((e) => e?.toString() ?? '').where((e) => e.isNotEmpty).toList()
+        : <String>[];
     return DailyContentPack(
       dateKey: json['date']?.toString() ?? article?.dateKey ?? video?.dateKey ?? '',
       topic: json['topic']?.toString() ?? article?.topic ?? video?.topic ?? '',
       article: article,
       video: video,
+      recentArticleUrls: recentArticleUrls,
     );
   }
 }
@@ -135,9 +147,39 @@ class DailyContentService {
   static const _fileName = 'daily_content_v1.json';
   static const _maxAttempts = 4;
 
+  /// How many recently-shown article URLs to remember (oldest evicted first).
+  static const kMaxRecentArticleUrls = 14;
+
   Future<File> _file() async {
     final dir = await getApplicationDocumentsDirectory();
     return File('${dir.path}/$_fileName');
+  }
+
+  /// Reads the persisted recent-article-URL history regardless of whether
+  /// the persisted pack matches today's date (unlike [findTodaysPack], which
+  /// discards stale packs) — this history must survive across days.
+  Future<List<String>> _readRecentArticleUrls() async {
+    try {
+      final file = await _file();
+      if (!await file.exists()) return const [];
+      final decoded = jsonDecode(await file.readAsString());
+      if (decoded is! Map) return const [];
+      final pack = DailyContentPack.fromJson(Map<String, dynamic>.from(decoded));
+      return pack.recentArticleUrls;
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Appends [url] to [existing] (moving it to the end if already present)
+  /// and evicts the oldest entries past [kMaxRecentArticleUrls].
+  static List<String> _withRecentUrl(List<String> existing, String? url) {
+    if (url == null || url.isEmpty) return existing;
+    final updated = [...existing.where((u) => u != url), url];
+    if (updated.length > kMaxRecentArticleUrls) {
+      return updated.sublist(updated.length - kMaxRecentArticleUrls);
+    }
+    return updated;
   }
 
   String _dateKey(DateTime dt) => '${dt.year}-${dt.month}-${dt.day}';
@@ -218,12 +260,19 @@ class DailyContentService {
       }
     }
 
+    // Article URLs shown in recent packs — excluded below so a fixed topic
+    // (e.g. a single-goal learner, see _pickTopic) doesn't resolve to the
+    // same article every day.
+    final recentArticleUrls = await _readRecentArticleUrls();
+    final recentArticleUrlSet = recentArticleUrls.toSet();
+
     final dateKey = _dateKey(DateTime.now());
     var article = await _generateValidated(
       type: 'article',
       topic: resolvedTopic,
       dateKey: dateKey,
       topicResolutionBlock: resolutionBlock,
+      recentArticleUrls: recentArticleUrlSet,
     );
     var video = await _generateValidated(
       type: 'video',
@@ -235,6 +284,7 @@ class DailyContentService {
       type: 'article',
       topic: resolvedTopic,
       dateKey: dateKey,
+      excludeUrls: recentArticleUrlSet,
     );
     video ??= await DailyContentFallbacks.pick(
       type: 'video',
@@ -246,6 +296,7 @@ class DailyContentService {
       topic: resolvedTopic,
       dateKey: dateKey,
       trustedOnly: true,
+      excludeUrls: recentArticleUrlSet,
     );
     video ??= await DailyContentFallbacks.pick(
       type: 'video',
@@ -256,6 +307,7 @@ class DailyContentService {
     article ??= await DailyContentFallbacks.topicAwareMinimumArticle(
       topic: resolvedTopic,
       dateKey: dateKey,
+      excludeUrls: recentArticleUrlSet,
     );
     video ??= DailyContentFallbacks.topicAwareMinimumVideo(
       topic: resolvedTopic,
@@ -267,6 +319,7 @@ class DailyContentService {
       topic: resolvedTopic,
       article: article,
       video: video,
+      recentArticleUrls: _withRecentUrl(recentArticleUrls, article.url),
     );
     await _persist(pack);
     return pack;
@@ -277,13 +330,19 @@ class DailyContentService {
     required String topic,
     required String dateKey,
     String topicResolutionBlock = '',
+    Set<String> recentArticleUrls = const {},
   }) async {
+    final avoidUrls = <String>{};
     for (var attempt = 0; attempt < _maxAttempts; attempt++) {
       try {
         final raw = await llmManager.completeJson(
           userPrompt: type == 'video'
               ? _videoPrompt(topic, topicResolutionBlock: topicResolutionBlock)
-              : _articlePrompt(topic, topicResolutionBlock: topicResolutionBlock),
+              : _articlePrompt(
+                  topic,
+                  topicResolutionBlock: topicResolutionBlock,
+                  avoidUrls: avoidUrls,
+                ),
           systemPrompt:
               'You are a curriculum curator. Respond with a single valid JSON object only. No markdown.',
           recordBuiltinQuota: false,
@@ -295,7 +354,15 @@ class DailyContentService {
           dateKey: dateKey,
           topic: topic,
         );
-        if (item != null) return item;
+        if (item != null) {
+          if (type == 'article' && recentArticleUrls.contains(item.url)) {
+            // Same article as a recent day — nudge the LLM away from it and
+            // retry instead of showing a repeat.
+            avoidUrls.add(item.url);
+            continue;
+          }
+          return item;
+        }
       } on NoProviderConfiguredException {
         break;
       } on ProviderUnavailableException {
@@ -306,10 +373,19 @@ class DailyContentService {
         // Retry on parse/validation failure.
       }
     }
-    return DailyContentFallbacks.pick(type: type, topic: topic, dateKey: dateKey);
+    return DailyContentFallbacks.pick(
+      type: type,
+      topic: topic,
+      dateKey: dateKey,
+      excludeUrls: type == 'article' ? recentArticleUrls : const {},
+    );
   }
 
-  String _articlePrompt(String topic, {String topicResolutionBlock = ''}) => '''
+  String _articlePrompt(
+    String topic, {
+    String topicResolutionBlock = '',
+    Set<String> avoidUrls = const {},
+  }) => '''
 ${topicResolutionBlock.isNotEmpty ? '$topicResolutionBlock\n' : ''}Pick one FREE, real article/tutorial for this topic: "$topic".
 Return a single JSON object only:
 {"type":"article","title":"...","url":"https://...","summary":"1-2 sentences"}
@@ -328,7 +404,7 @@ Rules:
 - For business / product / career topics prefer Wikipedia, wikiHow, How-To Geek, Investopedia, Khan Academy, or TED — not generic coding tutorials.
 - URL must be a real article page (not a site homepage or search results).
 - Never invent paths. Prefer a different URL on each retry.
-''';
+${avoidUrls.isEmpty ? '' : '- Do not suggest any of these URLs again, pick a different real article: ${avoidUrls.join(', ')}\n'}''';
 
   String _videoPrompt(String topic, {String topicResolutionBlock = ''}) => '''
 ${topicResolutionBlock.isNotEmpty ? '$topicResolutionBlock\n' : ''}Pick one FREE, real YouTube tutorial video for this topic: "$topic".
