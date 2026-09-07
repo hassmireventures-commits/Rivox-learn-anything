@@ -15,6 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-09-07 | feature | Website blog (B25 first batch, 3 posts) + second mini game (2048, MIT) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-09-07 | enhancement | SEO follow-up pass: meta description length, OG/Twitter tags, schema image, content-keyword gaps | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
 | 2026-09-07 | feature | Real Firebase Analytics (GA4) integration, gated behind existing "Help improve" opt-in | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-09-07 | enhancement | Native ad on "Quiz of the Day" See all sheet | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |

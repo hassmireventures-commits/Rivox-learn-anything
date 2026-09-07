@@ -1,5 +1,18 @@
 # Features Log
 
+## 2026-09-07 — Website blog (B25 first batch) + second mini game (2048)
+
+- **Type:** feature
+- **Area:** hosting (website), seo, content
+- **Files:** new `hosting/blog/index.html` + 3 post pages (`byok-ai-quiz-generation/`, `local-first-flashcards-spaced-repetition/`, `ai-quiz-competitive-exam-prep/`), new `hosting/games/2048/index.html`, new `hosting/games/vendor/2048/*` (vendored third-party), `hosting/games/index.html`, `hosting/sitemap.xml`, nav updates across `hosting/index.html`/`privacy`/`terms`/`games`/`games/dino`.
+- **Problem / Goal:** User asked to add blog content and more mini games. Blog content is backlog B25's own first-batch scope ("3-5 pages targeting the highest-winnability phrases... each a real, substantive page, not thin SEO filler") — used the three long-tail phrases B25 itself already identified as winnable (BYOK AI quiz generation, local-first flashcards, AI quiz for competitive exams) rather than inventing new topics.
+- **Solution:**
+  - **Blog:** 3 real, substantive posts (each explains the underlying concept in its own right — how BYOK pricing works, how the SM-2 spaced-repetition algorithm works, what AI practice quizzes are and aren't good for in competitive-exam prep — with a genuine FAQ section each, not just marketing copy), plus a `/blog` hub page listing them as cards (reusing the existing `.game-grid`/`.game-card` styles, no new CSS needed). Each post carries its own canonical/OG/Twitter tags and a `BlogPosting` JSON-LD block. `Blog` added to the site nav on every existing page.
+  - **Second mini game (2048):** vendored, unmodified, from `gabrielecirulli/2048` (MIT License — the same license family/verification rigor as the existing Dino Run game). Fetched directly from the canonical GitHub repo (all 10 JS files + stylesheet + LICENSE, syntax-checked with `node --check`), matching this app's own established "genuinely open-source, verified license" bar. The game's own `keyboard_input_manager.js` already handles touch/swipe natively — no mobile-compat shim needed, unlike Dino Run. One necessary adaptation (not to the vendored files themselves, only to the page's own copy of the widget's static markup): renamed one inner `<p class="game-intro">` to `.puzzle-intro` to avoid a real CSS class collision with the site's own `.game-intro` (a section-level class used site-wide on every mini-game page) — confirmed via grep that no vendored JS references that class, so the rename is purely cosmetic and touches nothing functional. A non-disruptive native ad (`data-la-slot="gamesBottom"`, same slot Dino Run already uses) sits below the game, not overlaid on it.
+  - Added both to `hosting/sitemap.xml` with today's date.
+- **Regression risks:** None expected — all additive pages/nav links; Dino Run's own page/vendored files untouched.
+- **Verified:** Programmatic tag-balance check (all touched/new pages, exactly one `<h1>` each), JSON-LD parse-validity on all 3 new blog posts, internal-link resolution check (every `href` across all 10 touched/new pages resolves to a real route), and `node --check` syntax validation on all 10 vendored 2048 JS files. No visual/browser test possible from this environment.
+
 ## 2026-09-07 — Real Firebase Analytics (GA4) integration
 
 - **Type:** feature

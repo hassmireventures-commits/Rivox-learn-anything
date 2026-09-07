@@ -30,7 +30,7 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 | B22 | Google Search Console verification + sitemap submission | backlog (proposed 2026-08-29) | seo, hosting | Must have |
 | B23 | Attach `learnanything.app` custom domain | backlog (proposed 2026-08-29) | hosting, branding | Should have |
 | B24 | Custom Store Listing targeted at "voice interview preparation" | backlog (proposed 2026-08-29) | aso, marketing | Should have |
-| B25 | Content build-out for long-tail SEO keywords (blog / comparison pages) | backlog (proposed 2026-08-29) | hosting, content, seo | Could have |
+| B25 | Content build-out for long-tail SEO keywords (blog / comparison pages) | partial (2026-09-07, first batch shipped) | hosting, content, seo | Could have |
 | B26 | Scoped Android App Links (reserved app-deep-link path) | backlog (proposed 2026-08-29) | mobile, hosting, deep-linking | Could have |
 | B27 | Onboarding is already API-key-free; remove dead BYOK onboarding step | backlog (proposed 2026-09-07) | onboarding, ux | Won't have (already satisfied) |
 | B28 | Export quiz results / learning path as a shareable image | backlog (proposed 2026-09-07) | quiz, learn, sharing | Should have |
@@ -309,13 +309,14 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
 
 ### B25 — Content build-out for long-tail SEO keywords (blog / comparison pages)
 
-- **Status:** backlog (proposed 2026-08-29)
+- **Status:** partial (2026-09-07) — first batch of 3 shipped
 - **Area:** hosting, content, seo
 - **MoSCoW:** Could have
 - **Why it exists:** The 2026-08-29 keyword research found that real top-ranking competitors in this space win via scale — e.g. PracticeMock-style programmatic SEO (one indexed page per exam/topic, ~500+ pages) and RemNote-style long-form comparison posts ("Best Anki Alternatives" with tables, named competitors, FAQ sections). A handful of static marketing pages cannot compete head-on with that; winnable long-tail phrases (BYOK AI quiz generation, local-first flashcards, AI quiz for competitive exams) need actual content to rank for, not just better meta tags on the homepage.
-- **Suggested next step:** Do not build this speculatively or all at once. Scope a small first batch (e.g. 3-5 pages) targeting the highest-winnability phrases from the research (`docs/logs/FEATURES_LOG.md` keyword research notes), each a real, substantive page — not thin SEO filler — before deciding whether to invest further.
-- **Risks:** Largest scope item on this list — real ongoing content-writing effort, not a one-time code change. Thin/low-quality pages built purely for SEO can actively hurt rankings (Google's stated policy against "scaled content abuse") — any page built here must be genuinely useful on its own merits.
-- **Source:** `docs/logs/FEATURES_LOG.md` 2026-08-29 SEO audit keyword research.
+- **Shipped:** Exactly the first batch this entry's own "suggested next step" called for — 3 real, substantive posts (`/blog/byok-ai-quiz-generation`, `/blog/local-first-flashcards-spaced-repetition`, `/blog/ai-quiz-competitive-exam-prep`), one per identified winnable phrase, each explaining the underlying concept genuinely (not just restating app marketing copy) plus an FAQ section, and a `/blog` hub page. See `docs/logs/FEATURES_LOG.md` 2026-09-07 entry.
+- **Suggested next step:** Decide whether to invest further (comparison-style posts, e.g. "Rivox vs [named competitor]", or the larger programmatic-SEO approach) only after seeing whether this first batch gets any real traffic/indexing — per this entry's own original caution against building more speculatively.
+- **Risks:** Thin/low-quality pages built purely for SEO can actively hurt rankings (Google's stated policy against "scaled content abuse") — the shipped batch was written to be genuinely useful on its own merits, not filler; any further batch must hold the same bar.
+- **Source:** `docs/logs/FEATURES_LOG.md` 2026-08-29 SEO audit keyword research; 2026-09-07 shipped batch.
 
 ### B26 — Scoped Android App Links (reserved app-deep-link path)
 
