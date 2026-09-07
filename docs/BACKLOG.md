@@ -18,7 +18,7 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 | B10 | Hosting AdSense display slot IDs | done | hosting | — |
 | B11 | Spaced-repetition flashcards from library/mistakes | done (2026-08-29) | learn, library, ai | Must have |
 | B12 | Automated AI generation quality eval gate | done (2026-08-29) | ai, ci, qa | Must have |
-| B13 | Optional encrypted account + cross-device backup/sync | backlog (proposed 2026-08-29) | accounts, infra | Must have |
+| B13 | Optional encrypted account + cross-device backup/sync | done (2026-09-07) | accounts, infra | Must have |
 | B14 | Global AI-generation error-recovery UX contract | done (2026-08-29) | ux, quiz, learn | Must have |
 | B15 | Freemium hosted AI tier with budget guardrails | backlog (proposed 2026-08-29) | ai, monetization | Should have |
 | B16 | Achievement badges & milestone challenges | done (2026-08-29) | gamification, dashboard | Should have |
@@ -184,12 +184,14 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
 
 ### B13 — Optional encrypted account + cross-device backup/sync
 
-- **Status:** backlog (proposed 2026-08-29)
+- **Status:** done (2026-09-07)
 - **Area:** accounts, infra
 - **MoSCoW:** Must have
 - **Why it exists:** All user data (quiz history, learning paths, library uploads, stats/streaks) lives in local-only Isar today — confirmed by README ("local-first") and `scalability-roadmap.md`. `risk-register.md` R7 flags BYOK-wall activation friction as an "existential" risk, and both `product-review.md` and `executive-summary.md` independently call accounts/sync "retention-critical": an uninstall or device loss currently destroys a user's entire history, streaks included.
-- **Suggested next step:** Optional (never forced) account — Firebase Auth already in the stack (`firebase_options.dart`, Firestore rules exist for opt-in analytics). Encrypted backup of Isar collections to Firestore/Storage gated behind explicit opt-in, mirroring the existing `ENABLE_FIRESTORE_ANALYTICS` opt-in pattern. Must not weaken the current "cloud sync is off by default" privacy stance from the README.
-- **Risks:** Biggest scope item on this list — touches auth, encryption at rest, conflict resolution on multi-device edits, and Firestore rules/App Check (already flagged as optional/incomplete in `PLAY_STORE_CHECKLIST.md`). Should land behind a feature flag and ship backup before sync.
+- **Shipped:** Ships behind `kCloudBackupEnabled` (`lib/core/services/backup_flags.dart`, currently `false` — dark until deliberately flipped on, pending the Firebase-console prerequisite below). Google Sign-In only (`lib/data/remote/auth/auth_service.dart`, targets the current async `google_sign_in` 7.x API). Client-side end-to-end AES-256-GCM encryption with a user-chosen passphrase (`lib/data/remote/backup/backup_crypto.dart`, PBKDF2-HMAC-SHA256 key derivation) — Rivox/Firebase can never read backup contents. Covers quiz history, learning paths (+ step files), daily stats, learner profile, flashcards, chat history, syllabus/study-plan/career-skill data, and library uploads; excludes BYOK provider configs, internal AI-tuning data, and operational logs by design. Manual "Create backup now" / "Restore from backup" only (`lib/features/settings/presentation/backup_settings_screen.dart`) — no continuous sync, no conflict resolution, matching this entry's own "ship backup before sync" guidance. Encrypted blob in Firebase Storage (`users/{uid}/backups/latest.enc`); small cleartext KDF-params metadata doc in Firestore (`users/{uid}/backup_metadata/current`) — new `firestore.rules`/`storage.rules` scope both to `request.auth.uid == uid`.
+- **Corrected from this entry's original assumptions (verified against real code before building):** Firebase Auth was **not** actually in the stack (only `firebase_core`/`cloud_firestore`/`firebase_crashlytics` were) — added fresh. No `request.auth.uid`-scoped Firestore rule pattern existed anywhere — designed from scratch, not "mirrored."
+- **Known follow-ups, not blocking:** Firebase console setup (enable Google provider, register SHA-1/SHA-256, regenerate config files) is a manual prerequisite before sign-in works on a device — required before flipping the feature flag on. PBKDF2 at the shipped 600k-iteration default measured ~3.4s per derivation on the dev machine (real low-end Android devices will likely be slower) — acceptable for an infrequent, explicit action behind a progress dialog, but worth reducing (plan's documented fallback: 210k iterations) if user feedback says otherwise. App Check, backup version history/rollback, and an account-deletion/"delete my cloud data" flow remain deferred, as originally scoped.
+- **Risks:** Encryption is genuinely zero-knowledge — a forgotten passphrase with no other signed-in device means that backup is permanently unreadable, by design (documented prominently in the passphrase-entry UI, not buried).
 - **Source:** `docs/reviews/scalability-roadmap.md`, `product-review.md`, `executive-summary.md`, `risk-register.md` R7.
 
 ### B14 — Global AI-generation error-recovery UX contract

@@ -503,6 +503,105 @@ class LearnerRepository {
     });
     return true;
   }
+
+  /// Single [LearnerProfile] row, for B13 cloud backup (Phase 2).
+  Future<Map<String, dynamic>> exportProfile() async {
+    final profile = await getOrCreateProfile();
+    return {
+      'layoutMode': profile.layoutMode,
+      'density': profile.density,
+      'layoutModeOverride': profile.layoutModeOverride,
+      'goalsJson': profile.goalsJson,
+      'dailyMinutesGoal': profile.dailyMinutesGoal,
+      'examDate': profile.examDate?.toIso8601String(),
+      'preferredFormatsJson': profile.preferredFormatsJson,
+      'goalMode': profile.goalMode,
+      'goalContext': profile.goalContext,
+      'examType': profile.examType,
+      'roleSeniority': profile.roleSeniority,
+      'navOrderJson': profile.navOrderJson,
+      'navAffinityJson': profile.navAffinityJson,
+      'skillLevel': profile.skillLevel,
+      'helpImproveOptIn': profile.helpImproveOptIn,
+      'lastLayoutChangeAt': profile.lastLayoutChangeAt?.toIso8601String(),
+      'updatedAt': profile.updatedAt.toIso8601String(),
+    };
+  }
+
+  /// All [LearningPath] rows (any status), for B13 cloud backup (Phase 2).
+  /// Per-path step files live outside Isar — see `PathStepsStorage` and
+  /// `CloudBackupService.exportPathSteps` for those.
+  Future<List<Map<String, dynamic>>> exportLearningPaths() async {
+    final paths = await _db.learningPaths.where().findAll();
+    return paths
+        .map((p) => {
+              'uuid': p.uuid,
+              'title': p.title,
+              'topicsJson': p.topicsJson,
+              'status': p.status,
+              'source': p.source,
+              'currentIndex': p.currentIndex,
+              'createdAt': p.createdAt.toIso8601String(),
+              'completedAt': p.completedAt?.toIso8601String(),
+            })
+        .toList();
+  }
+
+  /// Overwrites the singleton [LearnerProfile] row's fields from a B13
+  /// cloud-backup manifest (Phase 3 restore). Unlike [updateProfile], this
+  /// is a full overwrite (every backed-up field is applied), not a partial
+  /// per-field update — a restore replaces the profile wholesale.
+  Future<void> importProfile(Map<String, dynamic> data) async {
+    final profile = await getOrCreateProfile();
+    profile
+      ..layoutMode = data['layoutMode'] as String? ?? profile.layoutMode
+      ..density = data['density'] as String? ?? profile.density
+      ..layoutModeOverride = data['layoutModeOverride'] as String? ?? profile.layoutModeOverride
+      ..goalsJson = data['goalsJson'] as String? ?? profile.goalsJson
+      ..dailyMinutesGoal = data['dailyMinutesGoal'] as int? ?? profile.dailyMinutesGoal
+      ..examDate = data['examDate'] != null ? DateTime.parse(data['examDate'] as String) : null
+      ..preferredFormatsJson =
+          data['preferredFormatsJson'] as String? ?? profile.preferredFormatsJson
+      ..goalMode = data['goalMode'] as String? ?? profile.goalMode
+      ..goalContext = data['goalContext'] as String? ?? profile.goalContext
+      ..examType = data['examType'] as String?
+      ..roleSeniority = data['roleSeniority'] as String?
+      ..navOrderJson = data['navOrderJson'] as String? ?? profile.navOrderJson
+      ..navAffinityJson = data['navAffinityJson'] as String? ?? profile.navAffinityJson
+      ..skillLevel = (data['skillLevel'] as num?)?.toDouble() ?? profile.skillLevel
+      ..helpImproveOptIn = data['helpImproveOptIn'] as bool? ?? profile.helpImproveOptIn
+      ..lastLayoutChangeAt = data['lastLayoutChangeAt'] != null
+          ? DateTime.parse(data['lastLayoutChangeAt'] as String)
+          : null
+      ..updatedAt = DateTime.now();
+
+    await _db.writeTxn(() async {
+      await _db.learnerProfiles.put(profile);
+    });
+  }
+
+  /// Replaces all [LearningPath] rows from a B13 cloud-backup manifest
+  /// (Phase 3 restore). Caller is responsible for clearing existing rows
+  /// first (see `IsarService.clearBackupInScopeData`) — this only writes.
+  /// Per-path step files are restored separately (see `PathStepsStorage`).
+  Future<void> importLearningPaths(List<dynamic> data) async {
+    final paths = data.map((raw) {
+      final m = Map<String, dynamic>.from(raw as Map);
+      return LearningPath()
+        ..uuid = m['uuid'] as String
+        ..title = m['title'] as String
+        ..topicsJson = m['topicsJson'] as String
+        ..status = m['status'] as String
+        ..source = m['source'] as String
+        ..currentIndex = m['currentIndex'] as int
+        ..createdAt = DateTime.parse(m['createdAt'] as String)
+        ..completedAt = m['completedAt'] != null ? DateTime.parse(m['completedAt'] as String) : null;
+    }).toList();
+
+    await _db.writeTxn(() async {
+      await _db.learningPaths.putAll(paths);
+    });
+  }
 }
 
 class PathResourceData {

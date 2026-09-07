@@ -135,4 +135,52 @@ class FlashcardRepository {
       ..createdAt = now
       ..nextReviewAt = now;
   }
+
+  /// All flashcards, for B13 cloud backup (Phase 2).
+  Future<List<Map<String, dynamic>>> exportFlashcards() async {
+    final cards = await _db.flashcards.where().findAll();
+    return cards
+        .map((c) => {
+              'uuid': c.uuid,
+              'front': c.front,
+              'back': c.back,
+              'sourceType': c.sourceType,
+              'sourceRef': c.sourceRef,
+              'goalMode': c.goalMode,
+              'createdAt': c.createdAt.toIso8601String(),
+              'lastReviewedAt': c.lastReviewedAt?.toIso8601String(),
+              'nextReviewAt': c.nextReviewAt.toIso8601String(),
+              'easeFactor': c.easeFactor,
+              'intervalDays': c.intervalDays,
+              'repetitions': c.repetitions,
+            })
+        .toList();
+  }
+
+  /// Replaces all flashcards from a B13 cloud-backup manifest (Phase 3
+  /// restore). Caller is responsible for clearing existing rows first
+  /// (see `IsarService.clearBackupInScopeData`) — this only writes.
+  Future<void> importFlashcards(List<dynamic> data) async {
+    final cards = data.map((raw) {
+      final m = Map<String, dynamic>.from(raw as Map);
+      return Flashcard()
+        ..uuid = m['uuid'] as String
+        ..front = m['front'] as String
+        ..back = m['back'] as String
+        ..sourceType = m['sourceType'] as String
+        ..sourceRef = m['sourceRef'] as String?
+        ..goalMode = m['goalMode'] as String
+        ..createdAt = DateTime.parse(m['createdAt'] as String)
+        ..lastReviewedAt =
+            m['lastReviewedAt'] != null ? DateTime.parse(m['lastReviewedAt'] as String) : null
+        ..nextReviewAt = DateTime.parse(m['nextReviewAt'] as String)
+        ..easeFactor = (m['easeFactor'] as num?)?.toDouble() ?? 2.5
+        ..intervalDays = m['intervalDays'] as int? ?? 0
+        ..repetitions = m['repetitions'] as int? ?? 0;
+    }).toList();
+
+    await _db.writeTxn(() async {
+      await _db.flashcards.putAll(cards);
+    });
+  }
 }

@@ -424,6 +424,128 @@ class KnowledgeRepository {
     return result;
   }
 
+  /// All knowledge-library data (sources, chunks, allowlisted websites), for
+  /// B13 cloud backup (Phase 2). Note [KnowledgeSource.localPath] points at
+  /// this device's filesystem — a restored source's text/vectors are usable
+  /// for search/chat, but "view original file" needs a graceful missing-file
+  /// fallback on a different device (not handled here; a Phase 3 concern).
+  Future<Map<String, dynamic>> exportKnowledgeData() async {
+    final sources = await _db.knowledgeSources.where().findAll();
+    final chunks = await _db.documentChunks.where().findAll();
+    final websites = await _db.userWebsites.where().findAll();
+    return {
+      'knowledgeSources': sources
+          .map((s) => {
+                'uuid': s.uuid,
+                'goalMode': s.goalMode,
+                'type': s.type,
+                'title': s.title,
+                'localPath': s.localPath,
+                'url': s.url,
+                'domain': s.domain,
+                'status': s.status,
+                'statusMessage': s.statusMessage,
+                'consentAt': s.consentAt?.toIso8601String(),
+                'enabled': s.enabled,
+                'lastIndexedAt': s.lastIndexedAt?.toIso8601String(),
+                'createdAt': s.createdAt.toIso8601String(),
+              })
+          .toList(),
+      'documentChunks': chunks
+          .map((c) => {
+                'chunkId': c.chunkId,
+                'sourceUuid': c.sourceUuid,
+                'text': c.text,
+                'page': c.page,
+                'section': c.section,
+                'vectorJson': c.vectorJson,
+                'tokenEstimate': c.tokenEstimate,
+                'citationLabel': c.citationLabel,
+                'updatedAt': c.updatedAt.toIso8601String(),
+              })
+          .toList(),
+      'userWebsites': websites
+          .map((w) => {
+                'uuid': w.uuid,
+                'domain': w.domain,
+                'label': w.label,
+                'goalMode': w.goalMode,
+                'startUrl': w.startUrl,
+                'lastCrawledAt': w.lastCrawledAt?.toIso8601String(),
+                'crawlMode': w.crawlMode,
+                'enabled': w.enabled,
+                'createdAt': w.createdAt.toIso8601String(),
+              })
+          .toList(),
+    };
+  }
+
+  /// Replaces all knowledge-library data from a B13 cloud-backup manifest
+  /// (Phase 3 restore). Caller is responsible for clearing existing rows
+  /// first (see `IsarService.clearBackupInScopeData`) — this only writes.
+  ///
+  /// [KnowledgeSource.localPath] is restored as backed-up but will point at
+  /// the ORIGINAL device's filesystem on a fresh-device restore — the
+  /// original file bytes were never part of this backup, only the derived
+  /// indexed text/vectors (`DocumentChunk`). Search/chat citations remain
+  /// usable; a "view original file"/"re-index" action needs its own
+  /// graceful missing-file handling, which is unrelated to this method.
+  Future<void> importKnowledgeData(Map<String, dynamic> data) async {
+    final sources = ((data['knowledgeSources'] as List?) ?? []).map((raw) {
+      final m = Map<String, dynamic>.from(raw as Map);
+      return KnowledgeSource()
+        ..uuid = m['uuid'] as String
+        ..goalMode = m['goalMode'] as String
+        ..type = m['type'] as String
+        ..title = m['title'] as String
+        ..localPath = m['localPath'] as String?
+        ..url = m['url'] as String?
+        ..domain = m['domain'] as String?
+        ..status = m['status'] as String
+        ..statusMessage = m['statusMessage'] as String?
+        ..consentAt = m['consentAt'] != null ? DateTime.parse(m['consentAt'] as String) : null
+        ..enabled = m['enabled'] as bool? ?? false
+        ..lastIndexedAt =
+            m['lastIndexedAt'] != null ? DateTime.parse(m['lastIndexedAt'] as String) : null
+        ..createdAt = DateTime.parse(m['createdAt'] as String);
+    }).toList();
+
+    final chunks = ((data['documentChunks'] as List?) ?? []).map((raw) {
+      final m = Map<String, dynamic>.from(raw as Map);
+      return DocumentChunk()
+        ..chunkId = m['chunkId'] as String
+        ..sourceUuid = m['sourceUuid'] as String
+        ..text = m['text'] as String
+        ..page = m['page'] as int?
+        ..section = m['section'] as String?
+        ..vectorJson = m['vectorJson'] as String
+        ..tokenEstimate = m['tokenEstimate'] as int
+        ..citationLabel = m['citationLabel'] as String?
+        ..updatedAt = DateTime.parse(m['updatedAt'] as String);
+    }).toList();
+
+    final websites = ((data['userWebsites'] as List?) ?? []).map((raw) {
+      final m = Map<String, dynamic>.from(raw as Map);
+      return UserWebsite()
+        ..uuid = m['uuid'] as String
+        ..domain = m['domain'] as String
+        ..label = m['label'] as String
+        ..goalMode = m['goalMode'] as String
+        ..startUrl = m['startUrl'] as String?
+        ..lastCrawledAt =
+            m['lastCrawledAt'] != null ? DateTime.parse(m['lastCrawledAt'] as String) : null
+        ..crawlMode = m['crawlMode'] as String
+        ..enabled = m['enabled'] as bool? ?? false
+        ..createdAt = DateTime.parse(m['createdAt'] as String);
+    }).toList();
+
+    await _db.writeTxn(() async {
+      await _db.knowledgeSources.putAll(sources);
+      await _db.documentChunks.putAll(chunks);
+      await _db.userWebsites.putAll(websites);
+    });
+  }
+
   Future<String> _copyToLibrary(String sourcePath, String type) async {
     final dir = await getApplicationDocumentsDirectory();
     final libDir = Directory(p.join(dir.path, 'knowledge_library', type));

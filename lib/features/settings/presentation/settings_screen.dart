@@ -21,6 +21,8 @@ import '../../../core/providers/home_refresh.dart';
 import '../../../core/providers/firebase_providers.dart';
 import '../../../core/services/ai_study_pulse_service.dart';
 import '../../../core/services/article_bookmark_store.dart';
+import '../../../core/providers/backup_providers.dart';
+import '../../../core/services/backup_flags.dart';
 import '../../../core/services/goal_topic_resolver.dart';
 import '../../../core/services/daily_content_scheduler.dart';
 import '../../../core/services/exam_notification_scheduler.dart';
@@ -413,6 +415,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           title: Text(l10n.settingsImportData),
                           onTap: () => _importData(context, ref),
                         ),
+                        if (kCloudBackupEnabled) ...[
+                          const Divider(),
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const SettingsLeadingIcon(Icons.cloud_outlined),
+                            title: const Text('Cloud Backup'),
+                            subtitle: const Text('Sign in and back up your progress'),
+                            trailing: const Icon(Icons.chevron_right_rounded),
+                            onTap: () => context.push('/settings/backup'),
+                          ),
+                        ],
                         const Divider(),
                         ListTile(
                           contentPadding: EdgeInsets.zero,
@@ -663,6 +676,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         await AiStudyPulseService(llmManager: ref.read(llmManagerProvider)).clearCache();
         GoalTopicResolver.clearCache();
       } else {
+        // B13: a full reset already wipes CloudBackupState via clearAll()'s
+        // blanket db.clear(), but Firebase/Google sign-in state lives outside
+        // Isar — sign out too, so the Cloud Backup screen doesn't show a
+        // stale "signed in" state for data that no longer exists locally.
+        // (The "learning-only" branch above must NOT do this.)
+        if (kCloudBackupEnabled) {
+          await ref.read(authServiceProvider).signOut();
+        }
         await ref.read(isarServiceProvider).clearAll();
         await ref.read(secureKeyStorageProvider).clearAllKeys();
         await PathStepsStorage.instance.clearAll();

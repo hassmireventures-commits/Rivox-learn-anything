@@ -9,6 +9,7 @@ import 'models/ai_usage_daily.dart';
 import 'models/app_settings.dart';
 import 'models/career_skill.dart';
 import 'models/chat_message.dart';
+import 'models/cloud_backup_state.dart';
 import 'models/daily_stat.dart';
 import 'models/document_chunk.dart';
 import 'models/embedding_chunk.dart';
@@ -37,7 +38,7 @@ class IsarService {
   static IsarService get instance => _instance ??= IsarService._();
 
   /// Bump when making additive schema changes; pair with [_runMigrations].
-  static const int schemaVersion = 1;
+  static const int schemaVersion = 2;
 
   Isar? _isar;
   Isar get db {
@@ -81,6 +82,7 @@ class IsarService {
         UserWebsiteSchema,
         FlashcardSchema,
         ChatMessageSchema,
+        CloudBackupStateSchema,
       ],
       directory: dir.path,
       name: 'learn_anything_db',
@@ -139,6 +141,31 @@ class IsarService {
       await db.studyPlanItems.clear();
       await db.aiAuditEvents.clear();
       await db.aiUsageDailys.clear();
+      await db.knowledgeSources.clear();
+      await db.documentChunks.clear();
+      await db.userWebsites.clear();
+      await db.flashcards.clear();
+      await db.chatMessages.clear();
+    });
+  }
+
+  /// Clears exactly the collections in scope for B13 cloud backup/restore —
+  /// deliberately distinct from [clearLearningData], which also touches
+  /// derived/regenerable collections intentionally excluded from backup
+  /// scope (`topicNodes`, `topicEdges`, `recommendationItems`,
+  /// `embeddingChunks`, `telemetryEvents`, `modelWeights`, `healthSnapshots`,
+  /// `aiAuditEvents`, `aiUsageDailys`). Restore must not touch those.
+  Future<void> clearBackupInScopeData() async {
+    await db.writeTxn(() async {
+      await db.quizSessions.clear();
+      await db.questions.clear();
+      await db.learningPaths.clear();
+      await db.dailyStats.clear();
+      await db.learnerProfiles.clear();
+      await db.syllabus.clear();
+      await db.syllabusUnits.clear();
+      await db.careerSkills.clear();
+      await db.studyPlanItems.clear();
       await db.knowledgeSources.clear();
       await db.documentChunks.clear();
       await db.userWebsites.clear();

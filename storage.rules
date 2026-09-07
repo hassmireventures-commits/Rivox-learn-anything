@@ -1,0 +1,14 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // B13 opt-in encrypted cloud backup blob. Client-side end-to-end
+    // encrypted before upload (see lib/data/remote/backup/backup_crypto.dart)
+    // — Firebase/Rivox never see plaintext content or the passphrase.
+    match /users/{uid}/backups/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

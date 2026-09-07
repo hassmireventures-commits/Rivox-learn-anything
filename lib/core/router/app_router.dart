@@ -5,6 +5,7 @@ import '../locale/app_localizations_ext.dart';
 import '../services/daily_content_service.dart';
 
 import '../../features/career/presentation/drill_create_screen.dart';
+import '../../features/settings/presentation/backup_settings_screen.dart';
 import '../../features/chat/presentation/chat_screen.dart';
 import '../../features/career/presentation/voice_interview_hub_screen.dart';
 import '../../features/career/presentation/skill_matrix_screen.dart';
@@ -217,6 +218,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/settings/providers',
       pageBuilder: (context, state) => _pushPage(child: const ProvidersScreen()),
+    ),
+    GoRoute(
+      path: '/settings/backup',
+      pageBuilder: (context, state) => _pushPage(child: const BackupSettingsScreen()),
     ),
     GoRoute(
       path: '/legal/:docId',
