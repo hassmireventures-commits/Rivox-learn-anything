@@ -167,7 +167,15 @@ class GenerationJobService extends ChangeNotifier {
     }
   }
 
-  Future<void> startPath({int moduleCount = 6, String? generationMode}) async {
+  /// [focus] is an optional topic override (e.g. from a chat-triggered
+  /// proposal) — forwarded to [LearningOrchestrator.generateLearningPathWithLlm],
+  /// which already accepts it and falls back to the learner's primary goal
+  /// when omitted, same as before this param existed.
+  Future<void> startPath({
+    String? focus,
+    int moduleCount = 6,
+    String? generationMode,
+  }) async {
     _ensureIdle();
     final seq = ++_jobSeq;
     _running = true;
@@ -175,13 +183,14 @@ class GenerationJobService extends ChangeNotifier {
     _userCancelled = false;
     _uiAttached = true;
     _kind = GenerationJobKind.path;
-    _topic = 'Learning path';
+    _topic = focus ?? 'Learning path';
     _successRoute = null;
     _errorMessage = null;
     notifyListeners();
 
     try {
       final id = await _orchestrator.generateLearningPathWithLlm(
+        focus: focus,
         moduleCount: moduleCount,
         generationMode: generationMode,
       );

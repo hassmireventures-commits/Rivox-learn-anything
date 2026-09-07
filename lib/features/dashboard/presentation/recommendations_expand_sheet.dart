@@ -6,6 +6,7 @@ import '../../../core/personalization/ui_personalization_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/local/models/recommendation.dart';
 import '../../../shared/navigation/recommendation_navigation.dart';
+import '../../../shared/widgets/bottom_native_ad_slot.dart';
 import '../../../shared/widgets/dashboard/filter_chip_row.dart';
 import '../../../shared/widgets/dashboard/vertical_recommendation_card.dart';
 
@@ -186,9 +187,12 @@ class _RecommendationsExpandSheetState extends ConsumerState<RecommendationsExpa
                           AppTheme.pageHorizontal,
                           24,
                         ),
-                        itemCount: filtered.length,
+                        itemCount: filtered.length + 1,
                         separatorBuilder: (_, _) => const SizedBox(height: AppTheme.cardGap),
                         itemBuilder: (context, index) {
+                          if (index == filtered.length) {
+                            return const ScrollableNativeAdSlot(slotId: 'quiz_of_day_see_all');
+                          }
                           final item = filtered[index];
                           return VerticalRecommendationCard(
                             item: item,

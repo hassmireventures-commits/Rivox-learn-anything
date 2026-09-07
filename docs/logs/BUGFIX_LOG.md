@@ -1,5 +1,26 @@
 # Bug Fix Log
 
+## 2026-09-07 — Global chat entry FAB stayed visible on the chat screen itself; shown on too many screens
+
+- **Type:** bugfix
+- **Area:** chat, ux
+- **Files:** `lib/shared/widgets/chat_entry_fab.dart`, `lib/features/chat/presentation/chat_screen.dart`
+- **Problem / Goal:** User-reported: the floating "open chat" button stayed visible even while already on the chat screen, and separately asked for it to not appear on every screen (including Settings) at all.
+- **Root cause:** the FAB's visibility relied solely on `appRouter.routerDelegate.currentConfiguration.uri.path` matching against a hide-list of path prefixes. The FAB itself navigates to chat via an imperative `appRouter.push('/chat')` — and GoRouter's reported `currentConfiguration.uri` doesn't reliably reflect an imperative `push()` the same way it does a declarative `go()`, so the path-prefix check could still evaluate against a stale (pre-navigation) location while genuinely on the chat screen.
+- **Solution:** two changes. (1) Added a new `chatScreenVisible` `ValueNotifier<bool>` in `chat_screen.dart`, set `true`/`false` in `ChatScreen`'s `initState`/`dispose` — a deterministic "am I actually mounted" signal the FAB now checks directly, independent of GoRouter's URI-reporting quirks. (2) Switched the FAB from a blocklist (hide on specific screens) to an allowlist (only show on the three main shell tabs — Home/Learn/History), per the user's explicit "don't show on all pages" — removes the need to enumerate every screen it shouldn't appear on (Settings, Create Quiz, quiz play, Library, career/exam modules, legal, etc.).
+- **Regression risks:** None expected — the allowlist is strictly narrower than the previous blocklist, and the new visibility flag only ever adds an additional reason to hide, never to show.
+- **Verified:** `flutter analyze` (0 new issues); manual reasoning confirms the FAB now only renders on `/dashboard`, `/learn`, `/history`, and never while `ChatScreen` is mounted regardless of navigation method.
+
+## 2026-09-07 — Flashcard review buttons wrapped awkwardly ("Agai/n", "Goo/d")
+
+- **Type:** bugfix
+- **Area:** learn, flashcards, ux
+- **Files:** `lib/features/learn/presentation/flashcard_review_screen.dart`
+- **Problem / Goal:** User-reported/screenshot: the 4 rating buttons (Again/Hard/Good/Easy) on the flashcard review screen wrapped their labels onto two lines, since 4 `Expanded` `OutlinedButton`s in one row left too little width per button once default button padding was accounted for.
+- **Solution:** switched to a 2×2 grid (two rows of two buttons instead of one cramped row of four), added an icon to each button for faster visual recognition, reduced button padding, and capped labels to `maxLines: 1` with ellipsis as a safety net. Also simplified the review flow itself (the "also simplify its usage" half of the request): the flashcard is now tappable to reveal the answer directly (in addition to keeping the existing "Show answer" affordance, now rendered as inline text on the card), reducing one required tap in the common case.
+- **Regression risks:** None — pure layout/UX change, same `_rate(quality)` calls and SM-2 scheduling underneath, untouched.
+- **Verified:** `flutter analyze` (0 new issues).
+
 ## 2026-09-07 — RAG chat hallucinated performing actions it can't actually do
 
 - **Type:** bugfix

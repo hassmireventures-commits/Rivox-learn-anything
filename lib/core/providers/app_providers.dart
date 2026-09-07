@@ -91,6 +91,7 @@ final chatServiceProvider = Provider<ChatService>((ref) {
     llmManager: ref.watch(llmManagerProvider),
     aiPipeline: ref.watch(aiRequestPipelineProvider),
     chatRepository: ref.watch(chatRepositoryProvider),
+    quizRepository: ref.watch(quizRepositoryProvider),
   );
 });
 

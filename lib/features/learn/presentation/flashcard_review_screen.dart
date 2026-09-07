@@ -5,7 +5,6 @@ import '../../../core/locale/app_localizations_ext.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../data/local/models/flashcard.dart';
 import '../../../shared/widgets/app_card.dart';
-import '../../../shared/widgets/primary_button.dart';
 
 /// Spaced-repetition flashcard review (mistakes + library-generated cards).
 class FlashcardReviewScreen extends ConsumerStatefulWidget {
@@ -113,72 +112,111 @@ class _FlashcardReviewScreenState extends ConsumerState<FlashcardReviewScreen> {
             ),
             const SizedBox(height: 12),
             Expanded(
-              child: AppCard(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        card.front,
-                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-                        textAlign: TextAlign.center,
-                      ),
-                      if (_showAnswer) ...[
-                        const SizedBox(height: 20),
-                        Divider(color: theme.colorScheme.outlineVariant),
-                        const SizedBox(height: 20),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: _showAnswer ? null : () => setState(() => _showAnswer = true),
+                child: AppCard(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
                         Text(
-                          card.back,
-                          style: theme.textTheme.bodyLarge,
+                          card.front,
+                          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                           textAlign: TextAlign.center,
                         ),
+                        if (_showAnswer) ...[
+                          const SizedBox(height: 20),
+                          Divider(color: theme.colorScheme.outlineVariant),
+                          const SizedBox(height: 20),
+                          Text(
+                            card.back,
+                            style: theme.textTheme.bodyLarge,
+                            textAlign: TextAlign.center,
+                          ),
+                        ] else ...[
+                          const SizedBox(height: 16),
+                          Text(
+                            l10n.flashcardShowAnswer,
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            if (!_showAnswer)
-              PrimaryButton(
-                label: l10n.flashcardShowAnswer,
-                onPressed: () => setState(() => _showAnswer = true),
-              )
-            else
-              Row(
+            if (_showAnswer)
+              Column(
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => _rate(0),
-                      child: Text(l10n.flashcardAgain),
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _RatingButton(
+                          icon: Icons.replay_rounded,
+                          label: l10n.flashcardAgain,
+                          onPressed: () => _rate(0),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _RatingButton(
+                          icon: Icons.trending_down_rounded,
+                          label: l10n.flashcardHard,
+                          onPressed: () => _rate(3),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => _rate(3),
-                      child: Text(l10n.flashcardHard),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => _rate(4),
-                      child: Text(l10n.flashcardGood),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => _rate(5),
-                      child: Text(l10n.flashcardEasy),
-                    ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _RatingButton(
+                          icon: Icons.check_rounded,
+                          label: l10n.flashcardGood,
+                          onPressed: () => _rate(4),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _RatingButton(
+                          icon: Icons.trending_up_rounded,
+                          label: l10n.flashcardEasy,
+                          onPressed: () => _rate(5),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _RatingButton extends StatelessWidget {
+  const _RatingButton({required this.icon, required this.label, required this.onPressed});
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+      ),
+      icon: Icon(icon, size: 18),
+      label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
     );
   }
 }

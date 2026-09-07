@@ -1,5 +1,15 @@
 ﻿# Enhancements Log
 
+## 2026-09-07 — Native ad on "Quiz of the Day" See all sheet
+
+- **Type:** enhancement
+- **Area:** dashboard, ads
+- **Files:** `lib/features/dashboard/presentation/recommendations_expand_sheet.dart`
+- **Problem / Goal:** User asked for a native ad on the "Quiz of the Day" section's "See all" page — this opens `RecommendationsExpandSheet`, the shared recommendations bottom sheet (Quiz of the Day's "See all" reuses the same underlying recommendations list as other dashboard sections).
+- **Solution:** appended the existing `ScrollableNativeAdSlot(slotId: 'quiz_of_day_see_all')` widget as the last item in the sheet's `ListView.separated` (`itemCount + 1`, rendered when `index == filtered.length`) — same dismissible native-ad widget already used on Settings/Home/Learn/History/Support, reusing the single shared AdMob native ad unit ID.
+- **Regression risks:** None — additive list item, existing recommendation-card rendering/filtering untouched.
+- **Verified:** `flutter analyze` (0 new issues).
+
 ## 2026-09-07 — Native ads on Settings/Home/Learn; daily quota 5→1; global generation banner; weekly support nag
 
 - **Type:** enhancement

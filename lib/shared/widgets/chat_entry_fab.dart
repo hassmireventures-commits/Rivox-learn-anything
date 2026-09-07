@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../../core/router/app_router.dart';
+import '../../features/chat/presentation/chat_screen.dart' show chatScreenVisible;
 
 /// Global floating entry point into the RAG chat (B1), added to the same
 /// [Stack] as [GenerationTopBanner] in `app.dart` so it doesn't require
 /// touching Home/Learn/Settings screen files.
 ///
-/// Hidden on screens where it would only get in the way: onboarding
-/// (splash/welcome), the chat screen itself, and while a quiz is actively
-/// being played.
+/// Deliberately an ALLOWLIST, not a blocklist: only shown on the three main
+/// shell tabs (Home/Learn/History) — every other pushed screen (Settings,
+/// Create Quiz, quiz play, Library, career/exam modules, legal, etc.) stays
+/// clear of it, and it hides on the chat screen itself via [chatScreenVisible].
 class ChatEntryFab extends StatefulWidget {
   const ChatEntryFab({super.key});
 
@@ -17,15 +19,6 @@ class ChatEntryFab extends StatefulWidget {
 }
 
 class _ChatEntryFabState extends State<ChatEntryFab> {
-  static const _hiddenOnPrefixes = [
-    '/splash',
-    '/welcome',
-    '/chat',
-    '/quiz/play',
-    // Already has its own bottom-right FAB (add provider).
-    '/settings/providers',
-  ];
-
   // Home/Learn/History live inside AppShell, which has its own
   // bottomNavigationBar — lift the FAB clear of it there.
   static const _shellRoutePrefixes = ['/dashboard', '/learn', '/history'];
@@ -34,11 +27,13 @@ class _ChatEntryFabState extends State<ChatEntryFab> {
   void initState() {
     super.initState();
     appRouter.routerDelegate.addListener(_onRouteChanged);
+    chatScreenVisible.addListener(_onRouteChanged);
   }
 
   @override
   void dispose() {
     appRouter.routerDelegate.removeListener(_onRouteChanged);
+    chatScreenVisible.removeListener(_onRouteChanged);
     super.dispose();
   }
 
@@ -46,14 +41,14 @@ class _ChatEntryFabState extends State<ChatEntryFab> {
 
   String get _currentPath => appRouter.routerDelegate.currentConfiguration.uri.path;
 
-  bool get _shouldShow {
-    final path = _currentPath;
-    return !_hiddenOnPrefixes.any((prefix) => path.startsWith(prefix));
-  }
-
   bool get _onShellRoute {
     final path = _currentPath;
     return _shellRoutePrefixes.any((prefix) => path.startsWith(prefix));
+  }
+
+  bool get _shouldShow {
+    if (chatScreenVisible.value) return false;
+    return _onShellRoute;
   }
 
   @override

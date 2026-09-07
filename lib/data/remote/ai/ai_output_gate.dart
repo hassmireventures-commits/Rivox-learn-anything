@@ -170,6 +170,7 @@ class AiOutputGate {
       '{"notes"',
       '{"score"',
       '{"related"',
+      '{"action"',
     ]) {
       final idx = sanitized.indexOf(root);
       if (idx < 0) continue;
@@ -292,6 +293,7 @@ class AiOutputGate {
       'notes',
       'score',
       'related',
+      'action',
     ];
     var score = jsonText.length ~/ 10;
     for (final key in preferredKeys) {

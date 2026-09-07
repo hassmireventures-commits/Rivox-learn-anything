@@ -15,6 +15,10 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-09-07 | enhancement | Native ad on "Quiz of the Day" See all sheet | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
+| 2026-09-07 | bugfix | Flashcard review buttons wrapped awkwardly; simplified review flow | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
+| 2026-09-07 | bugfix | Global chat entry FAB stayed visible on chat screen; shown on too many screens | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
+| 2026-09-07 | feature | Agentic RAG chat: propose-confirm quiz/path generation, all-library grounding, learning history | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-09-07 | bugfix | RAG chat hallucinated performing actions it can't actually do | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-07 | bugfix | Onboarding goal validation rejected short real subjects ("AWS", "SQL", etc.) | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-07 | feature | Optional encrypted cloud backup/restore (backlog B13) — Google Sign-In, client-side E2E encryption | [FEATURES_LOG](logs/FEATURES_LOG.md) |

@@ -60,6 +60,27 @@ class KnowledgeRepository {
     return {for (final s in sources) s.uuid: s.type};
   }
 
+  /// All enabled+indexed sources across every goal mode — used only by chat
+  /// (backlog B1's agentic pass), whose knowledge scope is intentionally
+  /// global rather than goal-scoped like quiz/path/GoalAgent generation
+  /// (see `enabledSourcesForGoal` for that scoped variant). `enabled` is
+  /// already an independent, goal-mode-agnostic boolean, so this needs no
+  /// new schema/index, just no `goalMode` filter.
+  Future<List<KnowledgeSource>> allEnabledSources() async {
+    final all = await _db.knowledgeSources.where().findAll();
+    return all.where((s) => s.enabled && s.status == 'indexed').toList();
+  }
+
+  Future<Set<String>> allEnabledSourceUuids() async {
+    final sources = await allEnabledSources();
+    return sources.map((s) => s.uuid).toSet();
+  }
+
+  Future<Map<String, String>> allEnabledSourceTypes() async {
+    final sources = await allEnabledSources();
+    return {for (final s in sources) s.uuid: s.type};
+  }
+
   Future<KnowledgeSource?> findByUrl({
     required String goalMode,
     required String url,
