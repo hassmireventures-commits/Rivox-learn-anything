@@ -15,6 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-09-07 | feature | Backlog: B40–B44 added from "how Google would build this" feedback (MoSCoW, fact-checked) | [BACKLOG](BACKLOG.md) |
 | 2026-09-07 | feature | Backlog: B27–B39 added from early-beta user feedback report (MoSCoW, code-verified) | [BACKLOG](BACKLOG.md) |
 | 2026-09-07 | feature | In-app RAG chat (backlog B1) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-09-07 | enhancement | Native ads on Settings/Home/Learn; daily quota 5→1; global generation banner; weekly support nag | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
