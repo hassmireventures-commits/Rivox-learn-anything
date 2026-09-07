@@ -587,7 +587,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsHelpImproveTitle => 'Help improve Rivox';
   @override
-  String get settingsHelpImproveSubtitle => 'Share anonymized learning signals only';
+  String get settingsHelpImproveSubtitle => 'Share anonymized learning signals and app usage analytics';
   @override
   String get settingsAppearance => 'Appearance';
   @override

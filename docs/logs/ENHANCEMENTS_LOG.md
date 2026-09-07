@@ -1,5 +1,21 @@
 ﻿# Enhancements Log
 
+## 2026-09-07 — SEO follow-up pass: meta description length, missing OG/Twitter tags, schema image, content-keyword gaps
+
+- **Type:** enhancement
+- **Area:** hosting (website), seo, aso
+- **Files:** `hosting/index.html`, `hosting/privacy/index.html`, `hosting/terms/index.html`, `hosting/games/index.html`, `hosting/games/dino/index.html`, `hosting/sitemap.xml`, `docs/store/LISTING.md`
+- **Problem / Goal:** User asked to improve SEO further, beyond the 2026-08-29 audit (which added robots.txt/sitemap/canonical/OG/JSON-LD) and the already-tracked backlog items B22-B26 (Search Console verification, custom domain, Custom Store Listing, content build-out, App Links — all either manual/human steps or explicitly deferred). Looked for new, concrete, code-only wins.
+- **Solution:**
+  - Trimmed the homepage `<meta name="description">` from 258 to 147 characters — the old one was well past Google's ~155-160 char display limit and was getting truncated in search results.
+  - Added a 7th feature card ("Spaced-repetition flashcards") to the homepage — the meta description and JSON-LD both already promised this shipped feature (B11), but the visible body content never mentioned it, a real relevance mismatch between what's promised in metadata and what's actually crawled.
+  - Added the missing `og:image`/`twitter:card`/`twitter:image` tags to all 4 sub-pages (privacy, terms, games, games/dino) — previously only the homepage had them, so sharing any other page rendered with no preview image.
+  - Added an `image` field to the homepage's `MobileApplication` JSON-LD (a real schema.org property that was simply omitted; deliberately did NOT add a fabricated `aggregateRating` — there's no real Play Store rating data to back one, and structured-data spam risks a manual action).
+  - Worked two already-truthful, already-used-elsewhere keyword phrases into `docs/store/LISTING.md`'s full description: "spaced-repetition flashcards" (used on the website, absent from the Play listing) and "SSC, banking, and CAT-style" competitive-exam terms (used in the website FAQ, absent from the listing's Career & Exam Modes bullet).
+  - Bumped `hosting/sitemap.xml`'s `lastmod` to today for all 5 pages, matching their actual edit date.
+- **Regression risks:** None — all changes are additive metadata/copy or a length trim; no markup structure changed. HTML tag-balance and JSON-LD parse-validity checked programmatically on all 5 touched pages after editing.
+- **Verified:** Programmatic tag-balance check (div/html/body/head/main/article/section counts) on all 5 pages — no mismatches. Both JSON-LD blocks on the homepage re-validated as parseable JSON. Meta description length re-measured at 147 chars (previously 258).
+
 ## 2026-09-07 — Native ad on "Quiz of the Day" See all sheet
 
 - **Type:** enhancement

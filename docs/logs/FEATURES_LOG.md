@@ -1,5 +1,15 @@
 # Features Log
 
+## 2026-09-07 — Real Firebase Analytics (GA4) integration
+
+- **Type:** feature
+- **Area:** analytics, privacy
+- **Files:** `lib/core/services/app_bootstrap.dart`, `lib/core/router/app_router.dart`, `lib/features/settings/presentation/settings_screen.dart`, `lib/l10n/app_en.arb` + `app_localizations_en.dart`, `pubspec.yaml`/`pubspec.lock`.
+- **Problem / Goal:** User noticed the Firebase console's Analytics dashboard was never updating. Root cause confirmed by direct search: `firebase_analytics` was never a dependency and zero `FirebaseAnalytics`/`logEvent` calls existed anywhere — the app's only existing Firebase-bound telemetry is a separate, custom, already-opt-in anonymized event stream to Firestore (`anon_events`, see `anon_analytics_sync.dart`), not the real GA4 SDK the console dashboard actually reads from. This wasn't a regression; the integration had simply never been built.
+- **Solution:** Added `firebase_analytics` and wired a `FirebaseAnalyticsObserver` into `appRouter`'s `observers` for automatic screen-view tracking. Collection is gated behind the exact same "Help improve Rivox" opt-in (`LearnerProfile.helpImproveOptIn`) the existing anonymized telemetry already uses — `setAnalyticsCollectionEnabled` is set from the stored preference at startup (`app_bootstrap.dart`, best-effort, never blocks boot) and kept live-in-sync from the same Settings toggle handler that already existed. Defaults to **off** until the learner opts in, consistent with this app's local-first/opt-in-by-default privacy stance — the SDK's own collection gate means the router observer can stay always-registered with zero network effect while disabled. Updated the toggle's subtitle copy (English) to honestly reflect that it now also covers app usage analytics, not just the narrower anonymized signals it described before.
+- **Regression risks:** None expected for users who don't opt in (default state, matches today's behavior exactly). For users who do opt in, this sends standard Firebase Analytics screen-view/event data to Google — a real, disclosed change in what "Help improve Rivox" means going forward.
+- **Verified:** `flutter analyze` (0 new issues, same 35 pre-existing project-wide); `flutter test --exclude-tags=live` (180 passed/1 skipped, no regressions).
+
 ## 2026-09-07 — Agentic RAG chat: propose-and-confirm quiz/path generation, all-library grounding, learning-history awareness
 
 - **Type:** feature

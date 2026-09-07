@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -197,6 +198,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ? (v) async {
                               await ref.read(learnerRepositoryProvider).updateProfile(helpImproveOptIn: v);
                               ref.invalidate(learnerProfileProvider);
+                              await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(v);
                               if (v) {
                                 await ref.read(anonAnalyticsSyncProvider).syncIfOptedIn();
                               }

@@ -1,9 +1,12 @@
 import 'dart:async';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../data/local/isar_service.dart';
+import '../../data/local/repositories/learner_repository.dart';
 import '../../firebase_options.dart';
 import 'ad_service.dart';
 import 'ads_init_service.dart';
@@ -36,6 +39,21 @@ Future<void> initializeOptionalServices() async {
         );
         await FirebaseCrashlytics.instance
             .setCrashlyticsCollectionEnabled(!kDebugMode);
+
+        // Firebase Analytics respects the same "help improve" opt-in as the
+        // existing anonymized telemetry (anon_analytics_sync.dart) — off
+        // until the learner explicitly turns it on in Settings, matching
+        // this app's local-first/opt-in-by-default privacy stance. Kept in
+        // sync live from settings_screen.dart's own toggle handler.
+        try {
+          final profile =
+              await LearnerRepository(IsarService.instance).getOrCreateProfile();
+          await FirebaseAnalytics.instance
+              .setAnalyticsCollectionEnabled(profile.helpImproveOptIn);
+        } catch (_) {
+          // Best-effort — a failure here must not block the rest of startup.
+        }
+
         AppLogger.crashSink = (tag, message, {error, stack, extras}) {
           final extrasMap = <String, Object>{
             'tag': tag,

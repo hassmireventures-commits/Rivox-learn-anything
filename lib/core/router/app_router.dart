@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -58,6 +59,11 @@ Page<void> _pushPage({required Widget child, LocalKey? key}) {
 final appRouter = GoRouter(
   initialLocation: '/splash',
   navigatorKey: _rootNavigatorKey,
+  // No-op network-wise while Firebase Analytics collection is disabled
+  // (default, until the learner opts in via Settings — see
+  // app_bootstrap.dart) — the SDK itself gates outgoing calls, so this
+  // observer is safe to keep always-registered.
+  observers: [FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance)],
   routes: [
     GoRoute(
       path: '/splash',

@@ -42,6 +42,7 @@ WHAT YOU CAN DO
 • Set difficulty, question count, timers, and explanations
 • Daily Quiz of the Day and weak-topic practice on your Home dashboard
 • Full results, review, and history — all stored locally
+• Spaced-repetition flashcards auto-built from your mistakes and library, reviewed right before you'd forget
 
 📰 DAILY LEARNING PACK
 • Every day: one validated article and one video matched to your goals
@@ -55,7 +56,7 @@ WHAT YOU CAN DO
 
 💼 CAREER & EXAM MODES
 • Career: skill matrix, interview drills, and role-focused practice
-• Exam prep: syllabus tracking, mock exams, and study-plan support
+• Exam prep: syllabus tracking, mock exams, and study-plan support — including SSC, banking, and CAT-style competitive practice
 • Goal-aware prompts so content stays relevant to what you are studying for
 
 📁 YOUR LIBRARY
