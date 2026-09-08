@@ -929,6 +929,7 @@ abstract class AppLocalizations {
   String flashcardsDueCount(int count);
   String get flashcardsEmpty;
   String get flashcardShowAnswer;
+  String get flashcardExplanationLabel;
   String get flashcardAgain;
   String get flashcardHard;
   String get flashcardGood;

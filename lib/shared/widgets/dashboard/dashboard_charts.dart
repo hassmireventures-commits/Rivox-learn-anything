@@ -73,7 +73,9 @@ class DashboardWeeklyChart extends StatelessWidget {
       defaultInteractions: false,
       primaryMeasureAxis: charts.NumericAxisSpec(
         tickProviderSpec: charts.BasicNumericTickProviderSpec(
-          desiredTickCount: maxY < 3 ? 3 : maxY + 1,
+          // Clamped (was `maxY + 1`, unbounded — a max of 30 requested 31
+          // ticks, cramming every integer label on top of each other).
+          desiredTickCount: (maxY + 1).clamp(3, 6),
         ),
         renderSpec: charts.GridlineRendererSpec(
           lineStyle: charts.LineStyleSpec(
@@ -230,7 +232,9 @@ class DashboardDifficultyChart extends StatelessWidget {
       defaultInteractions: false,
       primaryMeasureAxis: charts.NumericAxisSpec(
         tickProviderSpec: charts.BasicNumericTickProviderSpec(
-          desiredTickCount: maxY < 1 ? 2 : maxY + 1,
+          // Clamped (was `maxY + 1`, unbounded — same overlap risk as the
+          // weekly chart above for a large maxY).
+          desiredTickCount: (maxY + 1).clamp(2, 6),
         ),
         renderSpec: charts.GridlineRendererSpec(
           lineStyle: charts.LineStyleSpec(

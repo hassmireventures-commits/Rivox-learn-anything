@@ -1,5 +1,23 @@
 # Bug Fix Log
 
+## 2026-09-08 — Dashboard chart y-axis labels overlapping; AI brief refresh doing 2x the work; flashcard "why" explanation added
+
+- **Type:** bugfix + feature
+- **Area:** dashboard, home, flashcards
+- **Files:** `lib/shared/widgets/dashboard/dashboard_charts.dart`, `lib/core/services/ai_status_service.dart`, `lib/shared/widgets/generation_ready_banner.dart`, `lib/data/local/models/flashcard.dart` (+generated), `lib/data/remote/ai/flashcard_generation_service.dart`, `lib/data/local/repositories/flashcard_repository.dart`, `lib/features/learn/presentation/flashcard_review_screen.dart`, `lib/l10n/app_en.arb`, all 14 `lib/l10n/app_localizations_*.dart`, `test/flashcard_repository_test.dart`.
+- **Problem / Goal:** (1) User reported the dashboard chart still had an overlap after an earlier x-axis tick fix; a follow-up screenshot pinpointed the actual issue as the **y-axis** (vertical, numeric measure axis), heavily compressed and unreadable. (2) "AI brief" (Today's AI brief card) reported as slow to generate/refresh. (3) Add a detailed "why" explanation to flashcard answers, not just a bare answer.
+- **Root causes:**
+  1. `DashboardWeeklyChart` and `DashboardDifficultyChart`'s `primaryMeasureAxis` used `desiredTickCount: maxY + 1` with **no upper clamp** — for a day with 30 questions solved, that requests 31 tick labels crammed into the chart's vertical space, all overlapping. (`DashboardActivityTrendChart`'s y-axis already clamped to `.clamp(3, 6)` — only the other two charts had this bug.)
+  2. `AiStudyPulseNotifier.refresh()` awaited the brief-generation network call, then awaited a *separate* `aiStatusProvider.checkNow()` handshake call sequentially afterward — two independent network round-trips run back-to-back instead of concurrently, needlessly doubling total refresh time.
+  3. Not a bug — a missing feature. `Flashcard` only had `front`/`back`; `back` did double duty as "answer or explanation" per the AI prompt, with no dedicated field for deeper reasoning.
+- **Solution:**
+  1. Clamped both charts' `desiredTickCount` to `(maxY + 1).clamp(2, 6)` / `.clamp(3, 6)`, matching the already-safe trend chart.
+  2. `refresh()` now kicks off `checkNow()` before awaiting the brief fetch, then awaits both — same end state, roughly half the wall-clock time.
+  3. Added a nullable `Flashcard.explanation` field (regenerated Isar schema via `dart run build_runner build`). The AI flashcard-generation prompt now asks for a separate `"explanation"` (1-3 sentences on *why*, not a repeat of the answer); `fromWrongQuestion` (mistake-sourced cards) now keeps the correct-answer text in `back` and the question's own explanation in the new field, instead of concatenating them into one string. The review screen shows the explanation in a labeled "WHY" section below the answer, once revealed. `exportFlashcards`/`importFlashcards` (B13 backup) updated to carry the field.
+  - Also: while investigating a separate "quiz ready but tap doesn't open" report, audited `GenerationReadyBanner`'s tap handler end-to-end and found no definitive static defect, but hardened it — navigation failures now surface a SnackBar instead of failing silently.
+- **Regression risks:** None expected — chart fix only bounds an already-broken unbounded value; the AI-brief concurrency change doesn't alter final state, only timing; the flashcard field is additive/nullable, old cards unaffected.
+- **Verified:** `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test --exclude-tags=live` (180 passed/1 skipped) — one pre-existing test (`flashcard_repository_test.dart`) updated to assert the new answer/explanation split instead of the old concatenated string.
+
 ## 2026-09-08 — Quiz/exam timer rebuilt the entire question screen every second
 
 - **Type:** performance

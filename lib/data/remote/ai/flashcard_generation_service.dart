@@ -64,10 +64,12 @@ class FlashcardGenerationService {
           apiKey: apiKey,
           systemPrompt:
               'You are a study-flashcard writer. Respond with a single valid JSON object only, '
-              'no markdown: {"cards":[{"front":"...","back":"..."}]}.',
+              'no markdown: {"cards":[{"front":"...","back":"...","explanation":"..."}]}.',
           userPrompt: '''
 Create up to $count concise spaced-repetition flashcards from the reference material below.
-Each "front" is a short question or prompt; each "back" is the answer or explanation.
+Each "front" is a short question or prompt; each "back" is the short, direct answer;
+each "explanation" is 1-3 sentences on *why* that's correct or how it works — more detail
+than "back", not a repeat of it.
 Base the cards only on the material - do not invent facts.
 
 Reference material:
@@ -95,12 +97,14 @@ $contextBlock
       if (item is! Map) continue;
       final front = (item['front'] ?? '').toString().trim();
       final back = (item['back'] ?? '').toString().trim();
+      final explanation = (item['explanation'] ?? '').toString().trim();
       if (front.isEmpty || back.isEmpty) continue;
       cards.add(
         Flashcard()
           ..uuid = _uuid.v4()
           ..front = front
           ..back = back
+          ..explanation = explanation.isEmpty ? null : explanation
           ..sourceType = 'library'
           ..goalMode = goalMode
           ..createdAt = now

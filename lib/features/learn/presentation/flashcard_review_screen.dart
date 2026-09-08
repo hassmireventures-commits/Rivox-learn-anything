@@ -134,6 +134,27 @@ class _FlashcardReviewScreenState extends ConsumerState<FlashcardReviewScreen> {
                             style: theme.textTheme.bodyLarge,
                             textAlign: TextAlign.center,
                           ),
+                          if ((card.explanation ?? '').trim().isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            Text(
+                              l10n.flashcardExplanationLabel.toUpperCase(),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              card.explanation!.trim(),
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                                height: 1.4,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ] else ...[
                           const SizedBox(height: 16),
                           Text(

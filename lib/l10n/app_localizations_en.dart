@@ -1750,6 +1750,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get flashcardsEmpty => 'No cards due right now. Great job staying on top of your reviews!';
   @override
   String get flashcardShowAnswer => 'Show answer';
+  String get flashcardExplanationLabel => 'Why';
   @override
   String get flashcardAgain => 'Again';
   @override

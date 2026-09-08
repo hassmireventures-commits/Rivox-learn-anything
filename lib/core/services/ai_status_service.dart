@@ -126,8 +126,12 @@ class AiStudyPulseNotifier extends AsyncNotifier<AiStudyPulseResult> {
 
   Future<void> refresh() async {
     state = const AsyncLoading();
+    // Run concurrently, not sequentially — these are independent network
+    // calls (brief generation vs. provider-readiness handshake) that were
+    // needlessly doubling total refresh time back-to-back.
+    final statusFuture = ref.read(aiStatusProvider.notifier).checkNow();
     state = await AsyncValue.guard(() => _fetch(forceRefresh: true));
-    await ref.read(aiStatusProvider.notifier).checkNow();
+    await statusFuture;
   }
 
   Future<AiStudyPulseResult> _fetch({required bool forceRefresh}) async {

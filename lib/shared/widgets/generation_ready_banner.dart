@@ -56,8 +56,15 @@ class GenerationReadyBanner extends ConsumerWidget {
                     onTap: show
                         ? () {
                             final route = job.successRoute;
-                            if (route != null) context.push(route);
                             job.clearTerminalState();
+                            if (route == null) return;
+                            try {
+                              context.push(route);
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Couldn't open that: $e")),
+                              );
+                            }
                           }
                         : null,
                     child: Container(

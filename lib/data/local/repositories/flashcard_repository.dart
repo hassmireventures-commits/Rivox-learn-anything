@@ -120,15 +120,14 @@ class FlashcardRepository {
     } catch (_) {}
 
     final explanation = (question.explanation ?? '').trim();
-    final back = explanation.isEmpty
-        ? correctText
-        : (correctText.isEmpty ? explanation : '$correctText\n\n$explanation');
+    final back = correctText.isEmpty ? explanation : correctText;
 
     final now = DateTime.now();
     return Flashcard()
       ..uuid = uuid
       ..front = question.text
       ..back = back
+      ..explanation = (explanation.isEmpty || explanation == back) ? null : explanation
       ..sourceType = 'mistake'
       ..sourceRef = '${question.quizUuid}:${question.orderIndex}'
       ..goalMode = goalMode
@@ -144,6 +143,7 @@ class FlashcardRepository {
               'uuid': c.uuid,
               'front': c.front,
               'back': c.back,
+              'explanation': c.explanation,
               'sourceType': c.sourceType,
               'sourceRef': c.sourceRef,
               'goalMode': c.goalMode,
@@ -167,6 +167,7 @@ class FlashcardRepository {
         ..uuid = m['uuid'] as String
         ..front = m['front'] as String
         ..back = m['back'] as String
+        ..explanation = m['explanation'] as String?
         ..sourceType = m['sourceType'] as String
         ..sourceRef = m['sourceRef'] as String?
         ..goalMode = m['goalMode'] as String

@@ -90,7 +90,7 @@ void main() {
   });
 
   group('FlashcardRepository.fromWrongQuestion', () {
-    test('combines correct answer text and explanation into back', () {
+    test('keeps the correct answer in back and the reasoning in explanation', () {
       final question = Question()
         ..quizUuid = 'quiz-1'
         ..orderIndex = 2
@@ -108,8 +108,8 @@ void main() {
       );
 
       expect(card.front, 'What is the capital of France?');
-      expect(card.back, contains('Paris'));
-      expect(card.back, contains('Middle Ages'));
+      expect(card.back, 'Paris');
+      expect(card.explanation, 'Paris has been the capital since the Middle Ages.');
       expect(card.sourceType, 'mistake');
       expect(card.sourceRef, 'quiz-1:2');
       expect(card.goalMode, 'learning');
@@ -134,6 +134,7 @@ void main() {
       );
 
       expect(card.back, '4');
+      expect(card.explanation, isNull);
     });
   });
 }

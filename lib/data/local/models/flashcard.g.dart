@@ -28,43 +28,48 @@ const FlashcardSchema = CollectionSchema(
       name: r'easeFactor',
       type: IsarType.double,
     ),
-    r'front': PropertySchema(id: 3, name: r'front', type: IsarType.string),
+    r'explanation': PropertySchema(
+      id: 3,
+      name: r'explanation',
+      type: IsarType.string,
+    ),
+    r'front': PropertySchema(id: 4, name: r'front', type: IsarType.string),
     r'goalMode': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'goalMode',
       type: IsarType.string,
     ),
     r'intervalDays': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'intervalDays',
       type: IsarType.long,
     ),
     r'lastReviewedAt': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'lastReviewedAt',
       type: IsarType.dateTime,
     ),
     r'nextReviewAt': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'nextReviewAt',
       type: IsarType.dateTime,
     ),
     r'repetitions': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'repetitions',
       type: IsarType.long,
     ),
     r'sourceRef': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'sourceRef',
       type: IsarType.string,
     ),
     r'sourceType': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'sourceType',
       type: IsarType.string,
     ),
-    r'uuid': PropertySchema(id: 11, name: r'uuid', type: IsarType.string),
+    r'uuid': PropertySchema(id: 12, name: r'uuid', type: IsarType.string),
   },
 
   estimateSize: _flashcardEstimateSize,
@@ -155,6 +160,12 @@ int _flashcardEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.back.length * 3;
+  {
+    final value = object.explanation;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.front.length * 3;
   bytesCount += 3 + object.goalMode.length * 3;
   {
@@ -177,15 +188,16 @@ void _flashcardSerialize(
   writer.writeString(offsets[0], object.back);
   writer.writeDateTime(offsets[1], object.createdAt);
   writer.writeDouble(offsets[2], object.easeFactor);
-  writer.writeString(offsets[3], object.front);
-  writer.writeString(offsets[4], object.goalMode);
-  writer.writeLong(offsets[5], object.intervalDays);
-  writer.writeDateTime(offsets[6], object.lastReviewedAt);
-  writer.writeDateTime(offsets[7], object.nextReviewAt);
-  writer.writeLong(offsets[8], object.repetitions);
-  writer.writeString(offsets[9], object.sourceRef);
-  writer.writeString(offsets[10], object.sourceType);
-  writer.writeString(offsets[11], object.uuid);
+  writer.writeString(offsets[3], object.explanation);
+  writer.writeString(offsets[4], object.front);
+  writer.writeString(offsets[5], object.goalMode);
+  writer.writeLong(offsets[6], object.intervalDays);
+  writer.writeDateTime(offsets[7], object.lastReviewedAt);
+  writer.writeDateTime(offsets[8], object.nextReviewAt);
+  writer.writeLong(offsets[9], object.repetitions);
+  writer.writeString(offsets[10], object.sourceRef);
+  writer.writeString(offsets[11], object.sourceType);
+  writer.writeString(offsets[12], object.uuid);
 }
 
 Flashcard _flashcardDeserialize(
@@ -198,16 +210,17 @@ Flashcard _flashcardDeserialize(
   object.back = reader.readString(offsets[0]);
   object.createdAt = reader.readDateTime(offsets[1]);
   object.easeFactor = reader.readDouble(offsets[2]);
-  object.front = reader.readString(offsets[3]);
-  object.goalMode = reader.readString(offsets[4]);
+  object.explanation = reader.readStringOrNull(offsets[3]);
+  object.front = reader.readString(offsets[4]);
+  object.goalMode = reader.readString(offsets[5]);
   object.id = id;
-  object.intervalDays = reader.readLong(offsets[5]);
-  object.lastReviewedAt = reader.readDateTimeOrNull(offsets[6]);
-  object.nextReviewAt = reader.readDateTime(offsets[7]);
-  object.repetitions = reader.readLong(offsets[8]);
-  object.sourceRef = reader.readStringOrNull(offsets[9]);
-  object.sourceType = reader.readString(offsets[10]);
-  object.uuid = reader.readString(offsets[11]);
+  object.intervalDays = reader.readLong(offsets[6]);
+  object.lastReviewedAt = reader.readDateTimeOrNull(offsets[7]);
+  object.nextReviewAt = reader.readDateTime(offsets[8]);
+  object.repetitions = reader.readLong(offsets[9]);
+  object.sourceRef = reader.readStringOrNull(offsets[10]);
+  object.sourceType = reader.readString(offsets[11]);
+  object.uuid = reader.readString(offsets[12]);
   return object;
 }
 
@@ -225,22 +238,24 @@ P _flashcardDeserializeProp<P>(
     case 2:
       return (reader.readDouble(offset)) as P;
     case 3:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readLong(offset)) as P;
-    case 6:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 7:
-      return (reader.readDateTime(offset)) as P;
-    case 8:
-      return (reader.readLong(offset)) as P;
-    case 9:
-      return (reader.readStringOrNull(offset)) as P;
-    case 10:
       return (reader.readString(offset)) as P;
+    case 6:
+      return (reader.readLong(offset)) as P;
+    case 7:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 8:
+      return (reader.readDateTime(offset)) as P;
+    case 9:
+      return (reader.readLong(offset)) as P;
+    case 10:
+      return (reader.readStringOrNull(offset)) as P;
     case 11:
+      return (reader.readString(offset)) as P;
+    case 12:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1060,6 +1075,171 @@ extension FlashcardQueryFilter
 
           epsilon: epsilon,
         ),
+      );
+    });
+  }
+
+  QueryBuilder<Flashcard, Flashcard, QAfterFilterCondition>
+  explanationIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'explanation'),
+      );
+    });
+  }
+
+  QueryBuilder<Flashcard, Flashcard, QAfterFilterCondition>
+  explanationIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'explanation'),
+      );
+    });
+  }
+
+  QueryBuilder<Flashcard, Flashcard, QAfterFilterCondition> explanationEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'explanation',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Flashcard, Flashcard, QAfterFilterCondition>
+  explanationGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'explanation',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Flashcard, Flashcard, QAfterFilterCondition> explanationLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'explanation',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Flashcard, Flashcard, QAfterFilterCondition> explanationBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'explanation',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Flashcard, Flashcard, QAfterFilterCondition>
+  explanationStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'explanation',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Flashcard, Flashcard, QAfterFilterCondition> explanationEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'explanation',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Flashcard, Flashcard, QAfterFilterCondition> explanationContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'explanation',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Flashcard, Flashcard, QAfterFilterCondition> explanationMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'explanation',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Flashcard, Flashcard, QAfterFilterCondition>
+  explanationIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'explanation', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<Flashcard, Flashcard, QAfterFilterCondition>
+  explanationIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'explanation', value: ''),
       );
     });
   }
@@ -2158,6 +2338,18 @@ extension FlashcardQuerySortBy on QueryBuilder<Flashcard, Flashcard, QSortBy> {
     });
   }
 
+  QueryBuilder<Flashcard, Flashcard, QAfterSortBy> sortByExplanation() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'explanation', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Flashcard, Flashcard, QAfterSortBy> sortByExplanationDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'explanation', Sort.desc);
+    });
+  }
+
   QueryBuilder<Flashcard, Flashcard, QAfterSortBy> sortByFront() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'front', Sort.asc);
@@ -2305,6 +2497,18 @@ extension FlashcardQuerySortThenBy
     });
   }
 
+  QueryBuilder<Flashcard, Flashcard, QAfterSortBy> thenByExplanation() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'explanation', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Flashcard, Flashcard, QAfterSortBy> thenByExplanationDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'explanation', Sort.desc);
+    });
+  }
+
   QueryBuilder<Flashcard, Flashcard, QAfterSortBy> thenByFront() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'front', Sort.asc);
@@ -2448,6 +2652,14 @@ extension FlashcardQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Flashcard, Flashcard, QDistinct> distinctByExplanation({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'explanation', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Flashcard, Flashcard, QDistinct> distinctByFront({
     bool caseSensitive = true,
   }) {
@@ -2536,6 +2748,12 @@ extension FlashcardQueryProperty
   QueryBuilder<Flashcard, double, QQueryOperations> easeFactorProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'easeFactor');
+    });
+  }
+
+  QueryBuilder<Flashcard, String?, QQueryOperations> explanationProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'explanation');
     });
   }
 

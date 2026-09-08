@@ -12,6 +12,10 @@ class Flashcard {
   late String front;
   late String back;
 
+  /// Optional detailed reasoning behind [back] — why it's the answer, not
+  /// just what it is. Null for cards created before this field existed.
+  String? explanation;
+
   /// 'library' | 'mistake'
   @Index()
   late String sourceType;
