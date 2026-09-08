@@ -15,6 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-09-08 | bugfix | "Quiz ready" banner tap fixed (real nav bug); redirect to unopened results; clearer wording | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-08 | bugfix+feature | Chart y-axis overlap fixed; AI brief refresh 2x faster; flashcard "why" explanation added | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-08 | perf | Quiz/exam timer rebuilt the whole question screen every second | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-08 | bugfix | Chat-generated quiz never surfaced; unusual chart date gaps; ad-unlock cap removed | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |

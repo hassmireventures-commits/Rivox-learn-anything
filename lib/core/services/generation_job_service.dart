@@ -41,6 +41,14 @@ class GenerationJobService extends ChangeNotifier {
   String? get successRoute => _successRoute;
   String? get errorMessage => _errorMessage;
 
+  /// A previous job's result sitting ready but never opened. Callers about
+  /// to start a *new* generation should check this first and redirect here
+  /// instead — otherwise the earlier result is silently discarded the
+  /// moment the new job starts (its terminal state is reset unconditionally
+  /// at the top of `startQuiz`/`startPath`).
+  String? get pendingReadyRoute =>
+      (!_running && !_userCancelled && _successRoute != null) ? _successRoute : null;
+
   void clearTerminalState() {
     if (_running || _inFlight) return;
     _successRoute = null;

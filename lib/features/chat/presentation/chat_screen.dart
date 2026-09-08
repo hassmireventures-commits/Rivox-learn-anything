@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/error/app_exception.dart';
@@ -200,6 +201,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           content: Text('A generation is already running — try again once it finishes.'),
         ),
       );
+      return;
+    }
+    final pendingRoute = job.pendingReadyRoute;
+    if (pendingRoute != null) {
+      job.clearTerminalState();
+      context.push(pendingRoute);
       return;
     }
 

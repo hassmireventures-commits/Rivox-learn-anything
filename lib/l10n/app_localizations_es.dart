@@ -1131,7 +1131,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get dashboardTryDemoQuiz => 'Try demo quiz';
   @override
-  String get dashboardQuizOfTheDayStart => 'Tap to play';
+  String get dashboardQuizOfTheDayStart => 'Continue quiz';
   @override
   String get dashboardQuizOfTheDayCompleted => 'You completed today\'s quiz!';
   @override

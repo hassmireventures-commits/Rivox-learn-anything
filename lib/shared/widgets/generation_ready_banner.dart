@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../core/providers/app_providers.dart';
+import '../../core/router/app_router.dart';
 import '../../core/services/generation_job_service.dart';
 import '../../core/theme/app_theme.dart';
 
@@ -54,16 +54,31 @@ class GenerationReadyBanner extends ConsumerWidget {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(14),
                     onTap: show
-                        ? () {
+                        ? () async {
                             final route = job.successRoute;
                             job.clearTerminalState();
                             if (route == null) return;
                             try {
-                              context.push(route);
+                              // Use the raw router directly (same mechanism
+                              // notification taps already rely on
+                              // successfully — see
+                              // NotificationService._navigateFromNotification)
+                              // rather than context.push from this
+                              // above-the-router overlay context, which has
+                              // been unreliable here.
+                              final needsShell = route.startsWith('/quiz/') ||
+                                  route.startsWith('/paths/');
+                              if (needsShell) {
+                                appRouter.go('/dashboard');
+                                await Future<void>.delayed(Duration.zero);
+                              }
+                              appRouter.push(route);
                             } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Couldn't open that: $e")),
-                              );
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("Couldn't open that: $e")),
+                                );
+                              }
                             }
                           }
                         : null,

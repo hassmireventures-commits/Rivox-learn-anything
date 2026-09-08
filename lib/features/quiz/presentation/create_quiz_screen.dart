@@ -184,6 +184,12 @@ class _CreateQuizScreenState extends ConsumerState<CreateQuizScreen> {
       setState(() => _error = l10n.generationJobInProgress);
       return;
     }
+    final pendingRoute = job.pendingReadyRoute;
+    if (pendingRoute != null) {
+      job.clearTerminalState();
+      context.push(pendingRoute);
+      return;
+    }
 
     setState(() => _error = null);
 

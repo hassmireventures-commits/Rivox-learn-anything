@@ -1,5 +1,19 @@
 # Bug Fix Log
 
+## 2026-09-08 — "Quiz ready" banner tap genuinely failed to navigate; redirect to unopened results; clearer wording
+
+- **Type:** bugfix + enhancement
+- **Area:** router, generation, dashboard
+- **Files:** `lib/shared/widgets/generation_ready_banner.dart`, `lib/core/services/generation_job_service.dart`, `lib/features/quiz/presentation/create_quiz_screen.dart`, `lib/features/chat/presentation/chat_screen.dart`, `lib/l10n/app_en.arb`, all 14 `lib/l10n/app_localizations_*.dart`.
+- **Problem / Goal:** After adding a defensive try/catch around `GenerationReadyBanner`'s tap handler, the user confirmed it now surfaces a real error on tap — proving the earlier "shows tap to open but can't open" report was a genuine navigation failure, not a false alarm. Also requested: (1) prefer the existing OS push notification's proven-working redirect over a fragile in-app tap, (2) if the user tries to start a *new* quiz while a previous one is sitting ready-but-unopened, redirect to that one instead of generating another, (3) clearer wording than "Tap to play" for a not-yet-completed quiz.
+- **Root cause:** `NotificationService._navigateFromNotification` (used for the OS notification's own tap handling, confirmed reliable) navigates via the raw `appRouter` singleton directly (`router.go('/dashboard')` then `router.push(route)`). `GenerationReadyBanner`, by contrast, called `context.push(route)` using the `BuildContext` from `MaterialApp.router`'s `builder:` callback — a context that sits *above* the routed `Navigator` in the tree, which does not resolve navigation the same reliable way a context from inside a routed page does.
+- **Solution:**
+  1. `GenerationReadyBanner`'s tap now uses the exact same reliable mechanism as notification taps — `appRouter.go('/dashboard')` (only for quiz/path routes, which need the dashboard shell underneath) then `appRouter.push(route)` — instead of `context.push`.
+  2. New `GenerationJobService.pendingReadyRoute` getter: a previous job's result sitting ready but never opened. `create_quiz_screen.dart`'s generate button and `chat_screen.dart`'s action-chip confirm handler now check this first — if a result is already waiting, they redirect there instead of discarding it by starting a fresh generation (which unconditionally resets the job's terminal state).
+  3. `dashboardQuizOfTheDayStart` ("Tap to play") changed to "Continue quiz" for the not-yet-completed Quiz of the Day card — clearer than an imperative that reads like a fresh invitation for what might be a quiz the learner already dipped into (the app doesn't persist mid-quiz progress, so "Continue" reads correctly whether or not they've touched a question yet, unlike "Tap to play").
+- **Regression risks:** None expected — the router-based navigation targets the same routes as before, just through a different (already-proven) call path; the ready-route redirect only ever redirects to something the learner already generated, never blocks a genuinely new request when nothing is pending.
+- **Verified:** `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test --exclude-tags=live` (180 passed/1 skipped). The actual navigation fix itself could not be re-verified live in this environment (no emulator session running) — reasoned from the notification path's confirmed-working mechanism, not a fresh repro.
+
 ## 2026-09-08 — Dashboard chart y-axis labels overlapping; AI brief refresh doing 2x the work; flashcard "why" explanation added
 
 - **Type:** bugfix + feature

@@ -1197,7 +1197,7 @@
   "multiplayerUnavailableHint": "Solo quizzes and learning paths still work with your own API keys.",
   "dashboardQuizOfTheDay": "Quiz of the day",
   "dashboardTryDemoQuiz": "Try demo quiz",
-  "dashboardQuizOfTheDayStart": "Tap to play",
+  "dashboardQuizOfTheDayStart": "Continue quiz",
   "dashboardQuizOfTheDayCompleted": "You completed today's quiz!",
   "dashboardQuizOfTheDayEmpty": "Generate a short daily challenge from your topics.",
   "dashboardQuizOfTheDayGenerate": "Generate today's quiz",
