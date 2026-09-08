@@ -104,8 +104,16 @@ class BuiltInAiQuota {
   }
 
   /// Explicit restore for Workmanager / app resume. Returns true if reset.
+  ///
+  /// Deliberately does NOT unconditionally discard a valid in-memory cache
+  /// before checking — this method is called from `AppShell`'s app-resume
+  /// lifecycle observer completely unawaited, which can race a foreground
+  /// caller's own `grantAdBonus()` -> retry -> `ensureCanGenerate()` ->
+  /// `restoreIfExpired()` chain (e.g. dismissing a rewarded ad's full-screen
+  /// surface itself triggers an app-resume event). Trusting a still-valid
+  /// cache as-is avoids that race entirely.
   Future<bool> restoreIfExpired() async {
-    _cache = null;
+    if (_cache != null && !_cache!.isExpired) return false;
     final before = await _readRawPeriodStart();
     final snap = await load();
     if (before == null) return false;

@@ -1,5 +1,29 @@
 # Bug Fix Log
 
+## 2026-09-08 — 5 issues from agentic-chat testing: stale ready-banner, unified indicator, ad-unlock race, FAB visibility, draggable FAB
+
+- **Type:** bugfix + feature
+- **Area:** chat, ai, quota, router, ux
+- **Files:** `lib/core/services/built_in_ai_quota.dart`, `lib/core/services/built_in_chat_quota.dart`, `lib/core/router/route_path_observer.dart` (new), `lib/core/router/app_router.dart`, `lib/shared/widgets/generation_ready_banner.dart` (new), `lib/shared/widgets/chat_entry_fab.dart`, `lib/core/services/chat_fab_position_store.dart` (new), `lib/features/chat/presentation/chat_generation_status.dart`, `lib/features/chat/presentation/chat_screen.dart`, `lib/features/quiz/presentation/create_quiz_screen.dart`, `lib/app.dart`, `lib/main.dart`.
+- **Problem / Goal:** Testing yesterday's agentic-chat feature surfaced 5 issues, all root-caused directly against real code rather than assumed:
+  1. Chat's "Quiz ready — tap to open" banner never went away, even for an already-opened quiz.
+  2. The generation indicator needed to work consistently everywhere, not just in chat.
+  3. Watching a rewarded ad to unlock generation quota didn't reliably auto-trigger generation afterward.
+  4. The global chat-entry FAB still showed on quiz-play and other pushed screens.
+  5. Requested: make the FAB draggable to an edge, since its persistent presence was intrusive.
+- **Root causes:**
+  1. `GenerationJobService._successRoute` is never cleared except when the next job starts — chat's new persistent success UI was the first widget to ever render that state declaratively (the 3 existing generation screens only handled it via one-shot imperative navigation), so it was also the first to expose the missing "mark as handled" step.
+  2. Confirmed there was no global "ready" indicator at all — `GenerationTopBanner` only ever covered the "generating" state.
+  3. A real, confirmed concurrency bug: `BuiltInAiQuota.restoreIfExpired()` (and the identical method on `BuiltInChatQuota`) unconditionally discarded the in-memory quota cache before reloading from disk, and `AppShell`'s app-lifecycle observer fires that same method **unawaited** on every app resume — dismissing a rewarded ad's full-screen surface itself triggers that resume event, racing against the ad-unlock flow's own cache update. Affected `create_quiz_screen.dart`'s existing ad-unlock flow too, not just chat.
+  4. The FAB read `appRouter.routerDelegate.currentConfiguration.uri.path`, which go_router does not reliably update for imperative `push()` (only `go()`) — general to every pushed screen, not chat-specific.
+- **Solution:**
+  1. `restoreIfExpired()` on both quota classes now trusts a still-valid in-memory cache as-is instead of unconditionally nulling it — eliminates the race entirely without touching `AppShell`'s observer.
+  2. New `GenerationReadyBanner`, mounted globally in `app.dart` alongside the existing `GenerationTopBanner`, shows "ready" state for ANY job (chat-triggered or not) once the user has navigated away from where it started, using the already-existing `GenerationJobService.clearTerminalState()` to mark itself handled on tap or dismiss — the single, unified place "ready" surfaces now, fixing the stale-banner bug as a direct consequence. `ChatGenerationStatus` simplified to only show the in-conversation "Generating on X…" running state, deferring ready/error to the new global banner. Added the same `clearTerminalState()` call to `create_quiz_screen.dart`'s 3 existing success-consuming call sites (it was missing there too — `learn_screen.dart`'s path flow already had it via its own `_onReturnFromPath`).
+  3. New `RoutePathObserver` (`route_path_observer.dart`) hooks the Navigator directly (the same layer `FirebaseAnalyticsObserver` already uses for screen tracking) rather than relying on go_router's own location reporting. Every pushed page now carries a real `name:` (`_pushPage`/`_instantPage` in `app_router.dart`, ~23 call sites); the 3 shell-tab pages deliberately stay unnamed so `currentRoutePath == null` reliably means "on a shell tab, nothing pushed on top," regardless of which tab or how tabs were switched. The FAB now reads this instead — general fix, not a per-screen special case; the earlier one-off `chatScreenVisible` workaround is removed entirely.
+  4. New `ChatFabPositionStore` (mirrors the existing `GuidancePreferencesStore` sidecar-JSON pattern) persists a Samsung-Edge-panel-handle-style docked position (`left`/`right` + vertical fraction). The FAB is now draggable — live-follows vertically during drag, snaps to the nearer edge on release.
+- **Regression risks:** None expected — the quota fix only changes when disk is touched, never the resulting values; the router changes are additive (`name:`/observer) plus one call-site rewrite (`chat_entry_fab.dart`) with no other consumers of the old mechanism.
+- **Verified:** `flutter analyze` (0 new issues, same 35 pre-existing project-wide); `flutter test --exclude-tags=live` (180 passed/1 skipped, no regressions). The ad-unlock race and go_router observer timing can't be fully exercised by the automated suite or this environment (no live ad SDK, no interactive browser) — verified by direct code tracing of the actual race/observer mechanics instead, not live reproduction.
+
 ## 2026-09-07 — Global chat entry FAB stayed visible on the chat screen itself; shown on too many screens
 
 - **Type:** bugfix

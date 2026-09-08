@@ -109,8 +109,14 @@ class BuiltInChatQuota {
   }
 
   /// Explicit restore for app resume. Returns true if the window was reset.
+  ///
+  /// Deliberately does NOT unconditionally discard a valid in-memory cache
+  /// before checking — see `BuiltInAiQuota.restoreIfExpired`'s identical
+  /// fix for the full rationale (an app-resume-triggered call to this
+  /// method can otherwise race a foreground ad-unlock retry's own cache
+  /// update).
   Future<bool> restoreIfExpired() async {
-    _cache = null;
+    if (_cache != null && !_cache!.isExpired) return false;
     final before = await _readRawPeriodStart();
     final snap = await load();
     if (before == null) return false;

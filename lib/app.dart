@@ -8,6 +8,7 @@ import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
 import 'shared/widgets/chat_entry_fab.dart';
+import 'shared/widgets/generation_ready_banner.dart';
 import 'shared/widgets/generation_top_banner.dart';
 
 class AiQuizApp extends ConsumerWidget {
@@ -51,6 +52,7 @@ class AiQuizApp extends ConsumerWidget {
         children: [
           ?child,
           const GenerationTopBanner(),
+          const GenerationReadyBanner(),
           const ChatEntryFab(),
         ],
       ),

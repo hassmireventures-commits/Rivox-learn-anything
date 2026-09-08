@@ -27,14 +27,6 @@ import 'chat_generation_status.dart';
 
 const String _chatAvatarAsset = 'assets/branding/rivox_logo.png';
 
-/// True while [ChatScreen] is mounted. `ChatEntryFab` reads this directly
-/// rather than relying solely on GoRouter's reported location, since an
-/// imperative `push()` (how the FAB itself navigates here) doesn't reliably
-/// update `routerDelegate.currentConfiguration.uri` the same way `go()`
-/// does — path-prefix matching alone can't be trusted for "am I on the
-/// screen I just pushed onto."
-final ValueNotifier<bool> chatScreenVisible = ValueNotifier<bool>(false);
-
 /// Single continuous RAG chat thread (B1 — no multiple/named threads in v1).
 ///
 /// Agentic pass: chat can PROPOSE (never perform on its own) a quiz or
@@ -64,14 +56,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    chatScreenVisible.value = true;
     _load();
     _refreshChatQuota();
   }
 
   @override
   void dispose() {
-    chatScreenVisible.value = false;
     // Chat's generation status widget is intentionally non-blocking (unlike
     // the full-screen GenerationOverlay on Create/Learn), so a user can
     // navigate away mid-generation with no explicit "continue in background"

@@ -2,6 +2,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'route_path_observer.dart';
 import '../locale/app_localizations_ext.dart';
 import '../services/daily_content_service.dart';
 
@@ -40,9 +41,15 @@ final _shellNavigatorLearnKey = GlobalKey<NavigatorState>(debugLabel: 'learn');
 final _shellNavigatorHistoryKey = GlobalKey<NavigatorState>(debugLabel: 'history');
 
 /// Zero-duration cut - used only for /splash and /welcome (no spatial context).
-Page<void> _instantPage({required Widget child, LocalKey? key}) {
+///
+/// [state] is required so every page carries a real `name:` (its resolved
+/// path) — this is what makes [RoutePathObserver] a reliable, general
+/// "what screen is on top" signal for imperative pushes, which go_router's
+/// own `currentConfiguration.uri` does not reliably update for.
+Page<void> _instantPage({required Widget child, required GoRouterState state, LocalKey? key}) {
   return CustomTransitionPage<void>(
     key: key,
+    name: state.uri.toString(),
     child: child,
     transitionDuration: Duration.zero,
     reverseTransitionDuration: Duration.zero,
@@ -52,26 +59,29 @@ Page<void> _instantPage({required Widget child, LocalKey? key}) {
 
 /// Standard push - delegates to the platform transition defined in AppTheme.
 /// All content routes (quiz, settings, paths, results, …) use this.
-Page<void> _pushPage({required Widget child, LocalKey? key}) {
-  return MaterialPage<void>(key: key, child: child);
+Page<void> _pushPage({required Widget child, required GoRouterState state, LocalKey? key}) {
+  return MaterialPage<void>(key: key, name: state.uri.toString(), child: child);
 }
 
 final appRouter = GoRouter(
   initialLocation: '/splash',
   navigatorKey: _rootNavigatorKey,
-  // No-op network-wise while Firebase Analytics collection is disabled
-  // (default, until the learner opts in via Settings — see
-  // app_bootstrap.dart) — the SDK itself gates outgoing calls, so this
-  // observer is safe to keep always-registered.
-  observers: [FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance)],
+  observers: [
+    // No-op network-wise while Firebase Analytics collection is disabled
+    // (default, until the learner opts in via Settings — see
+    // app_bootstrap.dart) — the SDK itself gates outgoing calls, so this
+    // observer is safe to keep always-registered.
+    FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+    RoutePathObserver(),
+  ],
   routes: [
     GoRoute(
       path: '/splash',
-      pageBuilder: (context, state) => _instantPage(child: const SplashScreen()),
+      pageBuilder: (context, state) => _instantPage(child: const SplashScreen(), state: state),
     ),
     GoRoute(
       path: '/welcome',
-      pageBuilder: (context, state) => _instantPage(child: const WelcomeScreen()),
+      pageBuilder: (context, state) => _instantPage(child: const WelcomeScreen(), state: state),
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) => AppShell(navigationShell: navigationShell),
@@ -81,6 +91,11 @@ final appRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/dashboard',
+              // Deliberately no `name:` here (unlike _pushPage/_instantPage) —
+              // see RoutePathObserver's doc comment: shell-tab pages must
+              // stay unnamed so `currentRoutePath` reliably means "nothing
+              // pushed on top of a shell tab" regardless of which tab is
+              // active or how tabs were switched.
               pageBuilder: (context, state) => const NoTransitionPage(child: DashboardScreen()),
             ),
           ],
@@ -109,13 +124,14 @@ final appRouter = GoRouter(
       path: '/saved-articles',
       pageBuilder: (context, state) => _pushPage(
         child: const SavedArticlesScreen(),
+        state: state,
       ),
     ),
     GoRoute(
       path: '/flashcards',
       pageBuilder: (context, state) {
         final goal = state.uri.queryParameters['goal'];
-        return _pushPage(child: FlashcardReviewScreen(goalMode: goal));
+        return _pushPage(child: FlashcardReviewScreen(goalMode: goal), state: state);
       },
     ),
     GoRoute(
@@ -140,6 +156,7 @@ final appRouter = GoRouter(
             title: title.isEmpty ? 'Resource' : title,
             topic: topic,
           ),
+          state: state,
         );
       },
     ),
@@ -159,6 +176,7 @@ final appRouter = GoRouter(
             initialPack: pack,
             initialItem: item,
           ),
+          state: state,
         );
       },
     ),
@@ -166,6 +184,7 @@ final appRouter = GoRouter(
       path: '/paths/:id',
       pageBuilder: (context, state) => _pushPage(
         child: PathDetailScreen(pathId: state.pathParameters['id']!),
+        state: state,
       ),
     ),
     GoRoute(
@@ -174,6 +193,7 @@ final appRouter = GoRouter(
         final topic = state.uri.queryParameters['topic'];
         return _pushPage(
           child: CreateQuizScreen(initialTopic: topic),
+          state: state,
         );
       },
     ),
@@ -185,6 +205,7 @@ final appRouter = GoRouter(
           voiceMode: state.uri.queryParameters['voice'] == '1',
           interviewPersona: state.uri.queryParameters['persona'],
         ),
+        state: state,
       ),
     ),
     GoRoute(
@@ -195,64 +216,68 @@ final appRouter = GoRouter(
           voiceInterview: state.uri.queryParameters['voice'] == '1',
           interviewPersona: state.uri.queryParameters['persona'],
         ),
+        state: state,
       ),
     ),
     GoRoute(
       path: '/settings',
-      pageBuilder: (context, state) => _pushPage(child: const SettingsScreen()),
+      pageBuilder: (context, state) => _pushPage(child: const SettingsScreen(), state: state),
     ),
     GoRoute(
       path: '/exam/mock/create',
-      pageBuilder: (context, state) => _pushPage(child: const MockCreateScreen()),
+      pageBuilder: (context, state) => _pushPage(child: const MockCreateScreen(), state: state),
     ),
     GoRoute(
       path: '/exam/plan',
-      pageBuilder: (context, state) => _pushPage(child: const StudyPlanScreen()),
+      pageBuilder: (context, state) => _pushPage(child: const StudyPlanScreen(), state: state),
     ),
     GoRoute(
       path: '/career/matrix',
-      pageBuilder: (context, state) => _pushPage(child: const SkillMatrixScreen()),
+      pageBuilder: (context, state) => _pushPage(child: const SkillMatrixScreen(), state: state),
     ),
     GoRoute(
       path: '/career/voice-interview',
-      pageBuilder: (context, state) => _pushPage(child: const VoiceInterviewHubScreen()),
+      pageBuilder: (context, state) =>
+          _pushPage(child: const VoiceInterviewHubScreen(), state: state),
     ),
     GoRoute(
       path: '/career/drill/create',
-      pageBuilder: (context, state) => _pushPage(child: const DrillCreateScreen()),
+      pageBuilder: (context, state) => _pushPage(child: const DrillCreateScreen(), state: state),
     ),
     GoRoute(
       path: '/settings/providers',
-      pageBuilder: (context, state) => _pushPage(child: const ProvidersScreen()),
+      pageBuilder: (context, state) => _pushPage(child: const ProvidersScreen(), state: state),
     ),
     GoRoute(
       path: '/settings/backup',
-      pageBuilder: (context, state) => _pushPage(child: const BackupSettingsScreen()),
+      pageBuilder: (context, state) =>
+          _pushPage(child: const BackupSettingsScreen(), state: state),
     ),
     GoRoute(
       path: '/legal/:docId',
       pageBuilder: (context, state) => _pushPage(
         child: LegalDocumentScreen(documentId: state.pathParameters['docId']!),
+        state: state,
       ),
     ),
     GoRoute(
       path: '/help',
-      pageBuilder: (context, state) => _pushPage(child: const HelpCenterScreen()),
+      pageBuilder: (context, state) => _pushPage(child: const HelpCenterScreen(), state: state),
     ),
     GoRoute(
       path: '/library',
       pageBuilder: (context, state) {
         final goal = state.uri.queryParameters['goal'];
-        return _pushPage(child: MyLibraryScreen(initialGoalMode: goal));
+        return _pushPage(child: MyLibraryScreen(initialGoalMode: goal), state: state);
       },
     ),
     GoRoute(
       path: '/support',
-      pageBuilder: (context, state) => _pushPage(child: const SupportScreen()),
+      pageBuilder: (context, state) => _pushPage(child: const SupportScreen(), state: state),
     ),
     GoRoute(
       path: '/chat',
-      pageBuilder: (context, state) => _pushPage(child: const ChatScreen()),
+      pageBuilder: (context, state) => _pushPage(child: const ChatScreen(), state: state),
     ),
   ],
   errorBuilder: (context, state) {

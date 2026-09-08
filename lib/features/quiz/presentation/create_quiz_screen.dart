@@ -344,6 +344,7 @@ class _CreateQuizScreenState extends ConsumerState<CreateQuizScreen> {
       if (route != null && !cancelled && waiting) {
         await ref.read(anonAnalyticsSyncProvider).publishPromptOutcome('standard', success: true);
         context.pushReplacement(route);
+        latest.clearTerminalState();
       }
     } on TimeoutException catch (_) {
       final latest = ref.read(generationJobServiceProvider);
@@ -408,6 +409,7 @@ class _CreateQuizScreenState extends ConsumerState<CreateQuizScreen> {
     listenGenerationJobBackgroundSuccess(ref, GenerationJobKind.quiz, onSuccess: (route) {
       if (!mounted) return;
       context.pushReplacement(route);
+      ref.read(generationJobServiceProvider).clearTerminalState();
     });
 
     return PopScope(
@@ -713,7 +715,10 @@ class _CreateQuizScreenState extends ConsumerState<CreateQuizScreen> {
                         ),
                         if (job.successRoute != null)
                           TextButton(
-                            onPressed: () => context.pushReplacement(job.successRoute!),
+                            onPressed: () {
+                              context.pushReplacement(job.successRoute!);
+                              job.clearTerminalState();
+                            },
                             child: Text(l10n.generationOpenWhenReady),
                           ),
                       ],
