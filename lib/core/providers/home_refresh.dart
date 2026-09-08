@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/ai_status_service.dart';
 import '../services/daily_quiz_scheduler.dart';
+import '../services/learner_memory_scheduler.dart';
 import '../utils/calendar_day.dart';
 import 'app_providers.dart';
 import 'study_minutes_provider.dart';
@@ -34,4 +35,5 @@ void syncCalendarDayIfNeeded(WidgetRef ref) {
   ref.invalidate(todaysDailyQuizOfferProvider);
   ref.invalidate(todaysDailyQuizProvider);
   unawaited(ref.read(dailyQuizSchedulerProvider).trySchedule());
+  unawaited(ref.read(learnerMemorySchedulerProvider).trySchedule());
 }

@@ -1,5 +1,15 @@
 # Features Log
 
+## 2026-09-08 — Learner Memory: daily-refreshed context snapshot for chat
+
+- **Type:** feature
+- **Area:** chat, personalization
+- **Files:** new `lib/core/services/learner_memory.dart`, `lib/core/services/learner_memory_service.dart`, `lib/core/services/learner_memory_scheduler.dart`, `test/learner_memory_service_test.dart`; additive edits to `lib/features/onboarding/presentation/splash_screen.dart`, `lib/core/providers/home_refresh.dart`, `lib/features/chat/presentation/chat_screen.dart`, `lib/data/remote/ai/chat_service.dart`.
+- **Problem / Goal:** User asked for a consolidated "memory" — study goals, library content, quiz pattern, daily article history — refreshed once a day instead of recomputed on every run, explicitly not while a generation job is busy, and force-refreshed when the learner asks about their own recent activity. Confirmed with the user the quiz-pattern piece should be a local statistical rollup (no AI call, no network, no quota cost).
+- **Solution:** `LearnerMemoryScheduler` mirrors `DailyQuizScheduler`'s exact shape (calendar-day-keyed JSON sidecar, `_running` guard, best-effort/never-throws) with one added guard: skip while `GenerationJobService.isBusy`, without marking the day done, so it retries at the next opportunity instead of missing a day. `LearnerMemoryService.compute()` assembles the snapshot entirely from data this app already computes elsewhere — goals via `LearnerRepository`, library via `KnowledgeRepository.allEnabledSources()`, quiz pattern (per-topic average accuracy, streaks, frequently-missed topics) via the same `QuizSession`/`QuizRepository.getWrongQuestions()` data `StatsRepository`/chat's own summary already use, recent daily content via the existing `NotificationHistoryStore` — no new tracking, no LLM call. Wired to refresh on app bootstrap (`splash_screen.dart`, same fire-and-forget pattern as the other daily schedulers) and on day rollover (`home_refresh.dart`). Chat force-refreshes it (still respecting the busy-guard) when a cheap local keyword heuristic detects a "how am I doing" / "my progress" / "what did I get wrong" style question, then passes the cached snapshot into `ChatService.sendMessage` as a new, additive prompt section — the existing recent-quiz/wrong-answer summary logic in `chat_service.dart` is untouched.
+- **Regression risks:** None expected — entirely additive (new optional param, new scheduler call sites); a failure anywhere in the compute/persist path is caught and simply retried later, never surfaced to the user.
+- **Verified:** New unit tests (15) for the extracted pure aggregation functions (`topicAccuracyFrom`, `computeStreaks`, `frequentlyMissedFrom`) and the scheduler's skip-decision logic (`shouldSkip`) — no live Isar/Riverpod needed, mirroring `SpacedRepetition.review`'s pure-function-extraction precedent in `flashcard_repository.dart`. `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test --exclude-tags=live` (195 passed/1 skipped, up from 180).
+
 ## 2026-09-07 — Website blog (B25 first batch) + second mini game (2048)
 
 - **Type:** feature

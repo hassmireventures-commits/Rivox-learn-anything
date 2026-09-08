@@ -9,6 +9,7 @@ import '../../../core/locale/app_localizations_ext.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/services/daily_content_scheduler.dart';
 import '../../../core/services/daily_quiz_scheduler.dart';
+import '../../../core/services/learner_memory_scheduler.dart';
 import '../../../core/theme/app_theme.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -69,6 +70,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       await ref.read(recommendationEngineProvider).refreshRecommendations();
       unawaited(ref.read(dailyQuizSchedulerProvider).trySchedule());
       unawaited(ref.read(dailyContentSchedulerProvider).trySchedule());
+      unawaited(ref.read(learnerMemorySchedulerProvider).trySchedule());
       unawaited(
         ref.read(anonAnalyticsSyncProvider).syncIfOptedIn().catchError((_) {}),
       );

@@ -95,6 +95,7 @@ class ChatService {
     required String goalMode,
     Set<String>? enabledSourceUuids,
     Map<String, String>? sourceTypes,
+    String? learnerMemory,
   }) async {
     final resolved = await _llm.resolve();
     final isBuiltin = resolved.providerKey == BuiltInAiConfig.uuid;
@@ -127,7 +128,7 @@ class ChatService {
     try {
       rag = await _pipeline.buildRag(ctx);
       final learningHistory = await _buildLearningHistorySummary();
-      final basePrompt = _buildUserPrompt(history, learningHistory);
+      final basePrompt = _buildUserPrompt(history, learningHistory, learnerMemory);
       final promptWithRag = RagContextBuilder.prependToPrompt(basePrompt, rag);
 
       final raw = await _llm.completeJson(
@@ -168,8 +169,16 @@ class ChatService {
     }
   }
 
-  static String _buildUserPrompt(List<ChatMessage> history, String? learningHistory) {
+  static String _buildUserPrompt(
+    List<ChatMessage> history,
+    String? learningHistory,
+    String? learnerMemory,
+  ) {
     final buffer = StringBuffer();
+    if (learnerMemory != null && learnerMemory.isNotEmpty) {
+      buffer.writeln(learnerMemory);
+      buffer.writeln();
+    }
     if (learningHistory != null && learningHistory.isNotEmpty) {
       buffer.writeln(learningHistory);
       buffer.writeln();

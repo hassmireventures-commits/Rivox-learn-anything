@@ -15,6 +15,7 @@ import '../../../core/services/built_in_ai_quota.dart';
 import '../../../core/services/built_in_chat_quota.dart';
 import '../../../core/services/generation_sizing.dart';
 import '../../../core/services/learner_goal_guard.dart';
+import '../../../core/services/learner_memory_scheduler.dart';
 import '../../../core/services/topic_goal_relevance.dart';
 import '../../../data/local/models/chat_message.dart';
 import '../../../data/local/repositories/chat_repository.dart';
@@ -140,21 +141,57 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     await _requestReply(text, chatRepository);
   }
 
+  /// Cheap local keyword heuristic (no LLM call) — true when the learner is
+  /// plausibly asking about their own recent activity/progress, in which
+  /// case the cached learner-memory snapshot should be force-refreshed
+  /// first rather than answered off a stale (up to a day old) one.
+  static const _recentActivityKeywords = [
+    'how am i doing',
+    'my progress',
+    'my streak',
+    'this week',
+    'recent activity',
+    'recently',
+    'pattern',
+    'what did i get wrong',
+    'what did i miss',
+    'my mistakes',
+    'what did i study',
+    'my accuracy',
+    'how\'s my',
+  ];
+
+  static bool _looksLikeRecentActivityQuestion(String text) {
+    final lower = text.toLowerCase();
+    return _recentActivityKeywords.any(lower.contains);
+  }
+
   Future<void> _requestReply(String text, ChatRepository chatRepository) async {
     try {
       final learnerRepository = ref.read(learnerRepositoryProvider);
       final knowledgeRepository = ref.read(knowledgeRepositoryProvider);
+      final memoryScheduler = ref.read(learnerMemorySchedulerProvider);
       final profile = await learnerRepository.getOrCreateProfile();
       // Chat's knowledge scope is intentionally global (every enabled
       // source, any goal mode) — see KnowledgeRepository doc comment.
       final enabledSources = await knowledgeRepository.allEnabledSourceUuids();
       final sourceTypes = await knowledgeRepository.allEnabledSourceTypes();
 
+      // A question about the learner's own recent activity shouldn't answer
+      // off a stale (up to a day old) snapshot — force a refresh first. This
+      // still respects the generation-busy skip inside trySchedule, so it
+      // never fights an in-flight quiz/path/chat generation.
+      if (_looksLikeRecentActivityQuestion(text)) {
+        await memoryScheduler.trySchedule(force: true);
+      }
+      final memorySection = (await memoryScheduler.readCached())?.toPromptSection();
+
       final result = await ref.read(chatServiceProvider).sendMessage(
             latestUserMessage: text,
             goalMode: profile.goalMode,
             enabledSourceUuids: enabledSources,
             sourceTypes: sourceTypes,
+            learnerMemory: memorySection,
           );
 
       final assistantMessage = ChatMessage()
