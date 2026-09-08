@@ -51,8 +51,10 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
   final Map<int, TextEditingController> _textControllers = {};
   Timer? _timer;
   Timer? _examTimer;
-  int _remaining = 0;
-  int _examRemaining = 0;
+  // Ticking every second via a ValueNotifier (not setState) so only the
+  // small countdown widgets rebuild each tick, not the whole question UI.
+  final ValueNotifier<int> _remainingNotifier = ValueNotifier<int>(0);
+  final ValueNotifier<int> _examRemainingNotifier = ValueNotifier<int>(0);
   DateTime? _questionStartedAt;
   DateTime? _quizStartedAt;
   bool _loading = true;
@@ -108,6 +110,8 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
     StudySessionTracker.instance.endStudy();
     _timer?.cancel();
     _examTimer?.cancel();
+    _remainingNotifier.dispose();
+    _examRemainingNotifier.dispose();
     for (final c in _textControllers.values) {
       c.dispose();
     }
@@ -146,10 +150,10 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
     _questionStartedAt = DateTime.now();
     final seconds = _session?.examDurationSeconds;
     if (seconds == null || seconds <= 0) return;
-    setState(() => _examRemaining = seconds);
+    _examRemainingNotifier.value = seconds;
     _examTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
-      if (_examRemaining <= 1) {
+      if (_examRemainingNotifier.value <= 1) {
         timer.cancel();
         final l10n = context.l10n;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -157,7 +161,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
         );
         _submit();
       } else {
-        setState(() => _examRemaining--);
+        _examRemainingNotifier.value--;
       }
     });
   }
@@ -171,15 +175,15 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
     _questionStartedAt = DateTime.now();
     final seconds = _session?.timerSeconds;
     if (seconds == null) return;
-    setState(() => _remaining = seconds);
+    _remainingNotifier.value = seconds;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
-      if (_remaining <= 1) {
+      if (_remainingNotifier.value <= 1) {
         timer.cancel();
         _recordTime();
         _autoAdvance();
       } else {
-        setState(() => _remaining--);
+        _remainingNotifier.value--;
       }
     });
   }
@@ -595,39 +599,45 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
             ),
             if (_isTimedMock && _session!.examDurationSeconds != null) ...[
               const SizedBox(height: 12),
-              Semantics(
-                label: 'Exam time remaining',
-                value: '$_examRemaining seconds',
-                child: _ExamCountdownBar(
-                  remaining: _examRemaining,
-                  total: _session!.examDurationSeconds!,
+              ValueListenableBuilder<int>(
+                valueListenable: _examRemainingNotifier,
+                builder: (context, examRemaining, _) => Semantics(
+                  label: 'Exam time remaining',
+                  value: '$examRemaining seconds',
+                  child: _ExamCountdownBar(
+                    remaining: examRemaining,
+                    total: _session!.examDurationSeconds!,
+                  ),
                 ),
               ),
             ] else if (_session!.timerSeconds != null) ...[
               const SizedBox(height: 16),
-              Semantics(
-                label: 'Question timer',
-                value: '$_remaining seconds remaining',
-                child: SizedBox(
-                  width: 72,
-                  height: 72,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      CircularProgressIndicator(
-                        value: _remaining / _session!.timerSeconds!,
-                        strokeWidth: 6,
-                        color: _remaining <= 5 ? Colors.red : AppTheme.seedColor,
-                      ),
-                      Center(
-                        child: Text(
-                          '$_remaining',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
+              ValueListenableBuilder<int>(
+                valueListenable: _remainingNotifier,
+                builder: (context, remaining, _) => Semantics(
+                  label: 'Question timer',
+                  value: '$remaining seconds remaining',
+                  child: SizedBox(
+                    width: 72,
+                    height: 72,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CircularProgressIndicator(
+                          value: remaining / _session!.timerSeconds!,
+                          strokeWidth: 6,
+                          color: remaining <= 5 ? Colors.red : AppTheme.seedColor,
                         ),
-                      ),
-                    ],
+                        Center(
+                          child: Text(
+                            '$remaining',
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

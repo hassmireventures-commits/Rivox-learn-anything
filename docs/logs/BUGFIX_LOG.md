@@ -1,5 +1,16 @@
 # Bug Fix Log
 
+## 2026-09-08 — Quiz/exam timer rebuilt the entire question screen every second
+
+- **Type:** performance
+- **Area:** quiz
+- **Files:** `lib/features/quiz/presentation/quiz_play_screen.dart`.
+- **Problem / Goal:** "Make the app more smooth" — audited the codebase for concrete jank sources (ListView usage, Opacity, image decode sizing, provider watch scope, periodic timers). The one clear, high-impact find: the per-question and exam countdown timers called `setState` directly on `_QuizPlayScreenState` every second.
+- **Root cause:** `Timer.periodic(const Duration(seconds: 1), ...)` called `setState(() => _remaining--)` / `_examRemaining--` on the screen's top-level state class, forcing Flutter to rebuild the *entire* question UI (progress bar, question text, all answer options, voice-interview UI where applicable) once per second for the whole duration of every timed quiz or mock exam — real, continuous rebuild pressure on the app's most render-heavy screen.
+- **Solution:** Replaced the two `int` fields with `ValueNotifier<int>` (`_remainingNotifier`, `_examRemainingNotifier`); the timer callbacks now mutate `.value` directly instead of calling `setState`. Wrapped only the two small countdown display widgets (the exam bar, the per-question circular countdown) in `ValueListenableBuilder<int>`, so each tick now rebuilds just those few widgets instead of the whole screen. No behavior change — same countdown logic, same auto-submit/auto-advance triggers, same visuals.
+- **Regression risks:** None expected — purely a rebuild-scope change; all reads of the countdown value moved from a field to `.value` on the same notifier, same timing and thresholds.
+- **Verified:** `flutter analyze` (0 new issues, same 35 pre-existing baseline); `flutter test --exclude-tags=live` (180 passed/1 skipped, no regressions). No live device profiling in this environment — verified by direct code tracing of the rebuild scope, not a frame-timing capture.
+
 ## 2026-09-08 — Chat-generated quiz never surfaced; unusual chart date-label gaps; ad-unlock cap removed
 
 - **Type:** bugfix + enhancement

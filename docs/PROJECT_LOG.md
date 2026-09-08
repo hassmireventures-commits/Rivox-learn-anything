@@ -15,6 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-09-08 | perf | Quiz/exam timer rebuilt the whole question screen every second | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-08 | bugfix | Chat-generated quiz never surfaced; unusual chart date gaps; ad-unlock cap removed | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-08 | bugfix | App stuck on launch (native splash never dismissed) — analytics observer threw before runApp() | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-08 | bugfix | 5 agentic-chat issues: stale ready-banner, unified indicator, ad-unlock race, FAB visibility, draggable FAB | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
