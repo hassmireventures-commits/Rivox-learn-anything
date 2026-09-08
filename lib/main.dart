@@ -15,7 +15,6 @@ import 'core/services/notification_service.dart';
 import 'core/services/reminder_preferences.dart';
 import 'core/services/secondary_goals_store.dart';
 import 'core/services/article_bookmark_store.dart';
-import 'core/services/chat_fab_position_store.dart';
 import 'data/local/isar_service.dart';
 import 'data/local/repositories/goal_progress_repository.dart';
 import 'core/ai_platform/ai_consent_gate.dart';
@@ -62,7 +61,6 @@ Future<void> main() async {
   await ReminderPreferencesStore.instance.load();
   await SecondaryGoalsStore.instance.load();
   await ArticleBookmarkStore.instance.load();
-  await ChatFabPositionStore.instance.load();
   await AiPolicyRegistry.load();
   await UsageTracker(IsarService.instance).init();
 

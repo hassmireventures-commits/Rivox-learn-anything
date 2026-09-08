@@ -1,4 +1,5 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -63,6 +64,40 @@ Page<void> _pushPage({required Widget child, required GoRouterState state, Local
   return MaterialPage<void>(key: key, name: state.uri.toString(), child: child);
 }
 
+/// Defers touching `FirebaseAnalytics.instance` until a navigation event
+/// actually happens, and no-ops until `Firebase.initializeApp()` has
+/// resolved. `appRouter` below is a top-level `final`, first evaluated from
+/// `main.dart` before `runApp()` — well before Firebase finishes
+/// initializing (deferred to `initializeOptionalServices()`, which runs
+/// only after `runApp()`). Building `FirebaseAnalyticsObserver` eagerly at
+/// that point throws synchronously (`Firebase.app()` has no app yet),
+/// aborting `main()` before `runApp()` is ever reached.
+class _DeferredAnalyticsObserver extends NavigatorObserver {
+  FirebaseAnalyticsObserver? _delegate;
+
+  FirebaseAnalyticsObserver? get _observer {
+    if (_delegate != null) return _delegate;
+    if (Firebase.apps.isEmpty) return null;
+    return _delegate = FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance);
+  }
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) =>
+      _observer?.didPush(route, previousRoute);
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) =>
+      _observer?.didPop(route, previousRoute);
+
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) =>
+      _observer?.didRemove(route, previousRoute);
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) =>
+      _observer?.didReplace(newRoute: newRoute, oldRoute: oldRoute);
+}
+
 final appRouter = GoRouter(
   initialLocation: '/splash',
   navigatorKey: _rootNavigatorKey,
@@ -71,7 +106,7 @@ final appRouter = GoRouter(
     // (default, until the learner opts in via Settings — see
     // app_bootstrap.dart) — the SDK itself gates outgoing calls, so this
     // observer is safe to keep always-registered.
-    FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+    _DeferredAnalyticsObserver(),
     RoutePathObserver(),
   ],
   routes: [

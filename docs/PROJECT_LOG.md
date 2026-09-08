@@ -15,6 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-09-08 | bugfix | App stuck on launch (native splash never dismissed) — analytics observer threw before runApp() | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-08 | bugfix | 5 agentic-chat issues: stale ready-banner, unified indicator, ad-unlock race, FAB visibility, draggable FAB | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-07 | feature | Website blog (B25 first batch, 3 posts) + second mini game (2048, MIT) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-09-07 | enhancement | SEO follow-up pass: meta description length, OG/Twitter tags, schema image, content-keyword gaps | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
