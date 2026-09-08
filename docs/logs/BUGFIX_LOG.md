@@ -1,5 +1,24 @@
 # Bug Fix Log
 
+## 2026-09-08 — Chat-generated quiz never surfaced; unusual chart date-label gaps; ad-unlock cap removed
+
+- **Type:** bugfix + enhancement
+- **Area:** chat, router, dashboard, quota, ads
+- **Files:** `lib/features/chat/presentation/chat_screen.dart`, `lib/shared/widgets/dashboard/dashboard_charts.dart`, `lib/core/services/built_in_ai_config.dart`, `lib/core/services/built_in_ai_quota.dart`, `lib/l10n/app_en.arb`, `lib/l10n/app_localizations_en.dart`.
+- **Problem / Goal:** User reported (1) generation feels slower than usual, (2) a chat-triggered quiz still isn't reflected anywhere once done, (3)/(4) watching a rewarded ad to unlock more generations should have no daily cap, one ad = one generation. Separately reported "unusual" weekly-activity/activity-trend chart rendering.
+- **Root causes:**
+  1. Investigated the retry/circuit-breaker/timeout chain (`resilient_ai_provider.dart`, `retry_policy.dart`) — unchanged since the initial commit, not a regression. Worst case (primary model failing 3 retries at up to 90s each, then falling back) can legitimately take several minutes when the model API itself is slow/degraded — not something the app code controls. No code-level regression found.
+  2. Confirmed: yesterday's fix simplified `ChatGenerationStatus` to only render the "running" state, deferring "ready" to the global `GenerationReadyBanner` — but that banner only shows once `!uiAttached`, and chat only flips `uiAttached` false in `dispose()`. A user who stays on the chat screen until generation finishes (the common case) never triggers `dispose()`, so `uiAttached` stays `true` forever and neither widget ever shows the ready state — a real gap introduced by that simplification.
+  3/4. `BuiltInAiConfig.maxRewardedAdsPerDay = 3` capped rewarded-ad unlocks per day, and each ad granted `bonusPerRewardedAd = 2` generations.
+  - Chart: not a data bug — `StatsRepository._activityTrend` correctly returns 14 chronological days ending today, no future dates. The x-axis used `BasicNumericTickProviderSpec`, a "nice round number" heuristic meant for continuous measures, over a small integer day-index domain — producing unevenly-spaced, confusing tick placements instead of a clean, predictable date cadence.
+- **Solution:**
+  1. No code change — documented for the user; this tracks external model latency, not an app defect.
+  2. `ChatScreen` now uses `ref.listen(generationJobServiceProvider, ...)` in `build()` to call `continueInBackground()` the instant a job it started finishes (success or error), regardless of whether the learner has navigated away — handing off to the global banner/error dialog immediately instead of only on screen dispose.
+  3/4. Removed the daily ad cap (`BuiltInAiQuotaSnapshot.canWatchAd` now always `true`); `bonusPerRewardedAd` changed from 2 to 1 (one ad watch = exactly one more generation, watch as many times as needed). Updated `builtinQuotaBody` copy in both the ARB source and the hand-maintained `app_localizations_en.dart` (`generate: false` in `l10n.yaml`) to match.
+  - Chart: `DashboardActivityTrendChart`'s domain axis now uses `StaticNumericTickProviderSpec` with explicit, evenly-spaced tick indices (always including day 0 and the last day) and each tick's own precomputed date label, instead of a heuristic tick provider guessing positions.
+- **Regression risks:** None expected — the ad-cap removal only relaxes a gate (never blocks something that previously worked); the chat fix only widens when `continueInBackground()` fires, never narrows it; the chart fix only changes which indices get a rendered label, not the underlying data.
+- **Verified:** `flutter analyze` (0 new issues, same 35 pre-existing baseline); `flutter test --exclude-tags=live` (180 passed/1 skipped, no regressions). Chart tick placement and the ad-unlock loop reasoned through directly against the library/config source (no live device pass in this environment).
+
 ## 2026-09-08 — App stuck on launch (native splash never dismissed) after the analytics/router batch
 
 - **Type:** bugfix (critical — total launch failure)

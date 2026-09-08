@@ -1169,7 +1169,7 @@
   },
   "providersAddOwnButton": "Add your provider",
   "builtinQuotaTitle": "Daily AI limit reached",
-  "builtinQuotaBody": "You've used today's Built-in AI generations. Watch a rewarded ad for +2 more, or add your own provider in Settings.",
+  "builtinQuotaBody": "You've used today's Built-in AI generations. Watch a rewarded ad for +1 more — watch as many as you like — or add your own provider in Settings.",
   "builtinQuotaWatchAd": "Watch ad for more",
   "builtinQuotaUseOwnProvider": "Use your own provider",
   "builtinQuotaAdFailed": "Ad could not be shown. Try again in a moment.",

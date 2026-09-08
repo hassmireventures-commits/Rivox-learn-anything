@@ -30,8 +30,10 @@ class BuiltInAiQuotaSnapshot {
 
   bool get canGenerate => remaining > 0;
 
-  bool get canWatchAd =>
-      adsWatched < BuiltInAiConfig.maxRewardedAdsPerDay;
+  /// No daily cap — a rewarded ad can always be watched to unlock one more
+  /// generation. `adsWatched` is still tracked (persisted, shown in
+  /// diagnostics) but no longer gates this.
+  bool get canWatchAd => true;
 
   DateTime get periodEndsAt =>
       periodStartedAt.add(const Duration(hours: 24));

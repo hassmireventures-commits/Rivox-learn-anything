@@ -302,6 +302,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Chat has no "attached" success UI of its own (ChatGenerationStatus
+    // only ever shows the running state) — as soon as a job started from
+    // here finishes, hand off immediately so the global GenerationReadyBanner
+    // picks it up even if the learner never navigates away from chat.
+    ref.listen(generationJobServiceProvider, (previous, next) {
+      if (previous?.isRunning == true && !next.isRunning && next.uiAttached) {
+        next.continueInBackground();
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Row(

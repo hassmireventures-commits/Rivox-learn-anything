@@ -344,6 +344,20 @@ class DashboardActivityTrendChart extends StatelessWidget {
     final maxY = data.fold<int>(0, (m, d) => d.value > m ? d.value : m);
     final summary = data.map((d) => '${d.label}: ${d.value}').join(', ');
 
+    // Explicit, evenly-spaced tick indices (always including the first and
+    // last day) rather than BasicNumericTickProviderSpec's "nice round
+    // number" heuristic, which is meant for continuous measures and can
+    // land on non-integer or unevenly-spaced positions over a small integer
+    // domain like a day index — producing an odd-looking, inconsistent
+    // date-label cadence on the x-axis.
+    final tickCount = data.length.clamp(2, 6);
+    final step = data.length <= 1 ? 1.0 : (data.length - 1) / (tickCount - 1);
+    final tickIndices = <int>{
+      for (var t = 0; t < tickCount; t++)
+        (t * step).round().clamp(0, data.length - 1),
+    }.toList()
+      ..sort();
+
     return Semantics(
       label: 'Activity trend chart. $summary',
       child: charts.LineChart(
@@ -369,15 +383,9 @@ class DashboardActivityTrendChart extends StatelessWidget {
           ),
         ),
         domainAxis: charts.NumericAxisSpec(
-          tickProviderSpec: charts.BasicNumericTickProviderSpec(
-            desiredTickCount: data.length.clamp(3, 7),
-          ),
-          tickFormatterSpec: charts.BasicNumericTickFormatterSpec((value) {
-            if (value == null) return '';
-            final i = value.toInt();
-            if (i < 0 || i >= data.length) return '';
-            return data[i].label;
-          }),
+          tickProviderSpec: charts.StaticNumericTickProviderSpec([
+            for (final i in tickIndices) charts.TickSpec<num>(i, label: data[i].label),
+          ]),
           renderSpec: charts.SmallTickRendererSpec(
             labelRotation: -45,
             labelStyle: charts.TextStyleSpec(

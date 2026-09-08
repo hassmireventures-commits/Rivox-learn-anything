@@ -63,9 +63,8 @@ class BuiltInAiConfig {
   /// Daily free generations before ads.
   static const int freeGenerationsPerDay = 1;
 
-  /// Generations granted per successful rewarded ad.
-  static const int bonusPerRewardedAd = 2;
-
-  /// Max rewarded ads that grant bonus per calendar day.
-  static const int maxRewardedAdsPerDay = 3;
+  /// Generations granted per successful rewarded ad — exactly one watch
+  /// unlocks exactly one more generation, with no daily cap on how many
+  /// ads can be watched (see [BuiltInAiQuotaSnapshot.canWatchAd]).
+  static const int bonusPerRewardedAd = 1;
 }

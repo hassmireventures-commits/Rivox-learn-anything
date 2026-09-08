@@ -1075,7 +1075,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get builtinQuotaTitle => 'Daily AI limit reached';
   @override
-  String get builtinQuotaBody => 'You\'ve used today\'s Built-in AI generations. Watch a rewarded ad for +2 more, or add your own provider in Settings.';
+  String get builtinQuotaBody => 'You\'ve used today\'s Built-in AI generations. Watch a rewarded ad for +1 more — watch as many as you like — or add your own provider in Settings.';
   @override
   String get builtinQuotaWatchAd => 'Watch ad for more';
   @override
