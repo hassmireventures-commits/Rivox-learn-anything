@@ -1,8 +1,13 @@
-# Rivox 1.1.0 (build 7)
+# Rivox 1.1.0 (build 8)
 
 **Release date:** 2026-09-08  
 **Version:** 1.1.0  
-**Version code:** 7  
+**Version code:** 8 (supersedes build 7 — same feature set; build 7 flagged by Play Console for
+low obfuscation (24%, then 19%, both below the 25% minimum), traced to overly broad
+`-keep class com.google.firebase.** { *; }` / `-keep class com.google.android.gms.** { *; }`
+rules in `android/app/proguard-rules.pro` keeping those entire (large) packages fully
+unobfuscated. Removed — Firebase/Play Services/AdMob all ship their own consumer ProGuard
+rules bundled in their AARs, so nothing actually needed was lost. Do not upload build 7.)  
 **Package:** `com.aiquiz.ai_quiz_app`
 
 ## What's new
@@ -39,6 +44,7 @@
 ### Behind the scenes
 - Groundwork for optional, end-to-end encrypted cloud backup/restore (Google Sign-In based) — built and tested, not yet enabled for users
 - Full test suite: 195 automated tests (up from 140), all passing
+- Removed redundant blanket ProGuard/R8 keep rules for Firebase/Play Services/AdMob, fixing a Play Console app-optimization warning (build 8 only — see version-code note above)
 
 ## Build artifacts
 

@@ -15,7 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
-| 2026-09-08 | release | Rivox 1.1.0 (build 7) — see [RELEASE_NOTES_1.1.0.md](RELEASE_NOTES_1.1.0.md) | — |
+| 2026-09-08 | release | Rivox 1.1.0 (build 8, supersedes 7 — Play Console obfuscation fix) — see [RELEASE_NOTES_1.1.0.md](RELEASE_NOTES_1.1.0.md) | — |
 | 2026-09-08 | feature | Learner Memory: daily-refreshed goals/library/quiz-pattern snapshot for chat | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-09-08 | bugfix | "Quiz ready" banner tap fixed (real nav bug); redirect to unopened results; clearer wording | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-08 | bugfix+feature | Chart y-axis overlap fixed; AI brief refresh 2x faster; flashcard "why" explanation added | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
