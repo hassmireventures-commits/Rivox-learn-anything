@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bring Your Own Key (BYOK) AI Quiz Generation, Explained — Rivox</title>
+  <title>Bring Your Own Key (BYOK) AI Quiz Generation, Explained | Rivox</title>
   <meta name="description" content="What BYOK means for AI quiz apps, how it differs from fixed-subscription AI tools, and how to pick between Built-in AI and your own API key.">
   <link rel="canonical" href="https://learn-anything-43970.web.app/blog/byok-ai-quiz-generation">
   <meta property="og:type" content="article">
@@ -63,31 +63,31 @@
       <h1>Bring Your Own Key (BYOK) AI Quiz Generation, Explained</h1>
       <p class="updated"><strong>Published:</strong> September 7, 2026</p>
 
-      <p>If you've shopped for an AI-powered study app recently, you've probably noticed two very different pricing models: a flat monthly subscription that bundles in "AI credits," or an app that asks you to paste in your own API key from OpenAI, Google, or Anthropic. The second model is usually called <strong>BYOK — Bring Your Own Key</strong> — and it's a meaningfully different deal for the person actually using the app, not just a technical detail.</p>
+      <p>If you've shopped for an AI-powered study app recently, you've probably noticed two very different pricing models: a flat monthly subscription that bundles in "AI credits," or an app that asks you to paste in your own API key from OpenAI, Google, or Anthropic. The second model is usually called <strong>BYOK: Bring Your Own Key</strong>, and it's a meaningfully different deal for the person actually using the app, not just a technical detail.</p>
 
       <h2>What BYOK actually means</h2>
-      <p>Every AI quiz generator, under the hood, is sending your topic and preferences to a large language model (an LLM) and asking it to write questions back. That LLM call costs money — a fraction of a cent per request, but it adds up across millions of users. A subscription app pays for that cost itself and folds it into your monthly fee, whether you generate five quizzes a month or five hundred. A BYOK app instead lets you supply your own account with an AI provider (OpenAI, Google Gemini, Anthropic Claude, or any OpenAI-compatible endpoint), and your usage is billed directly by that provider, usually at their standard per-token API rate.</p>
+      <p>Every AI quiz generator, under the hood, is sending your topic and preferences to a large language model (an LLM) and asking it to write questions back. That LLM call costs money: a fraction of a cent per request, but it adds up across millions of users. A subscription app pays for that cost itself and folds it into your monthly fee, whether you generate five quizzes a month or five hundred. A BYOK app instead lets you supply your own account with an AI provider (OpenAI, Google Gemini, Anthropic Claude, or any OpenAI-compatible endpoint), and your usage is billed directly by that provider, usually at their standard per-token API rate.</p>
 
       <h2>Why that trade-off is worth understanding</h2>
       <ul>
-        <li><strong>Cost scales with actual use.</strong> A light user who generates one quiz a week might spend a few cents a month on their own API key — far less than a flat subscription. A heavy daily user might spend more than a subscription would have cost. There's no universal winner; it depends on how much you actually generate.</li>
+        <li><strong>Cost scales with actual use.</strong> A light user who generates one quiz a week might spend a few cents a month on their own API key, far less than a flat subscription. A heavy daily user might spend more than a subscription would have cost. There's no universal winner; it depends on how much you actually generate.</li>
         <li><strong>You're not locked to one vendor's model quality or uptime.</strong> If one provider's model degrades, raises prices, or has an outage, a BYOK app lets you switch keys without switching apps. A subscription app ties you to whatever model the vendor chose.</li>
-        <li><strong>Your key, your data relationship.</strong> When you use your own key, your requests go directly to the provider under the terms you already agreed to with them — there's one less intermediary handling your prompts.</li>
+        <li><strong>Your key, your data relationship.</strong> When you use your own key, your requests go directly to the provider under the terms you already agreed to with them: there's one less intermediary handling your prompts.</li>
         <li><strong>It requires a small amount of setup.</strong> This is the real cost of BYOK: you have to create an account with an AI provider and generate an API key, which is an extra step compared to just paying a subscription and going. For someone who has never done this before, it can feel like a barrier.</li>
       </ul>
 
       <h2>The middle ground: Built-in AI with a free daily quota</h2>
-      <p>Because that setup step is a genuine barrier for first-time users, the most workable design isn't "BYOK or nothing" — it's offering a free, zero-setup Built-in AI option for people who just want to try the app immediately, with BYOK available as an upgrade path once someone knows they'll use the app regularly. That's the model Rivox uses: a Built-in AI tier that works the moment you open the app (a small free daily quota, extendable by watching a rewarded ad), and an "Add your own provider" option in Settings for anyone who wants unlimited generation on their own account and their choice of model.</p>
+      <p>Because that setup step is a genuine barrier for first-time users, the most workable design isn't "BYOK or nothing": it's offering a free, zero-setup Built-in AI option for people who just want to try the app immediately, with BYOK available as an upgrade path once someone knows they'll use the app regularly. That's the model Rivox uses: a Built-in AI tier that works the moment you open the app (a small free daily quota, extendable by watching a rewarded ad), and an "Add your own provider" option in Settings for anyone who wants unlimited generation on their own account and their choice of model.</p>
 
       <h2>Frequently asked questions</h2>
       <h3>Is BYOK safe? Where is my API key stored?</h3>
-      <p>In Rivox specifically, your key is stored in your device's secure storage (Android's encrypted keystore) and is sent only to the provider you selected — never to Rivox's own servers, since there isn't a Rivox backend sitting between you and the AI provider for BYOK requests.</p>
+      <p>In Rivox specifically, your key is stored in your device's secure storage (Android's encrypted keystore) and is sent only to the provider you selected, never to Rivox's own servers, since there isn't a Rivox backend sitting between you and the AI provider for BYOK requests.</p>
       <h3>Which providers can I use?</h3>
       <p>Rivox supports OpenAI-compatible providers, so this includes OpenAI itself, Google Gemini, Anthropic Claude, and any other service that exposes an OpenAI-compatible chat completions API.</p>
       <h3>Do I have to use BYOK?</h3>
-      <p>No — Built-in AI is the default and requires no key at all. BYOK is purely an option for people who want more generations per day or a specific model.</p>
+      <p>No. Built-in AI is the default and requires no key at all. BYOK is purely an option for people who want more generations per day or a specific model.</p>
 
-      <p>Curious to try it yourself? <a href="https://play.google.com/store/apps/details?id=com.aiquiz.ai_quiz_app" rel="noopener noreferrer" target="_blank">Rivox is free on Google Play</a> — start with Built-in AI, and add your own key later if you want to.</p>
+      <p>Curious to try it yourself? <a href="https://play.google.com/store/apps/details?id=com.aiquiz.ai_quiz_app" rel="noopener noreferrer" target="_blank">Rivox is free on Google Play</a>. Start with Built-in AI, and add your own key later if you want to.</p>
 
       <ins class="adsbygoogle" style="display:block;min-height:90px" data-la-slot="doc" data-ad-format="auto"></ins>
     </main>
@@ -102,6 +102,6 @@
     </footer>
   </div>
 
-  <script src="/ads.js?v=20260907" defer></script>
+  <script src="/ads.js?v=20260909" defer></script>
 </body>
 </html>

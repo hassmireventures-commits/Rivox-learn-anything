@@ -15,7 +15,8 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
-| 2026-09-09 | release | Rivox 1.1.0 (build 9, supersedes 7/8 — chat FAB over modals fix) — see [RELEASE_NOTES_1.1.0.md](RELEASE_NOTES_1.1.0.md) | — |
+| 2026-09-09 | enhancement | Website copy cleanup (no emoji, no em-dash), new ad slots on hub pages, mobile-friendliness review | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
+| 2026-09-09 | release | Rivox 1.1.0 (build 9, supersedes 7/8: chat FAB over modals fix), see [RELEASE_NOTES_1.1.0.md](RELEASE_NOTES_1.1.0.md) | (n/a) |
 | 2026-09-09 | bugfix | Global chat FAB appeared over modal bottom sheets (reminder setup, and any other) | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-08 | release | Rivox 1.1.0 (build 8, supersedes 7 — Play Console obfuscation fix) — see [RELEASE_NOTES_1.1.0.md](RELEASE_NOTES_1.1.0.md) | — |
 | 2026-09-08 | feature | Learner Memory: daily-refreshed goals/library/quiz-pattern snapshot for chat | [FEATURES_LOG](logs/FEATURES_LOG.md) |

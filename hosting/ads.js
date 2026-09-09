@@ -18,8 +18,14 @@
  *                 only after the visitor clicks the button (needs its own
  *                 In-article ad unit; must NOT be the same slot as `native`,
  *                 AdSense forbids reusing one ad unit twice on one page)
- *   gamesBottom → hosting/games/dino/index.html, below the game
- *                 (needs its own In-article ad unit)
+ *   gamesBottom → hosting/games/dino/index.html and hosting/games/2048/index.html,
+ *                 below the game (needs its own In-article ad unit)
+ *   gamesTop    → hosting/games/index.html, above the game grid — reuses the
+ *                 same Display unit as homeTop/doc (a different page each,
+ *                 so reusing one Display unit's slot ID is fine; AdSense
+ *                 only forbids reusing one unit twice on the *same* page)
+ *   blogTop     → hosting/blog/index.html, above the post grid — same reuse
+ *                 as gamesTop
  */
 window.LA_ADSENSE = {
   client: 'ca-pub-5325876102788151',
@@ -28,6 +34,8 @@ window.LA_ADSENSE = {
     // Create a second Display ad unit in AdSense, paste its slot ID here:
     homeBottom: '',
     doc: '3346149333',
+    gamesTop: '3346149333',
+    blogTop: '3346149333',
     // Create an "In-article" ad unit in AdSense for each of these three and
     // paste its slot ID — they must be three DIFFERENT ad units (AdSense
     // rejects reusing one ad unit's slot twice on the same page load):

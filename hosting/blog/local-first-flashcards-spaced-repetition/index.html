@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Local-First Flashcards: Spaced Repetition Without the Cloud — Rivox</title>
+  <title>Local-First Flashcards: Spaced Repetition Without the Cloud | Rivox</title>
   <meta name="description" content="How spaced repetition (SM-2) works, why local-first storage matters for flashcard apps, and how Rivox builds flashcards automatically from your mistakes.">
   <link rel="canonical" href="https://learn-anything-43970.web.app/blog/local-first-flashcards-spaced-repetition">
   <meta property="og:type" content="article">
@@ -63,37 +63,37 @@
       <h1>Local-First Flashcards: Spaced Repetition Without the Cloud</h1>
       <p class="updated"><strong>Published:</strong> September 7, 2026</p>
 
-      <p>Spaced repetition is one of the most well-tested ideas in learning science, and it's the engine behind almost every serious flashcard app — Anki, SuperMemo, and now the flashcard system built into Rivox. But "spaced repetition" gets thrown around a lot without much explanation of what it actually does, or why the app you use to review cards should matter beyond just showing you the cards.</p>
+      <p>Spaced repetition is one of the most well-tested ideas in learning science, and it's the engine behind almost every serious flashcard app: Anki, SuperMemo, and now the flashcard system built into Rivox. But "spaced repetition" gets thrown around a lot without much explanation of what it actually does, or why the app you use to review cards should matter beyond just showing you the cards.</p>
 
       <h2>The core idea: review right before you'd forget</h2>
-      <p>Human memory doesn't decay at a constant rate. Right after you learn something, you forget it quickly; the longer a memory survives, the more slowly it fades afterward. Spaced repetition algorithms exploit this by scheduling your next review right around the point you're about to forget — not too early (a waste of time reviewing something you already know cold) and not too late (you've already lost it and have to relearn it from scratch).</p>
+      <p>Human memory doesn't decay at a constant rate. Right after you learn something, you forget it quickly; the longer a memory survives, the more slowly it fades afterward. Spaced repetition algorithms exploit this by scheduling your next review right around the point you're about to forget, not too early (a waste of time reviewing something you already know cold) and not too late (you've already lost it and have to relearn it from scratch).</p>
 
       <h2>How the SM-2 algorithm actually works</h2>
       <p>The most widely used spaced repetition algorithm is called <strong>SM-2</strong> (SuperMemo 2), published in 1987 and still the basis for most modern flashcard software, including Rivox's. Each card tracks three numbers:</p>
       <ul>
-        <li><strong>Ease factor</strong> — how easy this specific card is for you, starting around 2.5 and adjusting up or down based on how you rate each review.</li>
-        <li><strong>Interval</strong> — how many days until the next review. A fresh card starts at 1 day, then jumps to 6 days after a second successful review, then grows by roughly the ease factor each time after that.</li>
-        <li><strong>Repetitions</strong> — how many times in a row you've gotten the card right; a single wrong answer resets this back to zero and drops the interval back to 1 day, since a mistake means the memory needs to be rebuilt.</li>
+        <li><strong>Ease factor:</strong> how easy this specific card is for you, starting around 2.5 and adjusting up or down based on how you rate each review.</li>
+        <li><strong>Interval:</strong> how many days until the next review. A fresh card starts at 1 day, then jumps to 6 days after a second successful review, then grows by roughly the ease factor each time after that.</li>
+        <li><strong>Repetitions:</strong> how many times in a row you've gotten the card right; a single wrong answer resets this back to zero and drops the interval back to 1 day, since a mistake means the memory needs to be rebuilt.</li>
       </ul>
-      <p>The result is a schedule that stretches out fast for cards you find easy and stays tight for cards you keep struggling with — automatically, without you having to manage it.</p>
+      <p>The result is a schedule that stretches out fast for cards you find easy and stays tight for cards you keep struggling with, automatically, without you having to manage it.</p>
 
       <h2>Why "local-first" matters here specifically</h2>
-      <p>A flashcard deck is, functionally, a record of exactly what you don't yet know — every card you're still struggling with, indexed by topic. That's genuinely sensitive information if it's tied to something like exam prep, professional certification, or interview practice. "Local-first" means that record lives on your device by default, in a local database, rather than being uploaded to a server as a matter of course. Rivox's flashcard data — the cards themselves, your review history, your scheduling state — is stored locally and never leaves your device unless you explicitly choose to back it up.</p>
+      <p>A flashcard deck is, functionally, a record of exactly what you don't yet know: every card you're still struggling with, indexed by topic. That's genuinely sensitive information if it's tied to something like exam prep, professional certification, or interview practice. "Local-first" means that record lives on your device by default, in a local database, rather than being uploaded to a server as a matter of course. Rivox's flashcard data (the cards themselves, your review history, your scheduling state) is stored locally and never leaves your device unless you explicitly choose to back it up.</p>
 
       <h2>Where the cards actually come from</h2>
       <p>A flashcard system is only as useful as what ends up in it. Rivox builds flashcards two ways:</p>
       <ul>
-        <li><strong>From your mistakes</strong> — any quiz question you get wrong can become a flashcard automatically, free, no extra AI generation involved. This is the fastest way to build a deck that's genuinely targeted at your weak spots.</li>
-        <li><strong>From your uploaded library</strong> — notes, textbook chapters, or study material you've added to your personal library can be turned into flashcards grounded in that specific content, rather than generic questions on the topic.</li>
+        <li><strong>From your mistakes:</strong> any quiz question you get wrong can become a flashcard automatically, free, no extra AI generation involved. This is the fastest way to build a deck that's genuinely targeted at your weak spots.</li>
+        <li><strong>From your uploaded library:</strong> notes, textbook chapters, or study material you've added to your personal library can be turned into flashcards grounded in that specific content, rather than generic questions on the topic.</li>
       </ul>
 
       <h2>Frequently asked questions</h2>
       <h3>Is SM-2 better than Anki's algorithm?</h3>
-      <p>Anki's modern default is actually a more advanced descendant called FSRS, which uses a more sophisticated memory model. SM-2 is simpler but still a well-proven, effective baseline — the meaningful jump is going from no spaced repetition to any spaced repetition at all, not from SM-2 to a fancier variant.</p>
+      <p>Anki's modern default is actually a more advanced descendant called FSRS, which uses a more sophisticated memory model. SM-2 is simpler but still a well-proven, effective baseline: the meaningful jump is going from no spaced repetition to any spaced repetition at all, not from SM-2 to a fancier variant.</p>
       <h3>Do I need an internet connection to review flashcards in Rivox?</h3>
-      <p>No — since your deck and scheduling state are stored locally, reviewing cards works fully offline. An internet connection is only needed when generating new AI-grounded cards from your library.</p>
+      <p>No. Since your deck and scheduling state are stored locally, reviewing cards works fully offline. An internet connection is only needed when generating new AI-grounded cards from your library.</p>
       <h3>Can I lose my flashcards if I lose my phone?</h3>
-      <p>By default, local-first means your data lives only on that device — so yes, without a backup. Rivox offers an optional, end-to-end encrypted cloud backup you can turn on if you want a recovery copy; it's off by default to match the local-first default.</p>
+      <p>By default, local-first means your data lives only on that device, so yes, without a backup. Rivox offers an optional, end-to-end encrypted cloud backup you can turn on if you want a recovery copy; it's off by default to match the local-first default.</p>
 
       <p>Want to try spaced repetition that builds itself from your own mistakes? <a href="https://play.google.com/store/apps/details?id=com.aiquiz.ai_quiz_app" rel="noopener noreferrer" target="_blank">Rivox is free on Google Play</a>.</p>
 
@@ -110,6 +110,6 @@
     </footer>
   </div>
 
-  <script src="/ads.js?v=20260907" defer></script>
+  <script src="/ads.js?v=20260909" defer></script>
 </body>
 </html>

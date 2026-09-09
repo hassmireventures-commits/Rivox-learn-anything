@@ -1,5 +1,18 @@
 ﻿# Enhancements Log
 
+## 2026-09-09 — Website copy cleanup (no emoji, no em-dash), new ad slots on hub pages, mobile-friendliness review
+
+- **Type:** enhancement
+- **Area:** hosting (website), monetization
+- **Files:** all 10 `hosting/**/index.html` pages, `hosting/ads.js`.
+- **Problem / Goal:** User asked to (1) remove every emoji and em-dash from the website and never use either again going forward, (2) add ads where missing, (3) make the mini games mobile-friendly across all devices.
+- **Solution:**
+  1. Removed the 5 decorative emoji icons (blog/games card listings, `aria-hidden="true"` spans with no other content, so the spans were removed entirely rather than left empty) and rewrote every em-dash occurrence across all 10 pages (title tags, meta/OG/Twitter descriptions, JSON-LD FAQ text, body copy, list items) into plain punctuation (period, comma, or colon depending on what reads naturally). Roughly 50 occurrences fixed. Left en-dashes alone (e.g. "1–2 business days," a numeric range, not what was asked to remove). Saved as a standing memory rule for all future work on this project.
+  2. Found the games hub (`/games`) and blog hub (`/blog`) pages had no fixed ad unit at all (only the auto-ads loader script, no `<ins class="adsbygoogle">`), unlike every other page. Added a Display banner to both, reusing the existing `homeTop`/`doc` ad unit ID (`ads.js`'s own comments already establish that reusing one Display unit's slot ID across *different* pages is fine; AdSense only forbids reusing one unit twice on the *same* page), so these went live immediately without requiring a new AdSense ad unit to be created first.
+  3. Reviewed both vendored games' actual mobile support in detail rather than guessing: Dino Run's CSS already scales its canvas via `width:100%`/`max-width:600px` with dedicated media queries down to 240px width plus a debounced JS resize handler (`scaleWidth = window.innerWidth / dimensions.WIDTH`), Chromium's own upstream offline-dino code, already well-engineered. 2048's CSS has its own `max-width: 520px` breakpoint shrinking the board, and its `keyboard_input_manager.js` already binds real `touchstart`/`touchmove`/`touchend` listeners natively. The one previously-known mobile bug (Dino Run unplayable with "Request Desktop Site" forcing `IS_MOBILE` false) was already fixed 2026-08-29. Found no further concrete gap through this review, flagged to the user rather than making speculative changes to already-working vendored code.
+- **Regression risks:** None expected for the copy/ad changes: additive markup, reused an existing ad unit ID already live on other pages, JSON-LD/tag-balance verified programmatically after every edit. No code changes made for the mobile-friendliness item (review only).
+- **Verified:** Programmatic JSON-LD parse-validity check on every touched page's structured data (all valid post-edit); one `<h1>` per page confirmed unchanged; full-site regex sweep confirming zero remaining em-dash or emoji characters in any `hosting/**/*.html` file. No live browser/device test possible from this environment for the mobile-friendliness review; based on static code analysis of the vendored games' own CSS/JS, not a fresh device repro.
+
 ## 2026-09-07 — SEO follow-up pass: meta description length, missing OG/Twitter tags, schema image, content-keyword gaps
 
 - **Type:** enhancement
