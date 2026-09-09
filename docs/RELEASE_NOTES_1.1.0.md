@@ -1,13 +1,18 @@
-# Rivox 1.1.0 (build 8)
+# Rivox 1.1.0 (build 9)
 
-**Release date:** 2026-09-08  
+**Release date:** 2026-09-09  
 **Version:** 1.1.0  
-**Version code:** 8 (supersedes build 7 — same feature set; build 7 flagged by Play Console for
-low obfuscation (24%, then 19%, both below the 25% minimum), traced to overly broad
-`-keep class com.google.firebase.** { *; }` / `-keep class com.google.android.gms.** { *; }`
-rules in `android/app/proguard-rules.pro` keeping those entire (large) packages fully
-unobfuscated. Removed — Firebase/Play Services/AdMob all ship their own consumer ProGuard
-rules bundled in their AARs, so nothing actually needed was lost. Do not upload build 7.)  
+**Version code:** 9 (supersedes builds 7 and 8 — same feature set, two follow-up fixes:
+- Build 8 superseded build 7: Play Console flagged low obfuscation (24%, then 19%, both below
+  the 25% minimum), traced to overly broad `-keep class com.google.firebase.** { *; }` /
+  `-keep class com.google.android.gms.** { *; }` rules in `android/app/proguard-rules.pro`
+  keeping those entire (large) packages fully unobfuscated. Removed — Firebase/Play
+  Services/AdMob all ship their own consumer ProGuard rules bundled in their AARs, so nothing
+  actually needed was lost.
+- Build 9 supersedes build 8: fixed the global chat FAB appearing over modal bottom sheets
+  (e.g. the reminder-setup sheet, from onboarding/Settings/Dashboard) — see BUGFIX_LOG.
+
+Do not upload builds 7 or 8.)  
 **Package:** `com.aiquiz.ai_quiz_app`
 
 ## What's new
@@ -19,6 +24,7 @@ rules bundled in their AARs, so nothing actually needed was lost. Do not upload 
 - Fixed: chat could describe having performed an action (adding content, enabling something) that it never actually did
 - Fixed: a chat-generated quiz/path could finish without any visible way to open it
 - The floating chat button is now draggable to either edge of the screen, and no longer appears on quiz-play or learning-path screens
+- Fixed: the chat button could appear on top of the reminder-setup sheet (during onboarding, Settings, or the Dashboard) and, more generally, on top of any modal bottom sheet or dialog
 
 ### Generation & quota
 - New global "ready" indicator: any quiz, learning path, or daily-content job that finishes while you're away from where it started now shows a tap-to-open banner, everywhere in the app
