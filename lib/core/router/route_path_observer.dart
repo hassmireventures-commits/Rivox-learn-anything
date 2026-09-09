@@ -18,8 +18,21 @@ class RoutePathObserver extends NavigatorObserver {
     currentRoutePath.value = route?.settings.name;
   }
 
+  /// A modal bottom sheet / dialog is an unnamed overlay on top of whatever
+  /// real page is underneath — it must never overwrite `currentRoutePath`
+  /// with `null`, or it looks indistinguishable from genuinely resting on a
+  /// shell tab (e.g. showing the global chat FAB over a reminder-setup sheet
+  /// opened from onboarding, settings, or the dashboard). Only a route that
+  /// carries a real `name:` (every actual page, per `_pushPage`/`_instantPage`
+  /// in `app_router.dart`) is allowed to change the tracked path; an unnamed
+  /// push/replace leaves it exactly as it was.
+  void _updateIfNamed(Route<dynamic>? route) {
+    if (route != null && route.settings.name == null) return;
+    _update(route);
+  }
+
   @override
-  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) => _update(route);
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) => _updateIfNamed(route);
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) => _update(previousRoute);
@@ -28,5 +41,6 @@ class RoutePathObserver extends NavigatorObserver {
   void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) => _update(previousRoute);
 
   @override
-  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) => _update(newRoute);
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) =>
+      _updateIfNamed(newRoute);
 }

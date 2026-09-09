@@ -1,5 +1,16 @@
 # Bug Fix Log
 
+## 2026-09-09 — Global chat FAB appeared over modal bottom sheets (reminder setup, and any other)
+
+- **Type:** bugfix
+- **Area:** router, chat
+- **Files:** `lib/core/router/route_path_observer.dart`.
+- **Problem / Goal:** User saw the global chat-entry FAB on top of the "Study reminders" bottom sheet during onboarding (Step 3 of 4). The same sheet is also opened from Settings and the Dashboard, so this wasn't onboarding-specific.
+- **Root cause:** `RoutePathObserver` sets `currentRoutePath` to the pushed route's `Page.name` on every `didPush`, and `null` is the sentinel meaning "on a shell tab, nothing pushed" (the FAB's own show condition). A `showModalBottomSheet` (or `showDialog`) pushes an unnamed route by default — so opening *any* modal from *any* screen overwrote `currentRoutePath` with `null`, making the FAB think it was back on a shell tab, regardless of what real page the modal was actually covering. This affects every modal in the app (23+ call sites), not just this one sheet.
+- **Solution:** `RoutePathObserver.didPush`/`didReplace` now ignore an unnamed route entirely (leave `currentRoutePath` exactly as it was) instead of overwriting it with `null` — only a route carrying a real `name:` (every actual page, per `_pushPage`/`_instantPage` in `app_router.dart`) is allowed to change the tracked path. `didPop`/`didRemove` are untouched: revealing an unnamed route after a pop (i.e. genuinely landing back on a shell tab) is the one case where `null` is correct, so those must keep updating unconditionally.
+- **Regression risks:** None expected — this only makes the tracked path *more* conservative (fewer false "on a shell tab" reads), never less; every existing named-page transition is unaffected.
+- **Verified:** `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test --exclude-tags=live` (195 passed/1 skipped, no regressions). No live device pass in this environment (the test emulator was unresponsive this session) — verified by tracing the exact NavigatorObserver call sequence for `showModalBottomSheet` against this app's own page-naming convention.
+
 ## 2026-09-08 — Play Console "App optimisation below threshold" (obfuscation 24%→19%)
 
 - **Type:** bugfix (Play Console compliance)
