@@ -7,6 +7,7 @@ import '../../../core/error/app_exception.dart';
 import '../../../core/services/built_in_ai_config.dart';
 import '../../../core/services/built_in_chat_quota.dart';
 import '../../../core/services/llm_manager.dart';
+import '../../../core/services/open_knowledge/open_knowledge_models.dart';
 import '../../../core/services/open_knowledge/open_knowledge_service.dart';
 import '../../local/models/chat_message.dart';
 import '../../local/repositories/chat_repository.dart';
@@ -48,7 +49,10 @@ class ChatService {
   /// Most-recent wrong answers folded into learning-history context.
   static const int kLearningHistoryWrongAnswers = 8;
 
-  static const String _systemPrompt =
+  static String get _navigationTargetList =>
+      ChatNavigationTargets.routes.keys.join(', ');
+
+  static String get _systemPrompt =>
       'You are a friendly, encouraging learning assistant inside a study app. '
       'The learner is asking a follow-up question about their modules, quizzes, '
       'or library content. Use the conversation history, their recent quiz '
@@ -58,43 +62,61 @@ class ChatService {
       'not sure rather than guessing with confidence. If they ask what they '
       'got wrong, how they\'re doing on a topic, or similar, answer from the '
       '"Recent quiz history" section below rather than saying you don\'t have '
-      'access to it. Keep replies concise (a few sentences, more only if '
-      'truly needed). '
+      'access to it. If an OPEN KNOWLEDGE section is provided below, those '
+      'are real sources the app already shows as tappable links under your '
+      'reply, so when the learner asks for article or reading suggestions '
+      'and that section is present, introduce what you found there instead '
+      'of telling them to check their library (their own uploaded library is '
+      'a separate, often-empty thing from these public sources). Only say '
+      'you have nothing to suggest if that section is genuinely absent or '
+      'empty. Keep replies concise (a few sentences, more only if truly '
+      'needed). '
       '\n\n'
       'You can only answer questions with text — you cannot create, add, '
       'enable, generate, download, or modify anything in the app (no library '
       'modules, quizzes, learning paths, flashcards, or settings). Never say '
       'or imply that you have done, made, added, enabled, or set up anything '
-      'for the learner, even if they say "yes" or ask you to. If a request '
-      'needs an action instead of an answer, say plainly that you can\'t do '
-      'that yourself and tell them where in the app they can do it (e.g. '
-      '"you can search for that in the Library tab"). '
+      'for the learner, even if they say "yes" or ask you to. '
       '\n\n'
-      'Two exceptions: you may PROPOSE, but never perform, generating a quiz '
-      'or a learning path on a topic; and you may suggest searching YouTube '
-      'for a video on a topic. Proposing costs nothing and starts nothing; '
-      'only the learner tapping a button in the app actually starts anything. '
-      'When you propose a quiz or path, phrase it as a suggestion or question '
-      'in "reply" (e.g. "Want me to generate a quiz on AWS?") and separately '
-      'set the "action" field so the app can show a button. Never say the '
-      'quiz or path has been created, started, generated, or is ready, only '
-      'that you are suggesting it. Only propose one when the learner\'s '
-      'intent is reasonably clear (they explicitly asked for a quiz, '
-      'practice, a test, a learning path, or a study plan on an identifiable '
-      'topic), not on every message, and not as a guess when they are just '
-      'asking a question or chatting. For a video suggestion, never name or '
-      'link a specific video (you cannot verify one actually exists); only '
-      'suggest searching YouTube for the topic, and the app builds a real '
-      'search link itself.'
+      'Four exceptions, none of them performed by you, only proposed: '
+      'generating a quiz on a topic; generating a learning path on a topic; '
+      'a video suggestion on a topic; and navigating to one specific screen '
+      'in the app, chosen only from this exact list (use one of these names '
+      'exactly, nothing else): $_navigationTargetList. Prefer navigate over a '
+      'video/quiz/path proposal whenever the learner is really just asking '
+      '"where do I do X" or "take me to X", for example asking about their '
+      'saved articles, their quiz history, adding library content, or '
+      'changing a setting. Proposing costs nothing and starts nothing, only '
+      'the learner tapping a button in the app actually does anything, and '
+      'that button is the ONLY clickable thing (a bare word or phrase in '
+      '"reply" is never clickable, never write a URL, never write "search '
+      'YouTube for ...", "check out this video", "go to the X tab", or any '
+      'instruction to go somewhere yourself, since the learner cannot tap '
+      'plain text). For every one of these four proposals, "reply" is only '
+      'ever a short suggestion or question (e.g. "Want me to generate a quiz '
+      'on AWS?", "Want a video on binary search trees?", "Want to open your '
+      'Saved Articles?") and the actual proposal lives entirely in the '
+      'separate "action" field so the app can render a real button, never '
+      'inside "reply" itself. Never say a quiz, path, or video has been '
+      'created, started, generated, found, or is ready in "reply", and never '
+      'say you have opened or navigated anywhere, only that you are '
+      'suggesting it. Only propose one when the learner\'s intent is '
+      'reasonably clear (they explicitly asked for a quiz, practice, a test, '
+      'a learning path, a study plan, a video on an identifiable topic, or '
+      'to go to a specific place in the app), not on every message, and not '
+      'as a guess when they are just asking a question or chatting. For a '
+      'video specifically, never name a specific video or write any link '
+      'yourself, you cannot verify a specific video exists. Set "videoTopic" '
+      'only, and the app builds a real, working YouTube search link from it.'
       '\n\n'
       'Respond with a single valid JSON object only, in this exact shape: '
       '{"reply": "...", "action": "none"|"proposeQuiz"|"proposePath"|'
-      '"suggestVideo", "quizTopic": "...", "quizQuestionCount": 15, '
+      '"suggestVideo"|"navigate", "quizTopic": "...", "quizQuestionCount": 15, '
       '"quizDifficulty": "easy"|"medium"|"hard", "pathTopic": "...", '
-      '"pathModuleCount": 6, "videoTopic": "..."}. '
-      'Use "action":"none" and omit the quiz*/path*/video* fields for '
-      'ordinary answers. Omit whichever fields do not apply to your chosen '
-      'action. No markdown, no extra keys, no text outside the JSON.';
+      '"pathModuleCount": 6, "videoTopic": "...", "navigateTo": "..."}. '
+      'Use "action":"none" and omit the quiz*/path*/video*/navigateTo fields '
+      'for ordinary answers. Omit whichever fields do not apply to your '
+      'chosen action. No markdown, no extra keys, no text outside the JSON.';
 
   /// Sends the learner's latest turn (already persisted by the caller — this
   /// service only reads history, it does not write messages) and returns the
@@ -145,14 +167,20 @@ class ChatService {
       final looksLikeTopic = ctx.topic.trim().split(RegExp(r'\s+')).length >= 3;
       final openKnowledgeFuture = looksLikeTopic
           ? OpenKnowledgeService()
-              .gatherPromptContext(ctx.topic)
-              .timeout(const Duration(seconds: 6), onTimeout: () => '')
-              .catchError((_) => '')
-          : Future.value('');
+              .gatherHits(ctx.topic)
+              .timeout(const Duration(seconds: 6), onTimeout: () => const <OpenKnowledgeHit>[])
+              .catchError((_) => const <OpenKnowledgeHit>[])
+          : Future.value(const <OpenKnowledgeHit>[]);
 
       rag = await ragFuture;
       final learningHistory = await learningHistoryFuture;
-      final openKnowledgeBlock = await openKnowledgeFuture;
+      final openKnowledgeHits = await openKnowledgeFuture;
+      final openKnowledgeBlock = openKnowledgeHits.isEmpty
+          ? ''
+          : 'OPEN KNOWLEDGE (verified public sources, already shown to the '
+              'learner as real tappable links below your reply, so introduce '
+              'them naturally rather than repeating their URLs or titles '
+              'verbatim):\n${openKnowledgeHits.map((h) => h.promptLine).join('\n')}\n';
 
       final basePrompt = _buildUserPrompt(history, learningHistory, learnerMemory, openKnowledgeBlock);
       final promptWithRag = RagContextBuilder.prependToPrompt(basePrompt, rag);
@@ -165,7 +193,13 @@ class ChatService {
         skipQuota: true,
         recordBuiltinQuota: false,
       );
-      final result = parseReplyWithAction(raw);
+      final result = parseReplyWithAction(
+        raw,
+        sources: openKnowledgeHits
+            .map((h) => ChatSourceSuggestion(title: h.title, url: h.url ?? '', source: h.source))
+            .where((s) => s.url.isNotEmpty)
+            .toList(),
+      );
       sw.stop();
 
       await _pipeline.auditLog.record(
@@ -283,13 +317,18 @@ class ChatService {
     return trimmed;
   }
 
-  /// Extracts both the reply text and an optional proposed quiz/path action.
-  /// Reuses [parseReply] unchanged for the reply/fallback/error behavior —
-  /// action extraction is independent and any failure (missing/malformed/
-  /// unrecognized "action", missing required topic) silently degrades to
-  /// `action: null`. This must never throw on account of the action fields
-  /// alone, and never blocks returning a usable reply.
-  static ChatReplyResult parseReplyWithAction(String raw) {
+  /// Extracts the reply text plus an optional proposed action. Reuses
+  /// [parseReply] unchanged for the reply/fallback/error behavior, action
+  /// extraction is independent and any failure (missing/malformed/
+  /// unrecognized "action", missing required topic, unrecognized navigate
+  /// target) silently degrades to `action: null`. This must never throw on
+  /// account of the action fields alone, and never blocks returning a usable
+  /// reply. [sources] passes through untouched, real open-knowledge links
+  /// gathered before the model call, never derived from its output.
+  static ChatReplyResult parseReplyWithAction(
+    String raw, {
+    List<ChatSourceSuggestion> sources = const [],
+  }) {
     final reply = parseReply(raw);
     ChatProposedAction? action;
     try {
@@ -320,12 +359,20 @@ class ChatService {
             if (topic != null && topic.isNotEmpty) {
               action = ChatProposedAction.video(topic: topic);
             }
+          } else if (kind == 'navigate') {
+            final name = decoded['navigateTo']?.toString().trim();
+            if (name != null && name.isNotEmpty) {
+              final match = ChatNavigationTargets.match(name);
+              if (match != null) {
+                action = ChatProposedAction.navigate(topic: match.$1, route: match.$2);
+              }
+            }
           }
         }
       }
     } catch (_) {
       action = null;
     }
-    return ChatReplyResult(reply: reply, action: action);
+    return ChatReplyResult(reply: reply, action: action, sources: sources);
   }
 }

@@ -255,6 +255,20 @@ class _MyLibraryScreenState extends ConsumerState<MyLibraryScreen> {
         children: [
           Text(l10n.librarySubtitle, style: Theme.of(context).textTheme.bodyMedium),
           const SizedBox(height: 12),
+          AppCard(
+            onTap: () => context.push('/saved-articles'),
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(
+                Icons.bookmarks_rounded,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              title: Text(l10n.savedArticlesTitle),
+              subtitle: Text(l10n.savedArticlesSubtitle),
+              trailing: const Icon(Icons.chevron_right_rounded),
+            ),
+          ),
+          const SizedBox(height: 16),
           SegmentedButton<String>(
             showSelectedIcon: false,
             segments: [

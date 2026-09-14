@@ -1,3 +1,4 @@
+import 'package:ai_quiz_app/data/remote/ai/chat_reply_result.dart';
 import 'package:ai_quiz_app/data/remote/ai/chat_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -88,6 +89,33 @@ void main() {
       final result = ChatService.parseReplyWithAction(raw);
       expect(result.reply, 'Let me suggest a video.');
       expect(result.action, isNull);
+    });
+
+    test('navigate with a valid navigateTo decodes a navigate action', () {
+      const raw = '{"reply": "Want to open your Saved Articles?", "action": "navigate", '
+          '"navigateTo": "Saved Articles"}';
+      final result = ChatService.parseReplyWithAction(raw);
+      expect(result.action, isNotNull);
+      expect(result.action!.isNavigate, isTrue);
+      expect(result.action!.topic, 'Saved Articles');
+      expect(result.action!.route, '/saved-articles');
+    });
+
+    test('navigate with an unrecognized destination degrades to no action', () {
+      const raw = '{"reply": "Let me take you somewhere.", "action": "navigate", '
+          '"navigateTo": "Nonexistent Screen"}';
+      final result = ChatService.parseReplyWithAction(raw);
+      expect(result.reply, 'Let me take you somewhere.');
+      expect(result.action, isNull);
+    });
+
+    test('sources pass through unchanged regardless of the model output', () {
+      const raw = '{"reply": "Here is what I found.", "action": "none"}';
+      final sources = [
+        const ChatSourceSuggestion(title: 'X', url: 'https://example.com', source: 'Wikipedia'),
+      ];
+      final result = ChatService.parseReplyWithAction(raw, sources: sources);
+      expect(result.sources, sources);
     });
 
     test('proposeQuiz missing the required quizTopic degrades to no action, reply still returned', () {

@@ -15,6 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-09-14 | bugfix+feature | Chat FAB over nested dialogs, video link fix, real article links, navigate-to-tab, saved articles moved into Library | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-14 | bugfix+feature | 5 chat issues: library sources, speed/thinking indicator, video suggestions, generation-fails-when-minimized, quiz hallucination | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-09 | enhancement | Website copy cleanup (no emoji, no em-dash), new ad slots on hub pages, mobile-friendliness review | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
 | 2026-09-09 | release | Rivox 1.1.0 (build 9, supersedes 7/8: chat FAB over modals fix), see [RELEASE_NOTES_1.1.0.md](RELEASE_NOTES_1.1.0.md) | (n/a) |

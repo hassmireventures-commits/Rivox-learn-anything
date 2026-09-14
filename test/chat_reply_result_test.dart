@@ -31,6 +31,15 @@ void main() {
       expect(decoded.isPath, isFalse);
       expect(decoded.topic, 'binary search trees');
     });
+
+    test('navigate action round-trips', () {
+      const action = ChatProposedAction.navigate(topic: 'Library', route: '/library');
+      final decoded = ChatProposedAction.fromJson(action.toJson());
+      expect(decoded, isNotNull);
+      expect(decoded!.isNavigate, isTrue);
+      expect(decoded.topic, 'Library');
+      expect(decoded.route, '/library');
+    });
   });
 
   group('ChatProposedAction.fromJson defensive decoding (legacy/malformed contextRef)', () {
@@ -48,6 +57,55 @@ void main() {
 
     test('completely unrelated legacy contextRef shape returns null', () {
       expect(ChatProposedAction.fromJson({'someOldField': 'unrelated'}), isNull);
+    });
+
+    test('navigate with an unrecognized destination name returns null', () {
+      expect(
+        ChatProposedAction.fromJson({'kind': 'navigate', 'topic': 'Not A Real Screen'}),
+        isNull,
+      );
+    });
+
+    test('navigate name match is case-insensitive', () {
+      final decoded = ChatProposedAction.fromJson({'kind': 'navigate', 'topic': 'library'});
+      expect(decoded, isNotNull);
+      expect(decoded!.isNavigate, isTrue);
+      expect(decoded.topic, 'Library');
+      expect(decoded.route, '/library');
+    });
+  });
+
+  group('ChatNavigationTargets.match', () {
+    test('exact match returns the canonical name and route', () {
+      final match = ChatNavigationTargets.match('History');
+      expect(match, ('History', '/history'));
+    });
+
+    test('unrecognized name returns null', () {
+      expect(ChatNavigationTargets.match('Not A Screen'), isNull);
+    });
+  });
+
+  group('ChatSourceSuggestion', () {
+    test('round-trips through toJson/fromJson', () {
+      const source = ChatSourceSuggestion(
+        title: 'Binary search tree',
+        url: 'https://en.wikipedia.org/wiki/Binary_search_tree',
+        source: 'Wikipedia',
+      );
+      final decoded = ChatSourceSuggestion.fromJson(source.toJson());
+      expect(decoded, isNotNull);
+      expect(decoded!.title, source.title);
+      expect(decoded.url, source.url);
+      expect(decoded.source, source.source);
+    });
+
+    test('missing url returns null, not a throw', () {
+      expect(ChatSourceSuggestion.fromJson({'title': 'X', 'source': 'Wikipedia'}), isNull);
+    });
+
+    test('missing title returns null', () {
+      expect(ChatSourceSuggestion.fromJson({'url': 'https://example.com', 'source': 'Wikipedia'}), isNull);
     });
   });
 }

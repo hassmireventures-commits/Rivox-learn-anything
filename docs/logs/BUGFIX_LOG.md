@@ -1,5 +1,26 @@
 # Bug Fix Log
 
+## 2026-09-14 (later): chat FAB over nested dialogs, video suggestion had no link, real article links, navigate-to-tab, saved articles moved into Library
+
+- **Type:** bugfix + feature
+- **Area:** chat, router, library
+- **Files:** `lib/core/router/route_path_observer.dart`, `lib/data/remote/ai/chat_service.dart`, `lib/data/remote/ai/chat_reply_result.dart`, `lib/features/chat/presentation/chat_screen.dart`, `lib/features/chat/presentation/chat_action_chip.dart`, `lib/features/library/presentation/my_library_screen.dart`, `lib/features/learn/presentation/learn_screen.dart`, `test/chat_service_test.dart`, `test/chat_reply_result_test.dart`.
+- **Problem / Goal:** User-reported: (1) chat FAB still appeared on the reminder-setup sheet specifically after approving the notification permission, (2) chat suggested a YouTube video but there was no actual link, (3) asking chat for article suggestions still pointed at the (empty) uploaded library instead of using the newly-wired-in public sources, (4) chat should be able to deep-link to any relevant app screen, (5) Saved Articles should live under the Library screen instead of Learn.
+- **Root causes:**
+  1. The 2026-09-09 fix only guarded `didPush`: an unnamed route (dialog/sheet) never overwrote `currentRoutePath`. But `didPop`/`didRemove` still unconditionally used whatever route the pop revealed, and nested unnamed overlays are real: the notification-permission rationale dialog opens on top of the (also unnamed) reminder-setup sheet. Dismissing the dialog popped back to the sheet, not to `/welcome`, and the sheet's own null name reset `currentRoutePath` to null anyway.
+  2. The system prompt said "suggest searching YouTube for the topic" without clearly banning YouTube-related phrasing from the reply text itself, so the model could describe a search suggestion in prose without ever setting the `suggestVideo` action, the only thing that actually renders a button.
+  3. The prior fix added `OpenKnowledgeService` results to the prompt as inert context text, with nothing telling the model those results existed as an alternative to "check your library," so it kept defaulting to that phrase.
+  4. No such capability existed; the system prompt only ever told the model to describe in text where to find something, never to actually propose a real navigation button.
+  5. Saved Articles was only ever linked from a card on the Learn screen, never from Library, despite being conceptually a personal content collection like Library itself.
+- **Solution:**
+  1. Rewrote `RoutePathObserver` to keep a shadow copy of the navigator's route stack instead of trusting a single `previousRoute` reference, and recompute `currentRoutePath` by walking that stack from the top down to the nearest **named** entry. Handles any depth of nested unnamed overlays, not just one.
+  2. Rewrote the video/quiz/path/navigate section of the system prompt to state explicitly that "reply" is only ever a short suggestion or question, the actual proposal always lives in the separate `action` field, and the model must never write a URL or "search YouTube for ..." itself.
+  3. `ChatService.sendMessage` now calls `OpenKnowledgeService.gatherHits` directly (not just the prompt-text helper) and passes the real hits through as `ChatReplyResult.sources`, bypassing the model output entirely for the link itself (no hallucination risk on the URL, since it comes straight from the API). The system prompt now says these are already shown to the learner as real tappable links, so introduce them rather than deflecting to "check your library."
+  4. Added a fourth proposed-action kind, `navigate`, restricted to an explicit allowlist of 15 parameterless top-level screens (`ChatNavigationTargets`) the model must choose from by name, never a raw path string. Renders as an "Open X" button; tapping it just pushes the route, no generation pipeline involved.
+  5. Moved the "Saved Articles" card from `learn_screen.dart` to the top of `my_library_screen.dart`, right below the library subtitle.
+- **Regression risks:** None expected for the route observer rewrite (strictly more correct than the single-level version, verified by tracing the exact nested-dialog sequence); the navigate allowlist can never send the learner to an unrecognized/unsafe destination since the model's raw output is matched against a fixed compile-time map, not used as a path directly; the sources are additive UI (a new optional list on an already-optional `contextRef` field), no change to existing action rendering.
+- **Verified:** `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test --exclude-tags=live` (209 passed/1 skipped, 11 new tests covering navigate parsing/allowlist matching and source-link round-trips). No live device pass in this environment for the nested-dialog repro specifically, reasoned from the exact reported sequence (notification permission dialog over the reminder sheet) against the observer's new stack-walking logic.
+
 ## 2026-09-14: 5 chat issues: library sources, speed/thinking indicator, video suggestions, generation-fails-when-minimized, quiz hallucination
 
 - **Type:** bugfix + feature

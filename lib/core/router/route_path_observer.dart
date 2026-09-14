@@ -14,33 +14,50 @@ import 'package:flutter/widgets.dart';
 final ValueNotifier<String?> currentRoutePath = ValueNotifier<String?>(null);
 
 class RoutePathObserver extends NavigatorObserver {
-  void _update(Route<dynamic>? route) {
-    currentRoutePath.value = route?.settings.name;
+  /// Shadow copy of this navigator's route stack. Needed because a pop can
+  /// reveal ANOTHER unnamed route, not the real underlying page — e.g. the
+  /// notification-permission rationale dialog opens on top of the
+  /// reminder-setup sheet (both unnamed); dismissing the dialog pops back to
+  /// the sheet, not to `/welcome`. Naively using `previousRoute` directly (as
+  /// an earlier version of this observer did) would read that sheet's own
+  /// null name and incorrectly reset `currentRoutePath` to null. Walking this
+  /// stack from the top down to the nearest *named* entry handles any depth
+  /// of nested unnamed overlays, not just one.
+  final List<Route<dynamic>> _stack = [];
+
+  void _recompute() {
+    for (final route in _stack.reversed) {
+      final name = route.settings.name;
+      if (name != null) {
+        currentRoutePath.value = name;
+        return;
+      }
+    }
+    currentRoutePath.value = null;
   }
 
-  /// A modal bottom sheet / dialog is an unnamed overlay on top of whatever
-  /// real page is underneath — it must never overwrite `currentRoutePath`
-  /// with `null`, or it looks indistinguishable from genuinely resting on a
-  /// shell tab (e.g. showing the global chat FAB over a reminder-setup sheet
-  /// opened from onboarding, settings, or the dashboard). Only a route that
-  /// carries a real `name:` (every actual page, per `_pushPage`/`_instantPage`
-  /// in `app_router.dart`) is allowed to change the tracked path; an unnamed
-  /// push/replace leaves it exactly as it was.
-  void _updateIfNamed(Route<dynamic>? route) {
-    if (route != null && route.settings.name == null) return;
-    _update(route);
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _stack.add(route);
+    _recompute();
   }
 
   @override
-  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) => _updateIfNamed(route);
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _stack.remove(route);
+    _recompute();
+  }
 
   @override
-  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) => _update(previousRoute);
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _stack.remove(route);
+    _recompute();
+  }
 
   @override
-  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) => _update(previousRoute);
-
-  @override
-  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) =>
-      _updateIfNamed(newRoute);
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    if (oldRoute != null) _stack.remove(oldRoute);
+    if (newRoute != null) _stack.add(newRoute);
+    _recompute();
+  }
 }

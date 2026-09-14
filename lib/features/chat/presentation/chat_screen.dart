@@ -203,12 +203,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             learnerMemory: memorySection,
           );
 
+      // Sources ride alongside the action in the same contextRef JSON object
+      // (an additional "sources" key the action's own fromJson simply
+      // ignores) rather than a second persisted field, so both survive
+      // history reload from one existing column.
+      final contextData = <String, dynamic>{
+        if (result.action != null) ...result.action!.toJson(),
+        if (result.sources.isNotEmpty)
+          'sources': result.sources.map((s) => s.toJson()).toList(),
+      };
       final assistantMessage = ChatMessage()
         ..uuid = _uuid.v4()
         ..role = 'assistant'
         ..text = result.reply
         ..createdAt = DateTime.now()
-        ..contextRef = result.action != null ? jsonEncode(result.action!.toJson()) : null;
+        ..contextRef = contextData.isEmpty ? null : jsonEncode(contextData);
       await chatRepository.appendMessage(assistantMessage);
       if (!mounted) return;
       setState(() {
@@ -233,18 +242,23 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     }
   }
 
-  /// Confirm-tap sequence for a proposed quiz/path/video action. Nothing here
-  /// runs unless the learner explicitly tapped the chip, see `ChatActionChip`.
-  /// Quiz/path mirror create_quiz_screen.dart's/learn_screen.dart's
-  /// pre-flight sequence (firewall, quota, sizing) without their
-  /// screen-specific off-goal warning dialogs, a deliberate v1 scope
-  /// reduction, see plan. Video is a plain external link, no generation
-  /// pipeline involved at all.
+  /// Confirm-tap sequence for a proposed quiz/path/video/navigate action.
+  /// Nothing here runs unless the learner explicitly tapped the chip, see
+  /// `ChatActionChip`. Quiz/path mirror create_quiz_screen.dart's/
+  /// learn_screen.dart's pre-flight sequence (firewall, quota, sizing)
+  /// without their screen-specific off-goal warning dialogs, a deliberate v1
+  /// scope reduction, see plan. Video and navigate are plain links/pushes,
+  /// no generation pipeline involved at all.
   Future<void> _confirmAction(ChatProposedAction action) async {
     if (action.isVideo) {
       final query = Uri.encodeQueryComponent('${action.topic} tutorial');
       final uri = Uri.parse('https://www.youtube.com/results?search_query=$query');
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+      return;
+    }
+    if (action.isNavigate) {
+      final route = action.route;
+      if (route != null && mounted) context.push(route);
       return;
     }
 
@@ -498,14 +512,35 @@ class _ChatBubble extends StatelessWidget {
   final ThemeData theme;
   final Future<void> Function(ChatProposedAction action) onConfirmAction;
 
-  ChatProposedAction? get _decodedAction {
+  Map<String, dynamic>? get _decodedContext {
     final raw = message.contextRef;
     if (raw == null || raw.isEmpty) return null;
     try {
       final json = jsonDecode(raw);
-      if (json is Map) return ChatProposedAction.fromJson(Map<String, dynamic>.from(json));
+      if (json is Map) return Map<String, dynamic>.from(json);
     } catch (_) {}
     return null;
+  }
+
+  ChatProposedAction? get _decodedAction {
+    final json = _decodedContext;
+    if (json == null) return null;
+    return ChatProposedAction.fromJson(json);
+  }
+
+  /// Reads the same persisted JSON's separate "sources" key, ignored by
+  /// [ChatProposedAction.fromJson] itself. Real links gathered before the
+  /// model call (see `ChatService.sendMessage`), never anything the model
+  /// wrote itself.
+  List<ChatSourceSuggestion> get _decodedSources {
+    final json = _decodedContext;
+    final raw = json?['sources'];
+    if (raw is! List) return const [];
+    return raw
+        .whereType<Map>()
+        .map((m) => ChatSourceSuggestion.fromJson(Map<String, dynamic>.from(m)))
+        .whereType<ChatSourceSuggestion>()
+        .toList();
   }
 
   @override
@@ -515,6 +550,7 @@ class _ChatBubble extends StatelessWidget {
         isUser ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest;
     final textColor = isUser ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface;
     final action = isUser ? null : _decodedAction;
+    final sources = isUser ? const <ChatSourceSuggestion>[] : _decodedSources;
 
     final bubble = Container(
       constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72),
@@ -538,6 +574,7 @@ class _ChatBubble extends StatelessWidget {
           ),
           if (action != null)
             ChatActionChip(action: action, onConfirm: () => onConfirmAction(action)),
+          for (final source in sources) _ChatSourceLink(source: source, textColor: textColor),
         ],
       ),
     );
@@ -557,6 +594,48 @@ class _ChatBubble extends StatelessWidget {
                   Flexible(child: bubble),
                 ],
               ),
+      ),
+    );
+  }
+}
+
+/// A real, verified public-source link (Wikipedia, arXiv, etc.) shown below
+/// a reply, opened externally on tap. See `ChatService.sendMessage`: these
+/// come straight from `OpenKnowledgeService`, never from the model.
+class _ChatSourceLink extends StatelessWidget {
+  const _ChatSourceLink({required this.source, required this.textColor});
+
+  final ChatSourceSuggestion source;
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: () {
+          final uri = Uri.tryParse(source.url);
+          if (uri != null) launchUrl(uri, mode: LaunchMode.externalApplication);
+        },
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.link_rounded, size: 14, color: textColor.withValues(alpha: 0.75)),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                source.source.isNotEmpty ? '${source.source}: ${source.title}' : source.title,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: textColor.withValues(alpha: 0.85),
+                  decoration: TextDecoration.underline,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

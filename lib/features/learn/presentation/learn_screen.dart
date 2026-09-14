@@ -443,20 +443,6 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
                       child: ListTile(
                         contentPadding: EdgeInsets.zero,
                         leading: Icon(
-                          Icons.bookmarks_rounded,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        title: Text(l10n.savedArticlesTitle),
-                        subtitle: Text(l10n.savedArticlesSubtitle),
-                        trailing: const Icon(Icons.chevron_right_rounded),
-                        onTap: () => context.push('/saved-articles'),
-                      ),
-                    ),
-                    SizedBox(height: layout.sectionGap * 0.5),
-                    AppCard(
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: Icon(
                           Icons.style_rounded,
                           color: Theme.of(context).colorScheme.primary,
                         ),

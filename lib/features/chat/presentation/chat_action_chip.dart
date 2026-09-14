@@ -36,6 +36,7 @@ class _ChatActionChipState extends State<ChatActionChip> {
     final label = switch (widget.action) {
       final a when a.isQuiz => 'Generate quiz on ${a.topic}',
       final a when a.isVideo => 'Search YouTube for ${a.topic}',
+      final a when a.isNavigate => 'Open ${a.topic}',
       final a => 'Generate a learning path on ${a.topic}',
     };
     return Padding(
@@ -56,6 +57,7 @@ class _ChatActionChipState extends State<ChatActionChip> {
                 switch (widget.action) {
                   final a when a.isQuiz => Icons.quiz_rounded,
                   final a when a.isVideo => Icons.smart_display_rounded,
+                  final a when a.isNavigate => Icons.open_in_new_rounded,
                   _ => Icons.route_rounded,
                 },
                 size: 18,
