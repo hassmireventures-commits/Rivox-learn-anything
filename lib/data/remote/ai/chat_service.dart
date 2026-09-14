@@ -52,11 +52,46 @@ class ChatService {
   static String get _navigationTargetList =>
       ChatNavigationTargets.routes.keys.join(', ');
 
+  /// Concise, factual reference so the assistant can accurately explain
+  /// what the app actually does instead of guessing or making something up,
+  /// kept in sync by hand with the app's real feature set (not derived from
+  /// any single source file, this is a deliberately short summary, not a
+  /// changelog).
+  static const String _aboutRivox =
+      'ABOUT RIVOX (for explaining the app accurately, never invent a '
+      'feature not listed here): an AI-powered study app. Built-in AI works '
+      'immediately with a small free daily quota (extendable by watching a '
+      'rewarded ad, unlimited per ad); learners can also add their own '
+      'OpenAI/Gemini/Claude/OpenAI-compatible key in Settings for unlimited '
+      'use. Core features: AI-generated quizzes and multi-module learning '
+      'paths on any topic; a personal Library the learner uploads notes, '
+      'resumes, or job descriptions to for grounded, personalized content; '
+      'spaced-repetition flashcards built from mistakes or library content; '
+      'a daily article-and-video pick; voice interview practice with live '
+      'transcription and AI scoring; Exam mode (syllabus tracking, timed '
+      'mock exams) and Career mode (skill matrix, role-targeted drills) for '
+      'exam prep and job seekers; local-first storage (quiz history, '
+      'progress, and API keys never leave the device except to the AI '
+      'provider chosen for a given request); an optional end-to-end '
+      'encrypted cloud backup. No required account for core use.';
+
   static String get _systemPrompt =>
-      'You are a friendly, encouraging learning assistant inside a study app. '
-      'The learner is asking a follow-up question about their modules, quizzes, '
-      'or library content. Use the conversation history, their recent quiz '
-      'history/mistakes, and any reference material below when relevant; do '
+      'You are a warm, genuinely helpful learning assistant inside Rivox, a '
+      'study app, similar in spirit to how Claude helps someone think '
+      'through a problem: clear, direct, and a little proactive, not just a '
+      'reactive FAQ bot. When the learner\'s name is given below, use it '
+      'naturally where it reads well (a greeting, a nudge of encouragement), '
+      'never in every single message and never forced into a sentence where '
+      'it would not naturally appear. $_aboutRivox Use this to explain '
+      'features accurately and to guide the learner to the right part of '
+      'the app, proactively suggesting a next step when one is clearly '
+      'useful (not just answering the literal question and stopping), '
+      'without being pushy about it. '
+      '\n\n'
+      'The learner is asking a follow-up question about their modules, '
+      'quizzes, or library content. Use the conversation history, their '
+      'recent quiz history/mistakes, their learner-memory snapshot, and any '
+      'reference material below when relevant; do '
       'not invent facts that contradict them, and never state something as '
       'fact unless you are genuinely confident it is accurate. Say you are '
       'not sure rather than guessing with confidence. If they ask what they '
@@ -127,6 +162,7 @@ class ChatService {
     Set<String>? enabledSourceUuids,
     Map<String, String>? sourceTypes,
     String? learnerMemory,
+    String? learnerName,
   }) async {
     final resolved = await _llm.resolve();
     final isBuiltin = resolved.providerKey == BuiltInAiConfig.uuid;
@@ -182,7 +218,8 @@ class ChatService {
               'them naturally rather than repeating their URLs or titles '
               'verbatim):\n${openKnowledgeHits.map((h) => h.promptLine).join('\n')}\n';
 
-      final basePrompt = _buildUserPrompt(history, learningHistory, learnerMemory, openKnowledgeBlock);
+      final basePrompt =
+          _buildUserPrompt(history, learningHistory, learnerMemory, openKnowledgeBlock, learnerName);
       final promptWithRag = RagContextBuilder.prependToPrompt(basePrompt, rag);
 
       final raw = await _llm.completeJson(
@@ -234,8 +271,13 @@ class ChatService {
     String? learningHistory,
     String? learnerMemory, [
     String? openKnowledgeBlock,
+    String? learnerName,
   ]) {
     final buffer = StringBuffer();
+    if (learnerName != null && learnerName.trim().isNotEmpty) {
+      buffer.writeln('Learner\'s name: ${learnerName.trim()}');
+      buffer.writeln();
+    }
     if (learnerMemory != null && learnerMemory.isNotEmpty) {
       buffer.writeln(learnerMemory);
       buffer.writeln();

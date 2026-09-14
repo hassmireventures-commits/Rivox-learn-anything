@@ -78,6 +78,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get dashboardLearnerFallback => 'கற்றலாளர்';
   @override
   String get dashboardAddProviderPrompt => 'உருவாக்கத்தை திற AI வழங்குநரைச் சேர்க்கவும்';
+  String get dashboardChatIntroTitle => 'Meet your AI study chat';
+  String get dashboardChatIntroBody => 'Ask questions about your library, quizzes, or progress. Find it on Home, Learn, and History.';
+  String get dashboardChatIntroAction => 'Try it';
   @override
   String dashboardApiLimitBanner(int minutes, int seconds) => 'API வரம்பு செயலில் · ${minutes}நி ${seconds}வி-க்குள் மீண்டும் முயற்சி';
   @override

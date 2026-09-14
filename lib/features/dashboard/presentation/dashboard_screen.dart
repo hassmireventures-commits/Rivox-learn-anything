@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/guidance/guidance_controller.dart';
 import '../../../core/layout/responsive_layout.dart';
 import '../../../core/locale/app_localizations_ext.dart';
 import '../../../core/locale/l10n_helpers.dart';
@@ -38,6 +39,12 @@ import '../../../shared/widgets/dashboard/achievement_badges.dart';
 import '../../../shared/widgets/dashboard/dashboard_section_header.dart';
 import '../../../shared/widgets/dashboard/geometric_wavy_header.dart';
 import '../../../shared/widgets/dashboard/horizontal_feature_card.dart';
+
+/// Shown once on Home, only once onboarding has actually finished and the
+/// learner has genuinely reached this screen, never during onboarding
+/// itself. Tracked via the existing GuidanceController.dismissedHintIds
+/// mechanism, dismissed the moment they either close it or tap through.
+const _chatIntroHintId = 'chat_intro';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -117,7 +124,58 @@ class DashboardScreen extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(horizontal: AppTheme.pageHorizontal),
                       sliver: Builder(
                         builder: (context) {
+                          final dismissedHints =
+                              ref.watch(guidanceControllerProvider).dismissedHintIds;
                           final children = <Widget>[
+                            if (!dismissedHints.contains(_chatIntroHintId))
+                              AppCard(
+                                color: AppTheme.purpleStart.withValues(alpha: 0.10),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Icon(Icons.chat_bubble_rounded, color: AppTheme.purpleStart),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            l10n.dashboardChatIntroTitle,
+                                            style: const TextStyle(fontWeight: FontWeight.w700),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            l10n.dashboardChatIntroBody,
+                                            style: Theme.of(context).textTheme.bodySmall,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
+                                              TextButton(
+                                                onPressed: () => ref
+                                                    .read(guidanceControllerProvider.notifier)
+                                                    .dismissHint(_chatIntroHintId),
+                                                child: Text(l10n.commonDismiss),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              FilledButton(
+                                                onPressed: () {
+                                                  ref
+                                                      .read(guidanceControllerProvider.notifier)
+                                                      .dismissHint(_chatIntroHintId);
+                                                  context.push('/chat');
+                                                },
+                                                child: Text(l10n.dashboardChatIntroAction),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             if (providersAsync.asData?.value.isEmpty ?? false)
                               AppCard(
                                 color: AppTheme.accentOrange.withValues(alpha: 0.18),

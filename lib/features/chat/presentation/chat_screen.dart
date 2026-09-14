@@ -180,7 +180,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       final knowledgeRepository = ref.read(knowledgeRepositoryProvider);
       final memoryScheduler = ref.read(learnerMemorySchedulerProvider);
       final chatService = ref.read(chatServiceProvider);
+      final profileRepository = ref.read(profileRepositoryProvider);
       final profile = await learnerRepository.getOrCreateProfile();
+      final userProfile = await profileRepository.getProfile();
       // Chat's knowledge scope is intentionally global (every enabled
       // source, any goal mode) — see KnowledgeRepository doc comment.
       final enabledSources = await knowledgeRepository.allEnabledSourceUuids();
@@ -201,6 +203,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             enabledSourceUuids: enabledSources,
             sourceTypes: sourceTypes,
             learnerMemory: memorySection,
+            learnerName: userProfile?.name,
           );
 
       // Sources ride alongside the action in the same contextRef JSON object

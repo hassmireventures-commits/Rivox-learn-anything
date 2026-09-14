@@ -68,6 +68,9 @@
   },
   "dashboardLearnerFallback": "learner",
   "dashboardAddProviderPrompt": "Add an AI provider to unlock generation",
+  "dashboardChatIntroTitle": "Meet your AI study chat",
+  "dashboardChatIntroBody": "Ask questions about your library, quizzes, or progress. Find it on Home, Learn, and History.",
+  "dashboardChatIntroAction": "Try it",
   "dashboardApiLimitBanner": "API limit active | retry in {minutes}m {seconds}s",
   "@dashboardApiLimitBanner": {
     "placeholders": {

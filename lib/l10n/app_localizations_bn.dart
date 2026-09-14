@@ -78,6 +78,9 @@ class AppLocalizationsBn extends AppLocalizations {
   String get dashboardLearnerFallback => 'learner';
   @override
   String get dashboardAddProviderPrompt => 'Add an AI provider to unlock generation';
+  String get dashboardChatIntroTitle => 'Meet your AI study chat';
+  String get dashboardChatIntroBody => 'Ask questions about your library, quizzes, or progress. Find it on Home, Learn, and History.';
+  String get dashboardChatIntroAction => 'Try it';
   @override
   String dashboardApiLimitBanner(int minutes, int seconds) => 'API limit active Â· retry in ${minutes}m ${seconds}s';
   @override

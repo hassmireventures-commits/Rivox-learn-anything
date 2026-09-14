@@ -93,6 +93,9 @@ abstract class AppLocalizations {
   String dashboardGreeting(String greeting, String name);
   String get dashboardLearnerFallback;
   String get dashboardAddProviderPrompt;
+  String get dashboardChatIntroTitle;
+  String get dashboardChatIntroBody;
+  String get dashboardChatIntroAction;
   String dashboardApiLimitBanner(int minutes, int seconds);
   String get dashboardLearningPulse;
   String dashboardSuggestedTopic(String topic);
