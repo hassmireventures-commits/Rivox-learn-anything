@@ -15,11 +15,17 @@ class ProfileRepository {
     return _db.userProfiles.where().findFirst();
   }
 
-  Future<UserProfile> saveProfile(String name) async {
+  Future<UserProfile> saveProfile(
+    String name, {
+    String? authUid,
+    String? authEmail,
+  }) async {
     final existing = await getProfile();
     final profile = existing ?? UserProfile()
       ..createdAt = DateTime.now();
     profile.name = name.trim();
+    if (authUid != null) profile.authUid = authUid;
+    if (authEmail != null) profile.authEmail = authEmail;
 
     await _db.writeTxn(() async {
       await _db.userProfiles.put(profile);

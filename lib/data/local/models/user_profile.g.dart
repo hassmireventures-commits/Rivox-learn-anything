@@ -17,12 +17,18 @@ const UserProfileSchema = CollectionSchema(
   name: r'UserProfile',
   id: 4738427352541298891,
   properties: {
-    r'createdAt': PropertySchema(
+    r'authEmail': PropertySchema(
       id: 0,
+      name: r'authEmail',
+      type: IsarType.string,
+    ),
+    r'authUid': PropertySchema(id: 1, name: r'authUid', type: IsarType.string),
+    r'createdAt': PropertySchema(
+      id: 2,
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
-    r'name': PropertySchema(id: 1, name: r'name', type: IsarType.string),
+    r'name': PropertySchema(id: 3, name: r'name', type: IsarType.string),
   },
 
   estimateSize: _userProfileEstimateSize,
@@ -46,6 +52,18 @@ int _userProfileEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  {
+    final value = object.authEmail;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.authUid;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.name.length * 3;
   return bytesCount;
 }
@@ -56,8 +74,10 @@ void _userProfileSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeDateTime(offsets[0], object.createdAt);
-  writer.writeString(offsets[1], object.name);
+  writer.writeString(offsets[0], object.authEmail);
+  writer.writeString(offsets[1], object.authUid);
+  writer.writeDateTime(offsets[2], object.createdAt);
+  writer.writeString(offsets[3], object.name);
 }
 
 UserProfile _userProfileDeserialize(
@@ -67,9 +87,11 @@ UserProfile _userProfileDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = UserProfile();
-  object.createdAt = reader.readDateTime(offsets[0]);
+  object.authEmail = reader.readStringOrNull(offsets[0]);
+  object.authUid = reader.readStringOrNull(offsets[1]);
+  object.createdAt = reader.readDateTime(offsets[2]);
   object.id = id;
-  object.name = reader.readString(offsets[1]);
+  object.name = reader.readString(offsets[3]);
   return object;
 }
 
@@ -81,8 +103,12 @@ P _userProfileDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 1:
+      return (reader.readStringOrNull(offset)) as P;
+    case 2:
+      return (reader.readDateTime(offset)) as P;
+    case 3:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -189,6 +215,330 @@ extension UserProfileQueryWhere
 
 extension UserProfileQueryFilter
     on QueryBuilder<UserProfile, UserProfile, QFilterCondition> {
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authEmailIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'authEmail'),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authEmailIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'authEmail'),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authEmailEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'authEmail',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authEmailGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'authEmail',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authEmailLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'authEmail',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authEmailBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'authEmail',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authEmailStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'authEmail',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authEmailEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'authEmail',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authEmailContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'authEmail',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authEmailMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'authEmail',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authEmailIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'authEmail', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authEmailIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'authEmail', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authUidIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'authUid'),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authUidIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'authUid'),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> authUidEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'authUid',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authUidGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'authUid',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> authUidLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'authUid',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> authUidBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'authUid',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authUidStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'authUid',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> authUidEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'authUid',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> authUidContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'authUid',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition> authUidMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'authUid',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authUidIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'authUid', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
+  authUidIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'authUid', value: ''),
+      );
+    });
+  }
+
   QueryBuilder<UserProfile, UserProfile, QAfterFilterCondition>
   createdAtEqualTo(DateTime value) {
     return QueryBuilder.apply(this, (query) {
@@ -459,6 +809,30 @@ extension UserProfileQueryLinks
 
 extension UserProfileQuerySortBy
     on QueryBuilder<UserProfile, UserProfile, QSortBy> {
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> sortByAuthEmail() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'authEmail', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> sortByAuthEmailDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'authEmail', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> sortByAuthUid() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'authUid', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> sortByAuthUidDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'authUid', Sort.desc);
+    });
+  }
+
   QueryBuilder<UserProfile, UserProfile, QAfterSortBy> sortByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.asc);
@@ -486,6 +860,30 @@ extension UserProfileQuerySortBy
 
 extension UserProfileQuerySortThenBy
     on QueryBuilder<UserProfile, UserProfile, QSortThenBy> {
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByAuthEmail() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'authEmail', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByAuthEmailDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'authEmail', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByAuthUid() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'authUid', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByAuthUidDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'authUid', Sort.desc);
+    });
+  }
+
   QueryBuilder<UserProfile, UserProfile, QAfterSortBy> thenByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.asc);
@@ -525,6 +923,22 @@ extension UserProfileQuerySortThenBy
 
 extension UserProfileQueryWhereDistinct
     on QueryBuilder<UserProfile, UserProfile, QDistinct> {
+  QueryBuilder<UserProfile, UserProfile, QDistinct> distinctByAuthEmail({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'authEmail', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<UserProfile, UserProfile, QDistinct> distinctByAuthUid({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'authUid', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<UserProfile, UserProfile, QDistinct> distinctByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'createdAt');
@@ -545,6 +959,18 @@ extension UserProfileQueryProperty
   QueryBuilder<UserProfile, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<UserProfile, String?, QQueryOperations> authEmailProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'authEmail');
+    });
+  }
+
+  QueryBuilder<UserProfile, String?, QQueryOperations> authUidProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'authUid');
     });
   }
 

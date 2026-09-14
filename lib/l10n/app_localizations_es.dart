@@ -47,6 +47,38 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get commonGoHome => 'Go Home';
   @override
+  String get authOnboardTitle => 'Sign in to Rivox';
+  @override
+  String get authOnboardSubtitle => 'Save your progress and sync across devices. You can skip this and sign in anytime from Settings.';
+  @override
+  String get authContinueWithGoogle => 'Continue with Google';
+  @override
+  String get authOrDivider => 'or';
+  @override
+  String get authEmailLabel => 'Email';
+  @override
+  String get authPasswordLabel => 'Password';
+  @override
+  String get authSignInButton => 'Sign in';
+  @override
+  String get authCreateAccountButton => 'Create account';
+  @override
+  String get authNewHerePrompt => 'New here? Create an account';
+  @override
+  String get authHaveAccountPrompt => 'Already have an account? Sign in';
+  @override
+  String get authSkipButton => 'Skip for now';
+  @override
+  String get authSignOutButton => 'Sign out';
+  @override
+  String get authInvalidEmailError => 'Enter a valid email address.';
+  @override
+  String get authWeakPasswordError => 'Password should be at least 6 characters.';
+  @override
+  String get authSignInError => 'Couldn\'t sign in. Check your email and password and try again.';
+  @override
+  String get authEmailInUseError => 'An account already exists with this email. Try signing in instead.';
+  @override
   String get welcomeTitle => 'Welcome to Rivox';
   @override
   String get welcomeSubtitle => 'Tell us a little so we can personalize your journey.';

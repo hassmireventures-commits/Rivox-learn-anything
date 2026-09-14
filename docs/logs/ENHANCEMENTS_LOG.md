@@ -1,5 +1,19 @@
 ﻿# Enhancements Log
 
+## 2026-09-14 (night): login step added to onboarding (email + Google, skippable)
+
+- **Type:** feature
+- **Area:** onboarding, accounts
+- **Files:** `lib/features/onboarding/presentation/welcome_screen.dart`, `lib/data/remote/auth/auth_service.dart`, `lib/data/local/models/user_profile.dart` (+ generated), `lib/data/local/repositories/profile_repository.dart`, `lib/l10n/app_en.arb`, `lib/l10n/app_localizations.dart`, all 14 `lib/l10n/app_localizations_*.dart`.
+- **Problem / Goal:** User asked to add a login screen to onboarding (email sign-in + Google, both already partially plumbed via B13's `AuthService`), update the onboarding flow to include it, and store only necessary account info locally.
+- **Solution:**
+  1. `AuthService` gained `signInWithEmail`/`registerWithEmail` (Firebase `signInWithEmailAndPassword`/`createUserWithEmailAndPassword`); `signInWithGoogle`/`signOut` were already there from B13 and needed no change.
+  2. Added a new first page to the onboarding `WelcomeScreen` PageView (now 5 pages instead of 4): Google button, email/password form with a sign-in/create-account toggle, inline error mapping for common Firebase Auth error codes, and a "Skip for now" link — sign-in is entirely optional, matching the app's local-first architecture and avoiding an App Store "Sign in with Apple" parity requirement that would apply if it were made mandatory. Existing installs are unaffected: onboarding only runs once, gated on the existing local `UserProfile` row, which this doesn't touch.
+  3. Storage kept minimal per the request: only `authUid` and `authEmail` (nullable, added to the existing `UserProfile` Isar row) are persisted — no display name, photo URL, or provider metadata. `authEmail` is stored for display only ("Signed in as x@y.com"), never used as an identifier.
+  4. On successful sign-in, the learner's name field auto-fills from the Google account's display name if not already typed (saves a step); returning to the auth page after signing in (via back navigation) shows a "Signed in as ..." state with sign-out instead of the form again.
+- **Regression risks:** Low. New Isar fields are nullable additions to an existing collection (no migration needed, existing rows read back with `null`); the auth page is purely additive at the front of the existing PageView, and every page-index-dependent switch (`_stepTitle`/`_stepSubtitle`/`_stepIcon`/`_nextPage`'s validation branches) was shifted to match. Skipping leaves the exact prior behavior (fully local, anonymous profile) untouched.
+- **Verified:** `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test` (209 passed/1 skipped, unchanged).
+
 ## 2026-09-14 (evening): one-time chat intro on Home, chat personality/name/app-guidance upgrade, Google Sign-In diagnosis, YouTube player research
 
 - **Type:** enhancement + finding

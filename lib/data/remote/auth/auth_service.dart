@@ -59,6 +59,30 @@ class AuthService {
     return userCredential.user;
   }
 
+  /// Signs in with an existing email/password account. Returns null if
+  /// Firebase isn't configured; rethrows [FirebaseAuthException] (e.g.
+  /// wrong-password, user-not-found) so the caller can show a message.
+  Future<User?> signInWithEmail(String email, String password) async {
+    if (Firebase.apps.isEmpty) return null;
+    final credential = await _auth.signInWithEmailAndPassword(
+      email: email.trim(),
+      password: password,
+    );
+    return credential.user;
+  }
+
+  /// Creates a new email/password account. Returns null if Firebase isn't
+  /// configured; rethrows [FirebaseAuthException] (e.g. email-already-in-use,
+  /// weak-password) so the caller can show a message.
+  Future<User?> registerWithEmail(String email, String password) async {
+    if (Firebase.apps.isEmpty) return null;
+    final credential = await _auth.createUserWithEmailAndPassword(
+      email: email.trim(),
+      password: password,
+    );
+    return credential.user;
+  }
+
   Future<void> signOut() async {
     if (Firebase.apps.isEmpty) return;
     await _auth.signOut();

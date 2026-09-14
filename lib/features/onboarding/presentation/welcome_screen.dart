@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import '../../../core/constants/supported_languages.dart';
 import '../../../core/locale/app_localizations_ext.dart';
 import '../../../core/locale/language_change_coordinator.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../../core/providers/backup_providers.dart';
 import '../../../core/providers/home_refresh.dart';
 import '../../../core/services/ai_study_pulse_service.dart';
 import '../../../core/services/exam_notification_scheduler.dart';
@@ -58,13 +60,15 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   final _goalsController = TextEditingController();
   final _examNameController = TextEditingController();
   final _roleController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   final _pageController = PageController();
 
   int _dailyMinutes = 15;
   bool _saving = false;
   late String _languageCode;
   int _page = 0;
-  static const int _totalPages = 4;
+  static const int _totalPages = 5;
   bool _legalAccepted = false;
 
   String _goalMode = 'learning';
@@ -72,6 +76,11 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   String? _examType;
   String? _roleSeniority;
   String? _goalModeError;
+
+  bool _authBusy = false;
+  bool _authIsSignUp = false;
+  String? _authError;
+  String? _signedInEmail;
 
   @override
   void initState() {
@@ -87,6 +96,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     _goalsController.dispose();
     _examNameController.dispose();
     _roleController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     _pageController.dispose();
     super.dispose();
   }
@@ -95,7 +106,12 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     await ref.read(guidanceControllerProvider.notifier).acceptLegal(
           GuidancePreferencesStore.currentLegalVersion,
         );
-    await ref.read(profileRepositoryProvider).saveProfile(_nameController.text);
+    final signedInUser = ref.read(authServiceProvider).currentUser;
+    await ref.read(profileRepositoryProvider).saveProfile(
+          _nameController.text,
+          authUid: signedInUser?.uid,
+          authEmail: signedInUser?.email,
+        );
     await ref.read(profileRepositoryProvider).updateSettings(language: _languageCode);
     final goals = LearnerGoalGuard.parseCommaTopics(_goalsController.text);
 
@@ -175,6 +191,90 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     }
   }
 
+  String _mapAuthError(AppLocalizations l10n, Object e) {
+    if (e is FirebaseAuthException) {
+      return switch (e.code) {
+        'invalid-email' => l10n.authInvalidEmailError,
+        'weak-password' => l10n.authWeakPasswordError,
+        'email-already-in-use' => l10n.authEmailInUseError,
+        _ => l10n.authSignInError,
+      };
+    }
+    return l10n.authSignInError;
+  }
+
+  void _onAuthSuccess(User user) {
+    if (!mounted) return;
+    if (_nameController.text.trim().isEmpty && (user.displayName?.isNotEmpty ?? false)) {
+      _nameController.text = user.displayName!;
+    }
+    setState(() {
+      _authBusy = false;
+      _signedInEmail = user.email;
+    });
+    _advancePage();
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    final l10n = context.l10n;
+    setState(() {
+      _authBusy = true;
+      _authError = null;
+    });
+    try {
+      final user = await ref.read(authServiceProvider).signInWithGoogle();
+      if (user == null) {
+        if (mounted) setState(() => _authBusy = false);
+        return;
+      }
+      _onAuthSuccess(user);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _authError = _mapAuthError(l10n, e);
+          _authBusy = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleEmailAuth() async {
+    final l10n = context.l10n;
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    if (!email.contains('@') || !email.contains('.')) {
+      setState(() => _authError = l10n.authInvalidEmailError);
+      return;
+    }
+    setState(() {
+      _authBusy = true;
+      _authError = null;
+    });
+    try {
+      final auth = ref.read(authServiceProvider);
+      final user = _authIsSignUp
+          ? await auth.registerWithEmail(email, password)
+          : await auth.signInWithEmail(email, password);
+      if (user == null) {
+        if (mounted) setState(() => _authBusy = false);
+        return;
+      }
+      _onAuthSuccess(user);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _authError = _mapAuthError(l10n, e);
+          _authBusy = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleAuthSignOut() async {
+    await ref.read(authServiceProvider).signOut();
+    if (mounted) setState(() => _signedInEmail = null);
+  }
+
     // Goal identity validation is handled in _nextFromGoalPage via LearnerGoalGuard.
 
   Future<void> _nextFromGoalPage(AppLocalizations l10n) async {
@@ -227,7 +327,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
 
   void _nextPage() {
     final l10n = context.l10n;
-    if (_page == 0) {
+    if (_page == 1) {
       if (_nameController.text.trim().length < 2) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.welcomeNameValidation)),
@@ -235,7 +335,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         return;
       }
     }
-    if (_page == 1) {
+    if (_page == 2) {
       _nextFromGoalPage(l10n);
       return;
     }
@@ -289,26 +389,29 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
       };
 
   String _stepTitle(AppLocalizations l10n) => switch (_page) {
-        0 => l10n.welcomeTitle,
-        1 => l10n.onboardingGoalTitle,
-        2 => l10n.onboardingHabitsTitle,
-        3 => l10n.onboardingLegalTitle,
+        0 => l10n.authOnboardTitle,
+        1 => l10n.welcomeTitle,
+        2 => l10n.onboardingGoalTitle,
+        3 => l10n.onboardingHabitsTitle,
+        4 => l10n.onboardingLegalTitle,
         _ => l10n.welcomeTitle,
       };
 
   String _stepSubtitle(AppLocalizations l10n) => switch (_page) {
-        0 => l10n.welcomeSubtitle,
-        1 => l10n.onboardingGoalSubtitle,
-        2 => l10n.onboardingHabitsSubtitle,
-        3 => l10n.onboardingLegalSubtitle,
+        0 => l10n.authOnboardSubtitle,
+        1 => l10n.welcomeSubtitle,
+        2 => l10n.onboardingGoalSubtitle,
+        3 => l10n.onboardingHabitsSubtitle,
+        4 => l10n.onboardingLegalSubtitle,
         _ => l10n.onboardingStepProgress(_page + 1, _totalPages),
       };
 
   IconData _stepIcon() => switch (_page) {
-        0 => Icons.waving_hand_rounded,
-        1 => Icons.auto_awesome_rounded,
-        2 => Icons.schedule_rounded,
-        3 => Icons.gavel_rounded,
+        0 => Icons.login_rounded,
+        1 => Icons.waving_hand_rounded,
+        2 => Icons.auto_awesome_rounded,
+        3 => Icons.schedule_rounded,
+        4 => Icons.gavel_rounded,
         _ => Icons.info_outline_rounded,
       };
 
@@ -382,6 +485,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               controller: _pageController,
               physics: const NeverScrollableScrollPhysics(),
               children: [
+                _buildAuthPage(theme, l10n),
                 _buildIdentityPage(theme, l10n),
                 _buildGoalModePage(theme, l10n),
                 _buildHabitsPage(theme, l10n),
@@ -472,6 +576,165 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                         await _finishOnboarding();
                       }
                     : null,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAuthPage(ThemeData theme, AppLocalizations l10n) {
+    if (_signedInEmail != null) {
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.pageHorizontal,
+          AppTheme.cardGap,
+          AppTheme.pageHorizontal,
+          AppTheme.pageHorizontal,
+        ),
+        children: [
+          DashboardAnimatedSection(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AppCard(
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _signedInEmail!,
+                          style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: _handleAuthSignOut,
+                        child: Text(l10n.authSignOutButton),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppTheme.cardGap),
+                PrimaryButton(
+                  label: l10n.welcomeContinueButton,
+                  icon: Icons.arrow_forward_rounded,
+                  onPressed: _advancePage,
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.pageHorizontal,
+        AppTheme.cardGap,
+        AppTheme.pageHorizontal,
+        AppTheme.pageHorizontal,
+      ),
+      children: [
+        DashboardAnimatedSection(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                _stepSubtitle(l10n),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: AppTheme.cardGap),
+              AppCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: _authBusy ? null : _handleGoogleSignIn,
+                        icon: const Icon(Icons.login_rounded),
+                        label: Text(l10n.authContinueWithGoogle),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(child: Divider(color: theme.colorScheme.outlineVariant)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(
+                            l10n.authOrDivider,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                        Expanded(child: Divider(color: theme.colorScheme.outlineVariant)),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: l10n.authEmailLabel,
+                        prefixIcon: const Icon(Icons.alternate_email_rounded),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: l10n.authPasswordLabel,
+                        prefixIcon: const Icon(Icons.lock_outline_rounded),
+                      ),
+                    ),
+                    if (_authError != null) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        _authError!,
+                        style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    PrimaryButton(
+                      label: _authIsSignUp ? l10n.authCreateAccountButton : l10n.authSignInButton,
+                      isLoading: _authBusy,
+                      onPressed: _authBusy ? null : _handleEmailAuth,
+                    ),
+                    const SizedBox(height: 8),
+                    Center(
+                      child: TextButton(
+                        onPressed: _authBusy
+                            ? null
+                            : () => setState(() {
+                                  _authIsSignUp = !_authIsSignUp;
+                                  _authError = null;
+                                }),
+                        child: Text(
+                          _authIsSignUp ? l10n.authHaveAccountPrompt : l10n.authNewHerePrompt,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppTheme.cardGap),
+              Center(
+                child: TextButton(
+                  onPressed: _authBusy ? null : _advancePage,
+                  child: Text(l10n.authSkipButton),
+                ),
               ),
             ],
           ),
