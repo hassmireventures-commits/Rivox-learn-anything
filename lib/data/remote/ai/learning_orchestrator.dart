@@ -11,6 +11,7 @@ import '../../../core/network/network_service.dart';
 import '../../../core/services/built_in_ai_config.dart';
 import '../../../core/services/built_in_ai_quota.dart';
 import '../../../core/services/goal_topic_resolver.dart';
+import '../../../core/services/open_knowledge/open_knowledge_service.dart';
 import '../../../core/services/topic_goal_relevance.dart';
 import '../../../core/services/llm_manager.dart';
 import '../../../core/services/app_logger.dart';
@@ -404,6 +405,12 @@ class LearningOrchestrator {
     final sourceTypes = await knowledgeRepository.enabledSourceTypes(profile.goalMode);
     final effectiveMode = generationMode ??
         (enabledSources.isNotEmpty ? 'grounded' : null);
+    // Kicked off alongside the library RAG lookup (not after it) so this
+    // never adds net latency; a slow/unreachable open-knowledge API degrades
+    // to no extra context instead of stalling generation.
+    final openKnowledgeFuture = OpenKnowledgeService()
+        .gatherPromptContext(effectiveTopic)
+        .timeout(const Duration(seconds: 6), onTimeout: () => '');
     final rag = await aiPipeline.buildRag(
       AiRequestContext(
         task: 'quiz',
@@ -415,6 +422,16 @@ class LearningOrchestrator {
         generationMode: effectiveMode,
       ),
     );
+    final openKnowledgeBlock = await openKnowledgeFuture.catchError((_) => '');
+    // Most quizzes have no uploaded library content, so ragContextBlock is
+    // usually empty and the model free-recalls with no grounding at all,
+    // which is what let a factually wrong "correct" answer through (reported
+    // hallucination). Real, verified public-source snippets (Wikipedia and
+    // friends, see OpenKnowledgeService) give it something to check itself
+    // against even when the learner never uploaded anything.
+    final combinedRagBlock = [rag.promptBlock, openKnowledgeBlock]
+        .where((s) => s.isNotEmpty)
+        .join('\n\n');
 
     final strategy = await _pickStrategy();
     final resolved = await llmManager.resolve();
@@ -476,7 +493,7 @@ class LearningOrchestrator {
       generateExplanations: explanations && strategy.strategyId != 'simplified',
       timerSeconds: timerSeconds,
       learningPattern: pattern,
-      ragContextBlock: rag.promptBlock,
+      ragContextBlock: combinedRagBlock,
       citationChunkIds: rag.chunkIds,
       learnerGoals: learnerRepository.goalsOf(profile),
       skillLevel: profile.skillLevel,

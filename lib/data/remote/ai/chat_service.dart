@@ -7,6 +7,7 @@ import '../../../core/error/app_exception.dart';
 import '../../../core/services/built_in_ai_config.dart';
 import '../../../core/services/built_in_chat_quota.dart';
 import '../../../core/services/llm_manager.dart';
+import '../../../core/services/open_knowledge/open_knowledge_service.dart';
 import '../../local/models/chat_message.dart';
 import '../../local/repositories/chat_repository.dart';
 import '../../local/repositories/quiz_repository.dart';
@@ -52,10 +53,13 @@ class ChatService {
       'The learner is asking a follow-up question about their modules, quizzes, '
       'or library content. Use the conversation history, their recent quiz '
       'history/mistakes, and any reference material below when relevant; do '
-      'not invent facts that contradict them. If they ask what they got wrong, '
-      'how they\'re doing on a topic, or similar, answer from the "Recent quiz '
-      'history" section below rather than saying you don\'t have access to it. '
-      'Keep replies concise (a few sentences, more only if truly needed). '
+      'not invent facts that contradict them, and never state something as '
+      'fact unless you are genuinely confident it is accurate. Say you are '
+      'not sure rather than guessing with confidence. If they ask what they '
+      'got wrong, how they\'re doing on a topic, or similar, answer from the '
+      '"Recent quiz history" section below rather than saying you don\'t have '
+      'access to it. Keep replies concise (a few sentences, more only if '
+      'truly needed). '
       '\n\n'
       'You can only answer questions with text — you cannot create, add, '
       'enable, generate, download, or modify anything in the app (no library '
@@ -66,26 +70,31 @@ class ChatService {
       'that yourself and tell them where in the app they can do it (e.g. '
       '"you can search for that in the Library tab"). '
       '\n\n'
-      'The one exception: you may PROPOSE — but never perform — generating a '
-      'quiz or a learning path on a topic. Proposing costs nothing and starts '
-      'nothing; only the learner tapping a button in the app actually starts '
-      'it. When you propose one, phrase it as a suggestion or question in '
-      '"reply" (e.g. "Want me to generate a quiz on AWS?") and separately set '
-      'the "action" field so the app can show a button — never say the quiz '
-      'or path has been created, started, generated, or is ready; only that '
-      'you are suggesting it. Only propose an action when the learner\'s '
+      'Two exceptions: you may PROPOSE, but never perform, generating a quiz '
+      'or a learning path on a topic; and you may suggest searching YouTube '
+      'for a video on a topic. Proposing costs nothing and starts nothing; '
+      'only the learner tapping a button in the app actually starts anything. '
+      'When you propose a quiz or path, phrase it as a suggestion or question '
+      'in "reply" (e.g. "Want me to generate a quiz on AWS?") and separately '
+      'set the "action" field so the app can show a button. Never say the '
+      'quiz or path has been created, started, generated, or is ready, only '
+      'that you are suggesting it. Only propose one when the learner\'s '
       'intent is reasonably clear (they explicitly asked for a quiz, '
       'practice, a test, a learning path, or a study plan on an identifiable '
-      'topic) — not on every message, and not as a guess when they are just '
-      'asking a question or chatting.'
+      'topic), not on every message, and not as a guess when they are just '
+      'asking a question or chatting. For a video suggestion, never name or '
+      'link a specific video (you cannot verify one actually exists); only '
+      'suggest searching YouTube for the topic, and the app builds a real '
+      'search link itself.'
       '\n\n'
       'Respond with a single valid JSON object only, in this exact shape: '
-      '{"reply": "...", "action": "none"|"proposeQuiz"|"proposePath", '
-      '"quizTopic": "...", "quizQuestionCount": 15, "quizDifficulty": '
-      '"easy"|"medium"|"hard", "pathTopic": "...", "pathModuleCount": 6}. '
-      'Use "action":"none" and omit the quiz*/path* fields for ordinary '
-      'answers. Omit whichever quiz*/path* fields do not apply to your '
-      'chosen action. No markdown, no extra keys, no text outside the JSON.';
+      '{"reply": "...", "action": "none"|"proposeQuiz"|"proposePath"|'
+      '"suggestVideo", "quizTopic": "...", "quizQuestionCount": 15, '
+      '"quizDifficulty": "easy"|"medium"|"hard", "pathTopic": "...", '
+      '"pathModuleCount": 6, "videoTopic": "..."}. '
+      'Use "action":"none" and omit the quiz*/path*/video* fields for '
+      'ordinary answers. Omit whichever fields do not apply to your chosen '
+      'action. No markdown, no extra keys, no text outside the JSON.';
 
   /// Sends the learner's latest turn (already persisted by the caller — this
   /// service only reads history, it does not write messages) and returns the
@@ -126,9 +135,26 @@ class ChatService {
     final sw = Stopwatch()..start();
     var rag = RagContext.empty;
     try {
-      rag = await _pipeline.buildRag(ctx);
-      final learningHistory = await _buildLearningHistorySummary();
-      final basePrompt = _buildUserPrompt(history, learningHistory, learnerMemory);
+      // Run independently instead of sequentially, none of these three
+      // depend on each other, so awaiting them one at a time was pure added
+      // latency for no reason. A short/conversational turn ("yes", "thanks")
+      // skips the open-knowledge fetch entirely rather than spending a
+      // network round-trip on a topic that isn't really a topic.
+      final ragFuture = _pipeline.buildRag(ctx);
+      final learningHistoryFuture = _buildLearningHistorySummary();
+      final looksLikeTopic = ctx.topic.trim().split(RegExp(r'\s+')).length >= 3;
+      final openKnowledgeFuture = looksLikeTopic
+          ? OpenKnowledgeService()
+              .gatherPromptContext(ctx.topic)
+              .timeout(const Duration(seconds: 6), onTimeout: () => '')
+              .catchError((_) => '')
+          : Future.value('');
+
+      rag = await ragFuture;
+      final learningHistory = await learningHistoryFuture;
+      final openKnowledgeBlock = await openKnowledgeFuture;
+
+      final basePrompt = _buildUserPrompt(history, learningHistory, learnerMemory, openKnowledgeBlock);
       final promptWithRag = RagContextBuilder.prependToPrompt(basePrompt, rag);
 
       final raw = await _llm.completeJson(
@@ -172,8 +198,9 @@ class ChatService {
   static String _buildUserPrompt(
     List<ChatMessage> history,
     String? learningHistory,
-    String? learnerMemory,
-  ) {
+    String? learnerMemory, [
+    String? openKnowledgeBlock,
+  ]) {
     final buffer = StringBuffer();
     if (learnerMemory != null && learnerMemory.isNotEmpty) {
       buffer.writeln(learnerMemory);
@@ -181,6 +208,10 @@ class ChatService {
     }
     if (learningHistory != null && learningHistory.isNotEmpty) {
       buffer.writeln(learningHistory);
+      buffer.writeln();
+    }
+    if (openKnowledgeBlock != null && openKnowledgeBlock.isNotEmpty) {
+      buffer.writeln(openKnowledgeBlock);
       buffer.writeln();
     }
     if (history.isEmpty) {
@@ -283,6 +314,11 @@ class ChatService {
                 topic: topic,
                 pathModuleCount: (decoded['pathModuleCount'] as num?)?.toInt(),
               );
+            }
+          } else if (kind == 'suggestVideo') {
+            final topic = decoded['videoTopic']?.toString().trim();
+            if (topic != null && topic.isNotEmpty) {
+              action = ChatProposedAction.video(topic: topic);
             }
           }
         }

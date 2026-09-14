@@ -88,12 +88,13 @@ MANDATORY (must satisfy every line — wrong counts are rejected):
 - Question format: $typeInstruction
 - Language: $language (all question and option text in this language)
 - Unique question stems only (no duplicate or near-duplicate questions)
+- Every marked-correct answer must be factually accurate and verifiable, not a plausible-sounding guess. If you are not confident an answer is objectively true, pick a different, more well-established question instead of guessing.
 $libraryNote$goalsNote$resolutionNote$specificityNote$competitiveNote$consistencyNote$beginnerNote
 $explanationInstruction
 $refsInstruction
 $timerNote
 $patternNote
-Rules: correctIndex is 0-based and must match the true answer; unique plausible options with full answer text (never letter-only like "A","B","C","D"); return exactly $count questions.$consistencyVerify
+Rules: correctIndex is 0-based and must match the objectively true, verifiable answer (never a confident-sounding but incorrect one); unique plausible options with full answer text (never letter-only like "A","B","C","D"); return exactly $count questions.$consistencyVerify
 
 Schema (questions array must contain exactly $count objects like this):
 {"questions":[{"text":"What is 2+2?","options":["3","4","5","6"],"correctIndex":1,"type":"mcq","explanation":$explanationExample$refsExample}]}

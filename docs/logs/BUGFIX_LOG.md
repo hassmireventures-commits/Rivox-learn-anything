@@ -1,5 +1,26 @@
 # Bug Fix Log
 
+## 2026-09-14: 5 chat issues: library sources, speed/thinking indicator, video suggestions, generation-fails-when-minimized, quiz hallucination
+
+- **Type:** bugfix + feature
+- **Area:** chat, quiz generation, ai
+- **Files:** `lib/data/remote/ai/chat_service.dart`, `lib/data/remote/ai/chat_reply_result.dart`, `lib/data/remote/ai/learning_orchestrator.dart`, `lib/data/remote/ai/prompt_builder.dart`, `lib/features/chat/presentation/chat_screen.dart`, `lib/features/chat/presentation/chat_action_chip.dart`, `test/chat_service_test.dart`, `test/chat_reply_result_test.dart`.
+- **Problem / Goal:** User-reported batch: (1) chat implies it can study from "the library" but only ever draws on user-uploaded files, (2) chat generation feels slow with no indication of what's happening, (3) chat should be able to suggest YouTube videos, (4) chat generation fails if the chat screen is minimized/left mid-reply, (5) a generated quiz had a confidently-wrong "correct" answer attached as a screenshot.
+- **Root causes:**
+  1. `ChatService.sendMessage` only ever grounds on `KnowledgeRepository` (user uploads) via `AiRequestPipeline.buildRag`. `OpenKnowledgeService` (Wikipedia, Wikidata, arXiv, Europe PMC, Gutendex) already exists and is wired into daily-content generation, but was never called from chat, or from quiz/path generation either.
+  2. `ChatService.sendMessage` awaited `buildRag`, then `_buildLearningHistorySummary`, sequentially, pure added latency since neither depends on the other. The typing indicator was a bare spinner with no status text.
+  3. No capability existed at all; chat could only propose a quiz or a path.
+  4. `_requestReply` called `ref.read(chatServiceProvider)` several `await`s deep into the method. If the chat screen is disposed (minimized/navigated away) before that point, using `ref` after disposal throws, failing the whole request instead of letting it finish and persist.
+  5. Confirmed via code review: most quizzes have no uploaded library content, so `ragContextBlock` is empty and the model free-recalls with zero external grounding or fact-check instruction, exactly the condition that lets a fluent, wrong "correct" answer through undetected by `AiOutputGate`/`QuizJsonParser` (which validate JSON structure/counts, not factual accuracy).
+- **Solution:**
+  1. Wired `OpenKnowledgeService().gatherPromptContext(topic)` into both `ChatService.sendMessage` (item 1) and `LearningOrchestrator.runQuizGeneration` (item 5), run concurrently with the existing RAG lookup and bounded to a 6-second timeout (degrades to no extra context instead of stalling generation). Chat skips the fetch entirely for a short/conversational turn (fewer than 3 words) rather than spending a network round-trip on a message that isn't really a topic.
+  2. Parallelized `ChatService.sendMessage`'s three independent lookups (RAG, learning-history summary, open-knowledge) instead of awaiting them one at a time. `_TypingBubble` now cycles through short status phrases ("Reading your message...", "Checking your library and sources...", "Thinking it through...") instead of a bare spinner.
+  3. Added a third proposed-action kind, `ChatProposedAction.video`, surfaced as `action: "suggestVideo"` in the model's JSON response. The model never names or links a specific video (it cannot verify one exists); it only supplies a topic, and the app builds a real YouTube search-results link itself, avoiding the same class of hallucination risk as item 5 rather than compounding it with a second one (fake video links).
+  4. Moved the `chatServiceProvider` read (and the two other provider reads already there) to the very top of `_requestReply`, before any `await`. The rest of the method now only touches already-captured local variables, so a mid-flight screen disposal no longer throws; the reply still persists via the repository object captured before the first await, and will show up next time the learner reopens chat even if they were away when it completed.
+  5. Added a universal "must be factually accurate and verifiable, not a plausible-sounding guess" instruction to the quiz prompt's MANDATORY block and its correctIndex rule (previously only implied for the uploaded-library case, and only via a much softer "do not invent facts" note that never fired for ungrounded quizzes), on top of the new open-knowledge grounding from item 5's other half.
+- **Regression risks:** None expected for the concurrency/ref-ordering changes; both are strictly-safer rewrites of existing logic. The new open-knowledge calls are timeboxed and best-effort (`catchError`), so a slow/unreachable external API degrades to the previous (ungrounded) behavior rather than failing generation. Prompt wording changes could shift model phrasing slightly but add instructions, they don't remove any existing constraint.
+- **Verified:** `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test --exclude-tags=live` (198 passed/1 skipped, 3 new tests for the video action). No live device pass in this environment for the minimize/background scenario or actual generation speed, reasoned from the confirmed ref-after-dispose mechanics and the removed sequential awaits, not a fresh repro.
+
 ## 2026-09-09 — Global chat FAB appeared over modal bottom sheets (reminder setup, and any other)
 
 - **Type:** bugfix

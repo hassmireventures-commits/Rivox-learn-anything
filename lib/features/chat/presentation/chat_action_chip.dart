@@ -33,9 +33,11 @@ class _ChatActionChipState extends State<ChatActionChip> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final label = widget.action.isQuiz
-        ? 'Generate quiz on ${widget.action.topic}'
-        : 'Generate a learning path on ${widget.action.topic}';
+    final label = switch (widget.action) {
+      final a when a.isQuiz => 'Generate quiz on ${a.topic}',
+      final a when a.isVideo => 'Search YouTube for ${a.topic}',
+      final a => 'Generate a learning path on ${a.topic}',
+    };
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: OutlinedButton.icon(
@@ -50,7 +52,14 @@ class _ChatActionChipState extends State<ChatActionChip> {
                 height: 16,
                 child: CircularProgressIndicator(strokeWidth: 2, color: theme.colorScheme.primary),
               )
-            : Icon(widget.action.isQuiz ? Icons.quiz_rounded : Icons.route_rounded, size: 18),
+            : Icon(
+                switch (widget.action) {
+                  final a when a.isQuiz => Icons.quiz_rounded,
+                  final a when a.isVideo => Icons.smart_display_rounded,
+                  _ => Icons.route_rounded,
+                },
+                size: 18,
+              ),
         label: Text(label, overflow: TextOverflow.ellipsis),
       ),
     );

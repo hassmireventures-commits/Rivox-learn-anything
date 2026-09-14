@@ -21,6 +21,16 @@ void main() {
       expect(decoded.topic, 'Rust');
       expect(decoded.pathModuleCount, 5);
     });
+
+    test('video action round-trips', () {
+      const action = ChatProposedAction.video(topic: 'binary search trees');
+      final decoded = ChatProposedAction.fromJson(action.toJson());
+      expect(decoded, isNotNull);
+      expect(decoded!.isVideo, isTrue);
+      expect(decoded.isQuiz, isFalse);
+      expect(decoded.isPath, isFalse);
+      expect(decoded.topic, 'binary search trees');
+    });
   });
 
   group('ChatProposedAction.fromJson defensive decoding (legacy/malformed contextRef)', () {

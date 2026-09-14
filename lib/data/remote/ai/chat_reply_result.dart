@@ -18,7 +18,17 @@ class ChatProposedAction {
         questionCount = null,
         difficulty = null;
 
-  /// 'quiz' | 'path'
+  /// Never a specific video pick (the model has no way to verify a real
+  /// video/ID exists), just a topic to search YouTube for. See
+  /// `ChatActionChip`'s video branch: it opens a YouTube search results URL,
+  /// never a synthesized watch link.
+  const ChatProposedAction.video({required this.topic})
+      : kind = 'video',
+        questionCount = null,
+        difficulty = null,
+        pathModuleCount = null;
+
+  /// 'quiz' | 'path' | 'video'
   final String kind;
   final String topic;
   final int? questionCount;
@@ -27,6 +37,7 @@ class ChatProposedAction {
 
   bool get isQuiz => kind == 'quiz';
   bool get isPath => kind == 'path';
+  bool get isVideo => kind == 'video';
 
   Map<String, dynamic> toJson() => {
         'kind': kind,
@@ -57,6 +68,8 @@ class ChatProposedAction {
             topic: topic,
             pathModuleCount: (json['pathModuleCount'] as num?)?.toInt(),
           );
+        case 'video':
+          return ChatProposedAction.video(topic: topic);
         default:
           return null;
       }

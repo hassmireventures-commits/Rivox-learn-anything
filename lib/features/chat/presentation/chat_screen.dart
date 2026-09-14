@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/error/app_exception.dart';
@@ -168,9 +169,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   Future<void> _requestReply(String text, ChatRepository chatRepository) async {
     try {
+      // Every ref.read happens here, before any await, so the rest of this
+      // method never touches `ref` again. Leaving chat mid-generation (or
+      // the OS backgrounding the app) can dispose this widget's ref while
+      // the request is still in flight; reading it again afterward (as a
+      // previous version of this method did for chatServiceProvider,
+      // several awaits after these first three reads) throws once ref is
+      // gone, failing generation instead of letting it finish and persist.
       final learnerRepository = ref.read(learnerRepositoryProvider);
       final knowledgeRepository = ref.read(knowledgeRepositoryProvider);
       final memoryScheduler = ref.read(learnerMemorySchedulerProvider);
+      final chatService = ref.read(chatServiceProvider);
       final profile = await learnerRepository.getOrCreateProfile();
       // Chat's knowledge scope is intentionally global (every enabled
       // source, any goal mode) — see KnowledgeRepository doc comment.
@@ -186,7 +195,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       }
       final memorySection = (await memoryScheduler.readCached())?.toPromptSection();
 
-      final result = await ref.read(chatServiceProvider).sendMessage(
+      final result = await chatService.sendMessage(
             latestUserMessage: text,
             goalMode: profile.goalMode,
             enabledSourceUuids: enabledSources,
@@ -224,12 +233,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     }
   }
 
-  /// Confirm-tap sequence for a proposed quiz/path action. Nothing here runs
-  /// unless the learner explicitly tapped the chip — see `ChatActionChip`.
-  /// Mirrors create_quiz_screen.dart's/learn_screen.dart's pre-flight
-  /// sequence (firewall, quota, sizing) without their screen-specific
-  /// off-goal warning dialogs — a deliberate v1 scope reduction, see plan.
+  /// Confirm-tap sequence for a proposed quiz/path/video action. Nothing here
+  /// runs unless the learner explicitly tapped the chip, see `ChatActionChip`.
+  /// Quiz/path mirror create_quiz_screen.dart's/learn_screen.dart's
+  /// pre-flight sequence (firewall, quota, sizing) without their
+  /// screen-specific off-goal warning dialogs, a deliberate v1 scope
+  /// reduction, see plan. Video is a plain external link, no generation
+  /// pipeline involved at all.
   Future<void> _confirmAction(ChatProposedAction action) async {
+    if (action.isVideo) {
+      final query = Uri.encodeQueryComponent('${action.topic} tutorial');
+      final uri = Uri.parse('https://www.youtube.com/results?search_query=$query');
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      return;
+    }
+
     final job = ref.read(generationJobServiceProvider);
     if (job.isBusy) {
       if (!mounted) return;
@@ -544,8 +562,41 @@ class _ChatBubble extends StatelessWidget {
   }
 }
 
-class _TypingBubble extends StatelessWidget {
+/// Cycles through short "what's happening" phrases instead of a bare spinner,
+/// so a slow reply reads as progress rather than a stall (this and the
+/// concurrent-fetch changes in ChatService together address "chat feels too
+/// slow, show what's happening").
+class _TypingBubble extends StatefulWidget {
   const _TypingBubble();
+
+  @override
+  State<_TypingBubble> createState() => _TypingBubbleState();
+}
+
+class _TypingBubbleState extends State<_TypingBubble> {
+  static const _phrases = [
+    'Reading your message…',
+    'Checking your library and sources…',
+    'Thinking it through…',
+  ];
+
+  int _index = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(milliseconds: 1800), (_) {
+      if (!mounted) return;
+      setState(() => _index = (_index + 1) % _phrases.length);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -556,22 +607,39 @@ class _TypingBubble extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const _ChatAvatar(radius: 14),
             const SizedBox(width: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    child: Text(
+                      _phrases[_index],
+                      key: ValueKey(_index),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

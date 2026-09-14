@@ -74,6 +74,22 @@ void main() {
       expect(result.action!.pathModuleCount, isNull);
     });
 
+    test('suggestVideo with videoTopic decodes a video action', () {
+      const raw = '{"reply": "Here\'s a good topic to search for.", "action": "suggestVideo", '
+          '"videoTopic": "binary search trees"}';
+      final result = ChatService.parseReplyWithAction(raw);
+      expect(result.action, isNotNull);
+      expect(result.action!.isVideo, isTrue);
+      expect(result.action!.topic, 'binary search trees');
+    });
+
+    test('suggestVideo missing the required videoTopic degrades to no action', () {
+      const raw = '{"reply": "Let me suggest a video.", "action": "suggestVideo"}';
+      final result = ChatService.parseReplyWithAction(raw);
+      expect(result.reply, 'Let me suggest a video.');
+      expect(result.action, isNull);
+    });
+
     test('proposeQuiz missing the required quizTopic degrades to no action, reply still returned', () {
       const raw = '{"reply": "Sure, want a quiz?", "action": "proposeQuiz"}';
       final result = ChatService.parseReplyWithAction(raw);
