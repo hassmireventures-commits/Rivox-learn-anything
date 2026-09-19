@@ -9,6 +9,7 @@ import '../../../core/services/backup_flags.dart';
 import '../../../data/local/models/cloud_backup_state.dart';
 import '../../../data/remote/backup/cloud_backup_service.dart';
 import '../../../shared/widgets/app_card.dart';
+import '../../../shared/widgets/google_logo_icon.dart';
 import 'backup_passphrase_sheet.dart';
 
 /// B13 cloud backup — sign-in, opt-in toggle, manual "Create backup now" /
@@ -124,7 +125,7 @@ class _SignedOutCardState extends ConsumerState<_SignedOutCard> {
                       height: 18,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Icon(Icons.login_rounded),
+                  : const GoogleLogoIcon(size: 20),
               label: Text(_signingIn ? 'Signing in…' : 'Sign in with Google'),
             ),
           ),

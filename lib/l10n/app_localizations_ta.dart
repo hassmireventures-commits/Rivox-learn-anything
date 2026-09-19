@@ -59,6 +59,10 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get authPasswordLabel => 'Password';
   @override
+  String get authShowPassword => 'Show password';
+  @override
+  String get authHidePassword => 'Hide password';
+  @override
   String get authSignInButton => 'Sign in';
   @override
   String get authCreateAccountButton => 'Create account';
@@ -70,6 +74,10 @@ class AppLocalizationsTa extends AppLocalizations {
   String get authSkipButton => 'Skip for now';
   @override
   String get authSignOutButton => 'Sign out';
+  @override
+  String get authForgotPasswordLink => 'Forgot password?';
+  @override
+  String get authResetEmailSent => 'Password reset email sent. Check your inbox.';
   @override
   String get authInvalidEmailError => 'Enter a valid email address.';
   @override

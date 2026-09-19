@@ -1,5 +1,25 @@
 ﻿# Enhancements Log
 
+## 2026-09-19 — Swapped hand-drawn Google G for Google's official icon asset
+
+- **Type:** enhancement (follow-up)
+- **Area:** onboarding, accounts
+- **Files:** `lib/shared/widgets/google_logo_icon.dart`, new `assets/branding/google_signin_light.png` + `google_signin_dark.png`, removed `assets/branding/google_g_logo.svg`, `pubspec.yaml`.
+- **Problem / Goal:** The prior entry below used a hand-drawn G mark since the official Figma-exported kit's SVGs rely on `foreignObject`/`feGaussianBlur` gradients that `flutter_svg`/`vector_graphics` don't reliably render. User supplied Google's official "Sign in with Google" branding kit (PNG + SVG, Android+Web and iOS, all theme/shape/text variants) directly.
+- **Solution:** Used the kit's icon-only ("Show text=No") Square PNGs instead of SVG, sidestepping the renderer-compatibility risk entirely and matching Google's actual pixel output. Picked icon-only (not the full baked-text button graphic) because the full button's "Sign in with Google" text is English-only and would have broken localization for the other 13 locales; our own localized label stays next to the icon. `GoogleLogoIcon` now swaps between the light/dark PNG based on `Theme.of(context).brightness`, used by both the onboarding auth page and the Cloud Backup settings screen (`backup_settings_screen.dart`) since both already shared this widget. Removed the now-dead SVG asset and the `flutter_svg` dependency (nothing else in the app used it).
+- **Regression risks:** None expected — same widget API (`GoogleLogoIcon(size: ...)`), only the internal rendering changed from vector-in-code to a tiny (~3KB) bundled PNG.
+- **Verified:** `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test` (209 passed/1 skipped, unchanged).
+
+## 2026-09-14 — Google logo, show-password, reset email, username on signup
+
+- **Type:** enhancement
+- **Area:** onboarding, accounts
+- **Files:** `welcome_screen.dart`, `auth_service.dart`, `backup_settings_screen.dart`, `google_logo_icon.dart` (existing), `assets/branding/google_g_logo.svg`, l10n
+- **Problem / Goal:** Google sign-in used a generic login icon; email password was always hidden; Forgot password / signup name were wired but not shown; signup name was not saved to Firebase.
+- **Solution:** Official multicolor Google G on onboarding and backup Google buttons (Figma kit SVGs use unsupported `foreignObject` filters, so the guideline G mark is used). Password visibility toggle. Forgot-password on sign-in. Username field on email signup, stored as Firebase `displayName` and used to prefill the learner name step.
+- **Regression risks:** Sign-in remains skippable. Password reset still requires a valid email. Google Sign-In still needs SHA fingerprints in Firebase Console.
+- **Verified:** `flutter analyze` on touched auth/onboarding files.
+
 ## 2026-09-14 (night): login step added to onboarding (email + Google, skippable)
 
 - **Type:** feature

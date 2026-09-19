@@ -27,6 +27,7 @@ import '../../../shared/widgets/language_picker_field.dart';
 import '../../../core/guidance/guidance_preferences_store.dart';
 import '../../../core/guidance/guidance_controller.dart';
 import '../../../shared/widgets/guidance/dynamic_app_preview_card.dart';
+import '../../../shared/widgets/google_logo_icon.dart';
 import '../../../shared/widgets/primary_button.dart';
 class _GoalMode {
   const _GoalMode({
@@ -62,6 +63,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   final _roleController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _authNameController = TextEditingController();
   final _pageController = PageController();
 
   int _dailyMinutes = 15;
@@ -79,6 +81,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
 
   bool _authBusy = false;
   bool _authIsSignUp = false;
+  bool _obscurePassword = true;
   String? _authError;
   String? _signedInEmail;
 
@@ -98,6 +101,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     _roleController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _authNameController.dispose();
     _pageController.dispose();
     super.dispose();
   }
@@ -197,16 +201,19 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         'invalid-email' => l10n.authInvalidEmailError,
         'weak-password' => l10n.authWeakPasswordError,
         'email-already-in-use' => l10n.authEmailInUseError,
+        'user-not-found' || 'wrong-password' || 'invalid-credential' =>
+          l10n.authSignInError,
         _ => l10n.authSignInError,
       };
     }
     return l10n.authSignInError;
   }
 
-  void _onAuthSuccess(User user) {
+  void _onAuthSuccess(User user, {String? fallbackName}) {
     if (!mounted) return;
-    if (_nameController.text.trim().isEmpty && (user.displayName?.isNotEmpty ?? false)) {
-      _nameController.text = user.displayName!;
+    final displayName = (user.displayName?.isNotEmpty ?? false) ? user.displayName : fallbackName;
+    if (_nameController.text.trim().isEmpty && (displayName?.isNotEmpty ?? false)) {
+      _nameController.text = displayName!;
     }
     setState(() {
       _authBusy = false;
@@ -242,8 +249,13 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     final l10n = context.l10n;
     final email = _emailController.text.trim();
     final password = _passwordController.text;
+    final signupName = _authNameController.text.trim();
     if (!email.contains('@') || !email.contains('.')) {
       setState(() => _authError = l10n.authInvalidEmailError);
+      return;
+    }
+    if (_authIsSignUp && signupName.length < 2) {
+      setState(() => _authError = l10n.welcomeNameValidation);
       return;
     }
     setState(() {
@@ -253,13 +265,48 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     try {
       final auth = ref.read(authServiceProvider);
       final user = _authIsSignUp
-          ? await auth.registerWithEmail(email, password)
+          ? await auth.registerWithEmail(
+              email,
+              password,
+              displayName: signupName,
+            )
           : await auth.signInWithEmail(email, password);
       if (user == null) {
         if (mounted) setState(() => _authBusy = false);
         return;
       }
-      _onAuthSuccess(user);
+      _onAuthSuccess(
+        user,
+        fallbackName: _authIsSignUp ? signupName : null,
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _authError = _mapAuthError(l10n, e);
+          _authBusy = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleForgotPassword() async {
+    final l10n = context.l10n;
+    final email = _emailController.text.trim();
+    if (!email.contains('@') || !email.contains('.')) {
+      setState(() => _authError = l10n.authInvalidEmailError);
+      return;
+    }
+    setState(() {
+      _authBusy = true;
+      _authError = null;
+    });
+    try {
+      await ref.read(authServiceProvider).sendPasswordResetEmail(email);
+      if (!mounted) return;
+      setState(() => _authBusy = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.authResetEmailSent)),
+      );
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -658,7 +705,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         onPressed: _authBusy ? null : _handleGoogleSignIn,
-                        icon: const Icon(Icons.login_rounded),
+                        icon: const GoogleLogoIcon(size: 20),
                         label: Text(l10n.authContinueWithGoogle),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
@@ -682,9 +729,23 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
+                    if (_authIsSignUp) ...[
+                      TextField(
+                        controller: _authNameController,
+                        textCapitalization: TextCapitalization.words,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          labelText: l10n.welcomeNameLabel,
+                          prefixIcon: const Icon(Icons.person_outline_rounded),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                     TextField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
+                      autofillHints: const [AutofillHints.email],
+                      textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                         labelText: l10n.authEmailLabel,
                         prefixIcon: const Icon(Icons.alternate_email_rounded),
@@ -693,12 +754,38 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                     const SizedBox(height: 12),
                     TextField(
                       controller: _passwordController,
-                      obscureText: true,
+                      obscureText: _obscurePassword,
+                      autofillHints: _authIsSignUp
+                          ? const [AutofillHints.newPassword]
+                          : const [AutofillHints.password],
+                      onSubmitted: (_) {
+                        if (!_authBusy) _handleEmailAuth();
+                      },
                       decoration: InputDecoration(
                         labelText: l10n.authPasswordLabel,
                         prefixIcon: const Icon(Icons.lock_outline_rounded),
+                        suffixIcon: IconButton(
+                          tooltip: _obscurePassword
+                              ? l10n.authShowPassword
+                              : l10n.authHidePassword,
+                          onPressed: () =>
+                              setState(() => _obscurePassword = !_obscurePassword),
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
+                          ),
+                        ),
                       ),
                     ),
+                    if (!_authIsSignUp)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: _authBusy ? null : _handleForgotPassword,
+                          child: Text(l10n.authForgotPasswordLink),
+                        ),
+                      ),
                     if (_authError != null) ...[
                       const SizedBox(height: 10),
                       Text(
@@ -720,6 +807,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                             : () => setState(() {
                                   _authIsSignUp = !_authIsSignUp;
                                   _authError = null;
+                                  _obscurePassword = true;
                                 }),
                         child: Text(
                           _authIsSignUp ? l10n.authHaveAccountPrompt : l10n.authNewHerePrompt,

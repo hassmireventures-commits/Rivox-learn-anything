@@ -83,12 +83,16 @@ abstract class AppLocalizations {
   String get authOrDivider;
   String get authEmailLabel;
   String get authPasswordLabel;
+  String get authShowPassword;
+  String get authHidePassword;
   String get authSignInButton;
   String get authCreateAccountButton;
   String get authNewHerePrompt;
   String get authHaveAccountPrompt;
   String get authSkipButton;
   String get authSignOutButton;
+  String get authForgotPasswordLink;
+  String get authResetEmailSent;
   String get authInvalidEmailError;
   String get authWeakPasswordError;
   String get authSignInError;
