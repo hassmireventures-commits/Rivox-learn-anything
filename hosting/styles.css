@@ -230,6 +230,7 @@ a {
   overflow: hidden;
   background: transparent;
   border: none;
+  pointer-events: none;
 }
 
 .ad-banner--pending {
@@ -240,6 +241,7 @@ a {
   min-height: 90px;
   background: #fafafa;
   border: 1px solid #e8e8e8;
+  pointer-events: auto;
 }
 
 .ad-banner--doc {

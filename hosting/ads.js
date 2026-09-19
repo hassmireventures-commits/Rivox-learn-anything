@@ -8,24 +8,14 @@
  * Do not replace hosting/ads.txt (website AdSense) with app-ads.txt (AdMob).
  *
  * Positions:
- *   homeTop     → hosting/index.html [data-la-slot="homeTop"] (Display)
- *   homeBottom  → optional second Display unit (needs its own slot ID in AdSense)
- *   doc         → legal pages [data-la-slot="doc"] (Display)
- *   native      → hosting/index.html, between Features and Support
- *                 (needs an "In-article" ad unit created in AdSense — same
- *                 client, just a different ad-unit *type*; paste its slot ID)
- *   support     → hosting/index.html "Support us" reveal — loaded lazily,
- *                 only after the visitor clicks the button (needs its own
- *                 In-article ad unit; must NOT be the same slot as `native`,
- *                 AdSense forbids reusing one ad unit twice on one page)
- *   gamesBottom → hosting/games/dino/index.html and hosting/games/2048/index.html,
- *                 below the game (needs its own In-article ad unit)
- *   gamesTop    → hosting/games/index.html, above the game grid — reuses the
- *                 same Display unit as homeTop/doc (a different page each,
- *                 so reusing one Display unit's slot ID is fine; AdSense
- *                 only forbids reusing one unit twice on the *same* page)
- *   blogTop     → hosting/blog/index.html, above the post grid — same reuse
- *                 as gamesTop
+ *   homeTop     → hosting/index.html after Features (Display)
+ *   homeBottom  → unused (needs its own Display slot ID)
+ *   doc         → blog posts mid-article (Display); not used on privacy/terms
+ *   native      → unused until an In-article unit ID exists
+ *   support     → homepage "Support us" reveal (needs its own In-article ID)
+ *   gamesTop    → games hub below the card grid, and Dino/2048 below the stage
+ *   blogTop     → blog hub below the post cards
+ *   gamesBottom → unused (do not place in-article units over play canvases)
  */
 window.LA_ADSENSE = {
   client: 'ca-pub-5325876102788151',

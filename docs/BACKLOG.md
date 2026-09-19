@@ -25,15 +25,15 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 | B17 | Mark-for-review / flag questions in mock exams | done (2026-08-29) | exam | Should have |
 | B18 | Shared / cohort learning packs | backlog (proposed 2026-08-29) | social, learn | Could have |
 | B19 | Home-screen widget (streak / daily quiz) | backlog (proposed 2026-08-29) | platform, retention | Could have |
-| B20 | Neurodiversity-aware adaptive pacing | backlog (proposed 2026-08-29) | ai, accessibility | Could have |
+| B20 | Neurodiversity-aware adaptive pacing | done (2026-09-19, manual preference only) | ai, accessibility | Could have |
 | B21 | Marketplace / enterprise SKU / learning-intelligence API | backlog (proposed 2026-08-29) | growth, enterprise | Won't have (this cycle) |
 | B22 | Google Search Console verification + sitemap submission | backlog (proposed 2026-08-29) | seo, hosting | Must have |
 | B23 | Attach `learnanything.app` custom domain | backlog (proposed 2026-08-29) | hosting, branding | Should have |
 | B24 | Custom Store Listing targeted at "voice interview preparation" | backlog (proposed 2026-08-29) | aso, marketing | Should have |
-| B25 | Content build-out for long-tail SEO keywords (blog / comparison pages) | partial (2026-09-07, first batch shipped) | hosting, content, seo | Could have |
+| B25 | Content build-out for long-tail SEO keywords (blog / comparison pages) | partial (2026-09-19, second batch shipped) | hosting, content, seo | Could have |
 | B26 | Scoped Android App Links (reserved app-deep-link path) | backlog (proposed 2026-08-29) | mobile, hosting, deep-linking | Could have |
 | B27 | Onboarding is already API-key-free; remove dead BYOK onboarding step | backlog (proposed 2026-09-07) | onboarding, ux | Won't have (already satisfied) |
-| B28 | Export quiz results / learning path as a shareable image | backlog (proposed 2026-09-07) | quiz, learn, sharing | Should have |
+| B28 | Export quiz results / learning path as a shareable image | done (2026-09-19) | quiz, learn, sharing | Should have |
 | B29 | Achievement unlock celebration + persisted unlock history | backlog (proposed 2026-09-07) | gamification, dashboard | Could have |
 | B30 | Ad-free premium subscription (IAP) for unlimited Built-in AI | backlog (proposed 2026-09-07) | monetization | Should have |
 | B31 | Classroom quiz-code sharing for teacher-led groups | backlog (proposed 2026-09-07) | social, career, accounts | Could have |
@@ -260,9 +260,10 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
 
 ### B20 — Neurodiversity-aware adaptive pacing
 
-- **Status:** backlog (proposed 2026-08-29)
+- **Status:** done (2026-09-19) — manual preference only, exactly as this entry's own "suggested next step" scoped it; no behavioral/affective detection built
 - **Area:** ai, accessibility
 - **MoSCoW:** Could have
+- **Shipped:** New `LearnerProfile.preferShorterSessions` (nullable-safe default-`false` addition, no migration needed) with a Settings toggle ("Prefer shorter sessions"). The one concrete, deterministic effect: `quiz_play_screen.dart` shows a single non-blocking SnackBar break nudge at the halfway point of quizzes with 10+ questions, only when the preference is on — no per-5-question repetition (would be naggy), no inference of user state, no adaptive difficulty/pacing logic. Question-count defaults were considered but already default to the lowest option (5), so no lever existed there.
 - **Why it exists:** External 2026 scan flags neurodiversity-aware pacing (ADHD/dyslexia-adjusted difficulty and break cadence) as an emerging differentiator in AI tutoring. Interesting and aligned with `ux-review.md`'s existing accessibility gap callout, but the detection/adaptation logic is research-grade and unproven — appropriately Could have, not a near-term commitment.
 - **Suggested next step:** Do not build affective/behavioral detection speculatively. If pursued, start narrow: a manual "shorter sessions / more breaks" pacing preference in Settings (no inference), then evaluate real signal-based adaptation later.
 - **Risks:** Easy to over-promise here; inferred neurodiversity signals are sensitive and error-prone — a manual preference is the safer v1 than any automatic detection.
@@ -310,12 +311,13 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
 
 ### B25 — Content build-out for long-tail SEO keywords (blog / comparison pages)
 
-- **Status:** partial (2026-09-07) — first batch of 3 shipped
+- **Status:** partial (2026-09-19) — second batch of 4 shipped, 7 total
 - **Area:** hosting, content, seo
 - **MoSCoW:** Could have
 - **Why it exists:** The 2026-08-29 keyword research found that real top-ranking competitors in this space win via scale — e.g. PracticeMock-style programmatic SEO (one indexed page per exam/topic, ~500+ pages) and RemNote-style long-form comparison posts ("Best Anki Alternatives" with tables, named competitors, FAQ sections). A handful of static marketing pages cannot compete head-on with that; winnable long-tail phrases (BYOK AI quiz generation, local-first flashcards, AI quiz for competitive exams) need actual content to rank for, not just better meta tags on the homepage.
-- **Shipped:** Exactly the first batch this entry's own "suggested next step" called for — 3 real, substantive posts (`/blog/byok-ai-quiz-generation`, `/blog/local-first-flashcards-spaced-repetition`, `/blog/ai-quiz-competitive-exam-prep`), one per identified winnable phrase, each explaining the underlying concept genuinely (not just restating app marketing copy) plus an FAQ section, and a `/blog` hub page. See `docs/logs/FEATURES_LOG.md` 2026-09-07 entry.
-- **Suggested next step:** Decide whether to invest further (comparison-style posts, e.g. "Rivox vs [named competitor]", or the larger programmatic-SEO approach) only after seeing whether this first batch gets any real traffic/indexing — per this entry's own original caution against building more speculatively.
+- **Shipped (first batch, 2026-09-07):** 3 real, substantive posts (`/blog/byok-ai-quiz-generation`, `/blog/local-first-flashcards-spaced-repetition`, `/blog/ai-quiz-competitive-exam-prep`), one per identified winnable phrase, each explaining the underlying concept genuinely (not just restating app marketing copy) plus an FAQ section, and a `/blog` hub page. See `docs/logs/FEATURES_LOG.md` 2026-09-07 entry.
+- **Shipped (second batch, 2026-09-19):** 4 more posts covering study-technique/practical long-tail queries rather than product-feature queries — `/blog/active-recall-vs-rereading` (self-quiz from notes), `/blog/fifteen-minute-study-sessions` (busy-schedule study habits), `/blog/job-description-to-study-list` (interview prep from a JD), `/blog/mock-exam-mistakes` (syllabus-mapped mistake review) — each independently validated per-page (single `<h1>`, valid JSON-LD) via a throwaway checker script, `/blog` hub and `sitemap.xml` updated.
+- **Suggested next step:** Decide whether to invest further (comparison-style posts, e.g. "Rivox vs [named competitor]", or the larger programmatic-SEO approach) only after seeing whether these batches get any real traffic/indexing — per this entry's own original caution against building more speculatively.
 - **Risks:** Thin/low-quality pages built purely for SEO can actively hurt rankings (Google's stated policy against "scaled content abuse") — the shipped batch was written to be genuinely useful on its own merits, not filler; any further batch must hold the same bar.
 - **Source:** `docs/logs/FEATURES_LOG.md` 2026-08-29 SEO audit keyword research; 2026-09-07 shipped batch.
 
@@ -342,9 +344,10 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
 
 ### B28 — Export quiz results / learning path as a shareable image
 
-- **Status:** backlog (proposed 2026-09-07)
+- **Status:** done (2026-09-19)
 - **Area:** quiz, learn, sharing
 - **MoSCoW:** Should have
+- **Shipped:** `screenshot: ^3.0.0` + the already-present `share_plus`. New `lib/shared/widgets/share_card.dart` — a generic, brand-styled `ShareCard` (gradient background, eyebrow/title/big-stat/meta-line/logo) plus a shared `shareCardAsImage()` helper (captures off-screen via `ScreenshotController.captureFromWidget`, writes to a temp PNG, opens the share sheet) reused by both call sites rather than duplicated. "Share as image" button next to the existing text-share button on `results_screen.dart` (topic, correct/total, accuracy, date); an app-bar action on `path_detail_screen.dart` (path title, completion %, modules completed/total). No new Isar schema — rendered entirely from data already loaded on-screen, per this entry's own scoping. PDF export intentionally not built, per this entry's own deferral.
 - **Why it exists:** Beta feedback: "Let us export custom quizzes or learning paths as clean images/PDFs so we can show them off on social media." Verified: `pubspec.yaml:24` already has `share_plus: ^13.2.0`, but the only existing usage is plain-text sharing (`results_screen.dart:115-131`, a score string + deep link, no rendered artifact). No `screenshot`, `pdf`, or `printing` package exists; no export button exists on `path_detail_screen.dart` or `achievement_badges.dart`. This is a real, unaddressed gap and the single highest-leverage low-cost virality lever in the whole feedback report — every other social-media share today is a plain link.
 - **Suggested next step (start here — easiest high-impact item on this list):**
   - Add the `screenshot: ^3.0.0` package (renders any widget subtree to a `Uint8List` PNG without a native platform channel — pairs directly with the already-present `share_plus`).
