@@ -6,7 +6,7 @@
 - **Area:** games, hosting
 - **Files:** `hosting/styles.css`
 - **Problem / Goal:** On phone-width viewports the 2048 page intro sat beside a ~125px clipped board, so the puzzle looked broken even after Auto ads were removed.
-- **Solution:** The vendored 2048 stylesheet floats `.game-intro` (the in-board tagline next to New Game). Our page intro uses the same class. Reset that class on `body.game-page main > section.game-intro` and restore the float only on `.game-stage .puzzle-intro`. Also zero vendor `body` margin/padding on game pages and keep Auto ads placeholders from eating taps (`ins.adsbygoogle-noablate`).
+- **Solution:** The vendored 2048 stylesheet floats `.game-intro` (the in-board tagline next to New Game). Our page intro uses the same class. Reset that class on `body.game-page main > section.game-intro` and restore the float only on `.game-stage .puzzle-intro`. Zero vendor `body` margin/padding, set `overflow: auto` so Dino's vendor `body { overflow: hidden }` does not trap the page, and keep Auto ads placeholders from eating taps (`ins.adsbygoogle-noablate`).
 - **Regression risks:** Dino hub/play pages share `body.game-page` and `.game-intro`; the reset makes the site intro full width there too, which is the intended layout. Do not edit `hosting/games/vendor/2048/style/main.css`.
 - **Verified:** Live 2048 at ~370px width: intro stacked above a full-width stage; tiles still move with arrow keys.
 
