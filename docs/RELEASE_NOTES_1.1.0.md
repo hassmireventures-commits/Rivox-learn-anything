@@ -50,7 +50,7 @@ Upload this AAB to Play. Do not upload builds 7–13 if 14 is the next store ver
 | arm64-v8a APK | `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` (47.5MB) |
 | armeabi-v7a APK | `build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk` (41.9MB) |
 | x86_64 APK | `build/app/outputs/flutter-apk/app-x86_64-release.apk` (49.8MB) |
-| App Bundle (AAB) | `build/app/outputs/bundle/release/app-release.aab` (build separately if needed for Play upload) |
+| App Bundle (AAB) | `build/app/outputs/bundle/release/app-release.aab` (101.3MB — this is the file to upload to Play Console; end-user download size per device is much smaller since Play delivers only the matching ABI/resources from the bundle) |
 
 ## Build command
 
