@@ -1,5 +1,15 @@
 ﻿# Enhancements Log
 
+## 2026-09-19 (Phase 4) — B37 voice interview: WPM/filler feedback + persona-aware scoring tone
+
+- **Type:** feature (backlog B37)
+- **Area:** career, ai, voice
+- **Files:** new `lib/core/constants/scoring_tone.dart`, new `lib/core/services/speech_delivery_metrics.dart`, new `test/speech_delivery_metrics_test.dart`; `lib/core/services/whisper_stt_service.dart`, `lib/features/career/presentation/interview_voice_input_bar.dart`, `lib/features/career/presentation/voice_interview_hub_screen.dart`, `lib/features/quiz/presentation/quiz_play_screen.dart`, `lib/features/quiz/presentation/results_screen.dart`, `lib/data/local/models/quiz_session.dart` (+ generated), `lib/data/local/repositories/quiz_repository.dart`, `lib/data/remote/ai/interview_rubric_scorer.dart`, `lib/core/router/app_router.dart`, l10n.
+- **Problem / Goal:** Continuing Phase 4 of the prioritized 12-item backlog batch: B37 asked for speaking-pace/filler-word feedback and a Strict-vs-Friendly interviewer tone option.
+- **Solution:** See `docs/BACKLOG.md` B37 for the full write-up, including a real architecture discovery mid-implementation (the assumed `verbose_json` Whisper path turned out to be dead code; the real live-chunked STT path doesn't cleanly support the same approach) and the resulting scope decision to ship WPM + filler-word count from data already fully controlled, deferring pause-time detection rather than build on an unverified API assumption. Added a new `ScoringTone` enum (strict/friendly) kept deliberately independent of the existing `InterviewPersona` (hr/tech, which controls question selection, not feedback tone) — a genuine design call this entry's own text flagged as needing confirmation, made directly since the user was mid-batch.
+- **Regression risks:** Low. New Isar fields are nullable additions (no migration). The tone instruction is explicitly scoped in the judge prompt to affect only feedback text, never the numeric score. `onSpeechMetrics` is a new, optional callback alongside the existing `onTranscript` — the existing single-String contract is untouched.
+- **Verified:** 8 new unit tests for the pure metrics logic; `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test` (225 passed/1 skipped, up from 217). Not live-tested against a real interview recording.
+
 ## 2026-09-19 (Phase 2) — B36 `.rivox` encrypted local sharing; B18 satisfied by it
 
 - **Type:** feature (backlog B36, B18)

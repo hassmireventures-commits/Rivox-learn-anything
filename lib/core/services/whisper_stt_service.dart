@@ -35,6 +35,14 @@ class WhisperSttService {
   String _liveTranscript = '';
   bool _liveActive = false;
   String? _liveLanguage;
+  DateTime? _liveStartedAt;
+
+  /// Wall-clock duration of the most recently completed live recording, in
+  /// seconds. Set when [stopLiveTranscription] resolves; null before the
+  /// first recording. Used for B37 speech-delivery metrics (words-per-minute)
+  /// rather than depending on Whisper's own segment timestamps, since this
+  /// NIM deployment's `verbose_json` support is unverified.
+  double? lastLiveDurationSeconds;
 
   bool get isConfigured => BuiltInWhisperConfig.hasApiKey;
   bool get isLiveActive => _liveActive;
@@ -195,6 +203,7 @@ class WhisperSttService {
     _liveTranscript = '';
     _liveActive = true;
     _liveLanguage = effectiveLanguage;
+    _liveStartedAt = DateTime.now();
     _liveSub = stream.listen((chunk) => _livePending.add(chunk));
     _liveChunkTimer = Timer.periodic(
       BuiltInWhisperConfig.liveChunkInterval,
@@ -213,6 +222,12 @@ class WhisperSttService {
     if (await _recorder.isRecording()) {
       await _recorder.stop();
     }
+    // Captured now, not after the tail-flush network call below, so
+    // WPM math reflects actual speaking time rather than transcription
+    // latency.
+    final startedAt = _liveStartedAt;
+    lastLiveDurationSeconds =
+        startedAt == null ? null : DateTime.now().difference(startedAt).inMilliseconds / 1000;
     await _liveSub?.cancel();
     _liveSub = null;
 
@@ -286,6 +301,7 @@ class WhisperSttService {
     _liveActive = false;
     _liveChunkInFlight = false;
     _liveLanguage = null;
+    _liveStartedAt = null;
   }
 
   /// Wraps raw 16-bit mono PCM bytes in a canonical WAV header.

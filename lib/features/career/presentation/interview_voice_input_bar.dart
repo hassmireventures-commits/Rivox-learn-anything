@@ -7,6 +7,7 @@ import '../../../core/constants/interview_persona.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../core/locale/app_localizations_ext.dart';
 import '../../../core/services/built_in_whisper_config.dart';
+import '../../../core/services/speech_delivery_metrics.dart';
 import '../../../core/services/whisper_stt_service.dart';
 import 'voice_interview_speech_coaching.dart';
 import 'voice_interview_theme.dart';
@@ -17,12 +18,19 @@ class InterviewVoiceInputBar extends StatefulWidget {
     super.key,
     required this.stt,
     required this.onTranscript,
+    this.onSpeechMetrics,
     this.persona,
     this.darkTheme = false,
   });
 
   final WhisperSttService stt;
   final ValueChanged<String> onTranscript;
+
+  /// B37 — called alongside [onTranscript] with this answer's speech-delivery
+  /// metrics (words-per-minute, filler-word count), when a duration could be
+  /// measured. Separate from [onTranscript] rather than changing its
+  /// signature, so the existing single-String contract stays untouched.
+  final ValueChanged<SpeechDeliveryMetrics>? onSpeechMetrics;
   final InterviewPersona? persona;
   final bool darkTheme;
 
@@ -124,6 +132,12 @@ class _InterviewVoiceInputBarState extends State<InterviewVoiceInputBar>
         _liveCaption = '';
       });
       widget.onTranscript(text);
+      final duration = widget.stt.lastLiveDurationSeconds;
+      if (duration != null && widget.onSpeechMetrics != null) {
+        widget.onSpeechMetrics!(
+          computeSpeechDeliveryMetrics(transcript: text, durationSeconds: duration),
+        );
+      }
     } catch (e) {
       if (!mounted) return;
       final msg = e is UnknownException

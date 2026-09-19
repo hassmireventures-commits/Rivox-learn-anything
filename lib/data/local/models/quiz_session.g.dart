@@ -27,124 +27,134 @@ const QuizSessionSchema = CollectionSchema(
       name: r'attemptNumber',
       type: IsarType.long,
     ),
-    r'citationChunkIdsJson': PropertySchema(
+    r'avgWordsPerMinute': PropertySchema(
       id: 2,
+      name: r'avgWordsPerMinute',
+      type: IsarType.double,
+    ),
+    r'citationChunkIdsJson': PropertySchema(
+      id: 3,
       name: r'citationChunkIdsJson',
       type: IsarType.string,
     ),
     r'completedAt': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'completedAt',
       type: IsarType.dateTime,
     ),
     r'completionTokens': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'completionTokens',
       type: IsarType.long,
     ),
     r'correctCount': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'correctCount',
       type: IsarType.long,
     ),
     r'difficulty': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'difficulty',
       type: IsarType.string,
     ),
     r'examDurationSeconds': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'examDurationSeconds',
       type: IsarType.long,
     ),
     r'generateExplanations': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'generateExplanations',
       type: IsarType.bool,
     ),
     r'language': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'language',
       type: IsarType.string,
     ),
     r'moduleIndex': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'moduleIndex',
       type: IsarType.long,
     ),
     r'passPercent': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'passPercent',
       type: IsarType.long,
     ),
-    r'pathId': PropertySchema(id: 12, name: r'pathId', type: IsarType.string),
+    r'pathId': PropertySchema(id: 13, name: r'pathId', type: IsarType.string),
     r'promptTokens': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'promptTokens',
       type: IsarType.long,
     ),
     r'questionCount': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'questionCount',
       type: IsarType.long,
     ),
     r'questionType': PropertySchema(
-      id: 15,
+      id: 16,
       name: r'questionType',
       type: IsarType.string,
     ),
     r'quizKind': PropertySchema(
-      id: 16,
+      id: 17,
       name: r'quizKind',
       type: IsarType.string,
     ),
     r'randomizeOptions': PropertySchema(
-      id: 17,
+      id: 18,
       name: r'randomizeOptions',
       type: IsarType.bool,
     ),
     r'randomizeQuestions': PropertySchema(
-      id: 18,
+      id: 19,
       name: r'randomizeQuestions',
       type: IsarType.bool,
     ),
-    r'roomId': PropertySchema(id: 19, name: r'roomId', type: IsarType.string),
-    r'score': PropertySchema(id: 20, name: r'score', type: IsarType.long),
+    r'roomId': PropertySchema(id: 20, name: r'roomId', type: IsarType.string),
+    r'score': PropertySchema(id: 21, name: r'score', type: IsarType.long),
     r'scorePercent': PropertySchema(
-      id: 21,
+      id: 22,
       name: r'scorePercent',
       type: IsarType.double,
     ),
-    r'source': PropertySchema(id: 22, name: r'source', type: IsarType.string),
+    r'source': PropertySchema(id: 23, name: r'source', type: IsarType.string),
     r'startedAt': PropertySchema(
-      id: 23,
+      id: 24,
       name: r'startedAt',
       type: IsarType.dateTime,
     ),
     r'syllabusUuid': PropertySchema(
-      id: 24,
+      id: 25,
       name: r'syllabusUuid',
       type: IsarType.string,
     ),
     r'timeTakenSeconds': PropertySchema(
-      id: 25,
+      id: 26,
       name: r'timeTakenSeconds',
       type: IsarType.long,
     ),
     r'timerSeconds': PropertySchema(
-      id: 26,
+      id: 27,
       name: r'timerSeconds',
       type: IsarType.long,
     ),
-    r'topic': PropertySchema(id: 27, name: r'topic', type: IsarType.string),
+    r'topic': PropertySchema(id: 28, name: r'topic', type: IsarType.string),
+    r'totalFillerWords': PropertySchema(
+      id: 29,
+      name: r'totalFillerWords',
+      type: IsarType.long,
+    ),
     r'unitFilterJson': PropertySchema(
-      id: 28,
+      id: 30,
       name: r'unitFilterJson',
       type: IsarType.string,
     ),
-    r'uuid': PropertySchema(id: 29, name: r'uuid', type: IsarType.string),
+    r'uuid': PropertySchema(id: 31, name: r'uuid', type: IsarType.string),
     r'wrongCount': PropertySchema(
-      id: 30,
+      id: 32,
       name: r'wrongCount',
       type: IsarType.long,
     ),
@@ -298,35 +308,37 @@ void _quizSessionSerialize(
 ) {
   writer.writeDouble(offsets[0], object.accuracy);
   writer.writeLong(offsets[1], object.attemptNumber);
-  writer.writeString(offsets[2], object.citationChunkIdsJson);
-  writer.writeDateTime(offsets[3], object.completedAt);
-  writer.writeLong(offsets[4], object.completionTokens);
-  writer.writeLong(offsets[5], object.correctCount);
-  writer.writeString(offsets[6], object.difficulty);
-  writer.writeLong(offsets[7], object.examDurationSeconds);
-  writer.writeBool(offsets[8], object.generateExplanations);
-  writer.writeString(offsets[9], object.language);
-  writer.writeLong(offsets[10], object.moduleIndex);
-  writer.writeLong(offsets[11], object.passPercent);
-  writer.writeString(offsets[12], object.pathId);
-  writer.writeLong(offsets[13], object.promptTokens);
-  writer.writeLong(offsets[14], object.questionCount);
-  writer.writeString(offsets[15], object.questionType);
-  writer.writeString(offsets[16], object.quizKind);
-  writer.writeBool(offsets[17], object.randomizeOptions);
-  writer.writeBool(offsets[18], object.randomizeQuestions);
-  writer.writeString(offsets[19], object.roomId);
-  writer.writeLong(offsets[20], object.score);
-  writer.writeDouble(offsets[21], object.scorePercent);
-  writer.writeString(offsets[22], object.source);
-  writer.writeDateTime(offsets[23], object.startedAt);
-  writer.writeString(offsets[24], object.syllabusUuid);
-  writer.writeLong(offsets[25], object.timeTakenSeconds);
-  writer.writeLong(offsets[26], object.timerSeconds);
-  writer.writeString(offsets[27], object.topic);
-  writer.writeString(offsets[28], object.unitFilterJson);
-  writer.writeString(offsets[29], object.uuid);
-  writer.writeLong(offsets[30], object.wrongCount);
+  writer.writeDouble(offsets[2], object.avgWordsPerMinute);
+  writer.writeString(offsets[3], object.citationChunkIdsJson);
+  writer.writeDateTime(offsets[4], object.completedAt);
+  writer.writeLong(offsets[5], object.completionTokens);
+  writer.writeLong(offsets[6], object.correctCount);
+  writer.writeString(offsets[7], object.difficulty);
+  writer.writeLong(offsets[8], object.examDurationSeconds);
+  writer.writeBool(offsets[9], object.generateExplanations);
+  writer.writeString(offsets[10], object.language);
+  writer.writeLong(offsets[11], object.moduleIndex);
+  writer.writeLong(offsets[12], object.passPercent);
+  writer.writeString(offsets[13], object.pathId);
+  writer.writeLong(offsets[14], object.promptTokens);
+  writer.writeLong(offsets[15], object.questionCount);
+  writer.writeString(offsets[16], object.questionType);
+  writer.writeString(offsets[17], object.quizKind);
+  writer.writeBool(offsets[18], object.randomizeOptions);
+  writer.writeBool(offsets[19], object.randomizeQuestions);
+  writer.writeString(offsets[20], object.roomId);
+  writer.writeLong(offsets[21], object.score);
+  writer.writeDouble(offsets[22], object.scorePercent);
+  writer.writeString(offsets[23], object.source);
+  writer.writeDateTime(offsets[24], object.startedAt);
+  writer.writeString(offsets[25], object.syllabusUuid);
+  writer.writeLong(offsets[26], object.timeTakenSeconds);
+  writer.writeLong(offsets[27], object.timerSeconds);
+  writer.writeString(offsets[28], object.topic);
+  writer.writeLong(offsets[29], object.totalFillerWords);
+  writer.writeString(offsets[30], object.unitFilterJson);
+  writer.writeString(offsets[31], object.uuid);
+  writer.writeLong(offsets[32], object.wrongCount);
 }
 
 QuizSession _quizSessionDeserialize(
@@ -338,36 +350,38 @@ QuizSession _quizSessionDeserialize(
   final object = QuizSession();
   object.accuracy = reader.readDoubleOrNull(offsets[0]);
   object.attemptNumber = reader.readLongOrNull(offsets[1]);
-  object.citationChunkIdsJson = reader.readStringOrNull(offsets[2]);
-  object.completedAt = reader.readDateTimeOrNull(offsets[3]);
-  object.completionTokens = reader.readLongOrNull(offsets[4]);
-  object.correctCount = reader.readLongOrNull(offsets[5]);
-  object.difficulty = reader.readString(offsets[6]);
-  object.examDurationSeconds = reader.readLongOrNull(offsets[7]);
-  object.generateExplanations = reader.readBool(offsets[8]);
+  object.avgWordsPerMinute = reader.readDoubleOrNull(offsets[2]);
+  object.citationChunkIdsJson = reader.readStringOrNull(offsets[3]);
+  object.completedAt = reader.readDateTimeOrNull(offsets[4]);
+  object.completionTokens = reader.readLongOrNull(offsets[5]);
+  object.correctCount = reader.readLongOrNull(offsets[6]);
+  object.difficulty = reader.readString(offsets[7]);
+  object.examDurationSeconds = reader.readLongOrNull(offsets[8]);
+  object.generateExplanations = reader.readBool(offsets[9]);
   object.id = id;
-  object.language = reader.readString(offsets[9]);
-  object.moduleIndex = reader.readLongOrNull(offsets[10]);
-  object.passPercent = reader.readLongOrNull(offsets[11]);
-  object.pathId = reader.readStringOrNull(offsets[12]);
-  object.promptTokens = reader.readLongOrNull(offsets[13]);
-  object.questionCount = reader.readLong(offsets[14]);
-  object.questionType = reader.readString(offsets[15]);
-  object.quizKind = reader.readString(offsets[16]);
-  object.randomizeOptions = reader.readBool(offsets[17]);
-  object.randomizeQuestions = reader.readBool(offsets[18]);
-  object.roomId = reader.readStringOrNull(offsets[19]);
-  object.score = reader.readLongOrNull(offsets[20]);
-  object.scorePercent = reader.readDoubleOrNull(offsets[21]);
-  object.source = reader.readString(offsets[22]);
-  object.startedAt = reader.readDateTime(offsets[23]);
-  object.syllabusUuid = reader.readStringOrNull(offsets[24]);
-  object.timeTakenSeconds = reader.readLongOrNull(offsets[25]);
-  object.timerSeconds = reader.readLongOrNull(offsets[26]);
-  object.topic = reader.readString(offsets[27]);
-  object.unitFilterJson = reader.readStringOrNull(offsets[28]);
-  object.uuid = reader.readString(offsets[29]);
-  object.wrongCount = reader.readLongOrNull(offsets[30]);
+  object.language = reader.readString(offsets[10]);
+  object.moduleIndex = reader.readLongOrNull(offsets[11]);
+  object.passPercent = reader.readLongOrNull(offsets[12]);
+  object.pathId = reader.readStringOrNull(offsets[13]);
+  object.promptTokens = reader.readLongOrNull(offsets[14]);
+  object.questionCount = reader.readLong(offsets[15]);
+  object.questionType = reader.readString(offsets[16]);
+  object.quizKind = reader.readString(offsets[17]);
+  object.randomizeOptions = reader.readBool(offsets[18]);
+  object.randomizeQuestions = reader.readBool(offsets[19]);
+  object.roomId = reader.readStringOrNull(offsets[20]);
+  object.score = reader.readLongOrNull(offsets[21]);
+  object.scorePercent = reader.readDoubleOrNull(offsets[22]);
+  object.source = reader.readString(offsets[23]);
+  object.startedAt = reader.readDateTime(offsets[24]);
+  object.syllabusUuid = reader.readStringOrNull(offsets[25]);
+  object.timeTakenSeconds = reader.readLongOrNull(offsets[26]);
+  object.timerSeconds = reader.readLongOrNull(offsets[27]);
+  object.topic = reader.readString(offsets[28]);
+  object.totalFillerWords = reader.readLongOrNull(offsets[29]);
+  object.unitFilterJson = reader.readStringOrNull(offsets[30]);
+  object.uuid = reader.readString(offsets[31]);
+  object.wrongCount = reader.readLongOrNull(offsets[32]);
   return object;
 }
 
@@ -383,62 +397,66 @@ P _quizSessionDeserializeProp<P>(
     case 1:
       return (reader.readLongOrNull(offset)) as P;
     case 2:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 3:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 4:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 5:
       return (reader.readLongOrNull(offset)) as P;
     case 6:
-      return (reader.readString(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 7:
-      return (reader.readLongOrNull(offset)) as P;
-    case 8:
-      return (reader.readBool(offset)) as P;
-    case 9:
       return (reader.readString(offset)) as P;
-    case 10:
+    case 8:
       return (reader.readLongOrNull(offset)) as P;
+    case 9:
+      return (reader.readBool(offset)) as P;
+    case 10:
+      return (reader.readString(offset)) as P;
     case 11:
       return (reader.readLongOrNull(offset)) as P;
     case 12:
-      return (reader.readStringOrNull(offset)) as P;
-    case 13:
       return (reader.readLongOrNull(offset)) as P;
+    case 13:
+      return (reader.readStringOrNull(offset)) as P;
     case 14:
-      return (reader.readLong(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 15:
-      return (reader.readString(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 16:
       return (reader.readString(offset)) as P;
     case 17:
-      return (reader.readBool(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 18:
       return (reader.readBool(offset)) as P;
     case 19:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 20:
-      return (reader.readLongOrNull(offset)) as P;
-    case 21:
-      return (reader.readDoubleOrNull(offset)) as P;
-    case 22:
-      return (reader.readString(offset)) as P;
-    case 23:
-      return (reader.readDateTime(offset)) as P;
-    case 24:
       return (reader.readStringOrNull(offset)) as P;
-    case 25:
+    case 21:
       return (reader.readLongOrNull(offset)) as P;
+    case 22:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 23:
+      return (reader.readString(offset)) as P;
+    case 24:
+      return (reader.readDateTime(offset)) as P;
+    case 25:
+      return (reader.readStringOrNull(offset)) as P;
     case 26:
       return (reader.readLongOrNull(offset)) as P;
     case 27:
-      return (reader.readString(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 28:
-      return (reader.readStringOrNull(offset)) as P;
-    case 29:
       return (reader.readString(offset)) as P;
+    case 29:
+      return (reader.readLongOrNull(offset)) as P;
     case 30:
+      return (reader.readStringOrNull(offset)) as P;
+    case 31:
+      return (reader.readString(offset)) as P;
+    case 32:
       return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1226,6 +1244,99 @@ extension QuizSessionQueryFilter
           includeLower: includeLower,
           upper: upper,
           includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterFilterCondition>
+  avgWordsPerMinuteIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'avgWordsPerMinute'),
+      );
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterFilterCondition>
+  avgWordsPerMinuteIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'avgWordsPerMinute'),
+      );
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterFilterCondition>
+  avgWordsPerMinuteEqualTo(double? value, {double epsilon = Query.epsilon}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'avgWordsPerMinute',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterFilterCondition>
+  avgWordsPerMinuteGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'avgWordsPerMinute',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterFilterCondition>
+  avgWordsPerMinuteLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'avgWordsPerMinute',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterFilterCondition>
+  avgWordsPerMinuteBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'avgWordsPerMinute',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+
+          epsilon: epsilon,
         ),
       );
     });
@@ -3769,6 +3880,79 @@ extension QuizSessionQueryFilter
   }
 
   QueryBuilder<QuizSession, QuizSession, QAfterFilterCondition>
+  totalFillerWordsIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'totalFillerWords'),
+      );
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterFilterCondition>
+  totalFillerWordsIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'totalFillerWords'),
+      );
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterFilterCondition>
+  totalFillerWordsEqualTo(int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'totalFillerWords', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterFilterCondition>
+  totalFillerWordsGreaterThan(int? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'totalFillerWords',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterFilterCondition>
+  totalFillerWordsLessThan(int? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'totalFillerWords',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterFilterCondition>
+  totalFillerWordsBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'totalFillerWords',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterFilterCondition>
   unitFilterJsonIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -4182,6 +4366,20 @@ extension QuizSessionQuerySortBy
   }
 
   QueryBuilder<QuizSession, QuizSession, QAfterSortBy>
+  sortByAvgWordsPerMinute() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'avgWordsPerMinute', Sort.asc);
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterSortBy>
+  sortByAvgWordsPerMinuteDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'avgWordsPerMinute', Sort.desc);
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterSortBy>
   sortByCitationChunkIdsJson() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'citationChunkIdsJson', Sort.asc);
@@ -4514,6 +4712,20 @@ extension QuizSessionQuerySortBy
     });
   }
 
+  QueryBuilder<QuizSession, QuizSession, QAfterSortBy>
+  sortByTotalFillerWords() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalFillerWords', Sort.asc);
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterSortBy>
+  sortByTotalFillerWordsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalFillerWords', Sort.desc);
+    });
+  }
+
   QueryBuilder<QuizSession, QuizSession, QAfterSortBy> sortByUnitFilterJson() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'unitFilterJson', Sort.asc);
@@ -4576,6 +4788,20 @@ extension QuizSessionQuerySortThenBy
   thenByAttemptNumberDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'attemptNumber', Sort.desc);
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterSortBy>
+  thenByAvgWordsPerMinute() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'avgWordsPerMinute', Sort.asc);
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterSortBy>
+  thenByAvgWordsPerMinuteDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'avgWordsPerMinute', Sort.desc);
     });
   }
 
@@ -4924,6 +5150,20 @@ extension QuizSessionQuerySortThenBy
     });
   }
 
+  QueryBuilder<QuizSession, QuizSession, QAfterSortBy>
+  thenByTotalFillerWords() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalFillerWords', Sort.asc);
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QAfterSortBy>
+  thenByTotalFillerWordsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalFillerWords', Sort.desc);
+    });
+  }
+
   QueryBuilder<QuizSession, QuizSession, QAfterSortBy> thenByUnitFilterJson() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'unitFilterJson', Sort.asc);
@@ -4973,6 +5213,13 @@ extension QuizSessionQueryWhereDistinct
   QueryBuilder<QuizSession, QuizSession, QDistinct> distinctByAttemptNumber() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'attemptNumber');
+    });
+  }
+
+  QueryBuilder<QuizSession, QuizSession, QDistinct>
+  distinctByAvgWordsPerMinute() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'avgWordsPerMinute');
     });
   }
 
@@ -5160,6 +5407,13 @@ extension QuizSessionQueryWhereDistinct
     });
   }
 
+  QueryBuilder<QuizSession, QuizSession, QDistinct>
+  distinctByTotalFillerWords() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'totalFillerWords');
+    });
+  }
+
   QueryBuilder<QuizSession, QuizSession, QDistinct> distinctByUnitFilterJson({
     bool caseSensitive = true,
   }) {
@@ -5203,6 +5457,13 @@ extension QuizSessionQueryProperty
   QueryBuilder<QuizSession, int?, QQueryOperations> attemptNumberProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'attemptNumber');
+    });
+  }
+
+  QueryBuilder<QuizSession, double?, QQueryOperations>
+  avgWordsPerMinuteProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'avgWordsPerMinute');
     });
   }
 
@@ -5363,6 +5624,12 @@ extension QuizSessionQueryProperty
   QueryBuilder<QuizSession, String, QQueryOperations> topicProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'topic');
+    });
+  }
+
+  QueryBuilder<QuizSession, int?, QQueryOperations> totalFillerWordsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'totalFillerWords');
     });
   }
 

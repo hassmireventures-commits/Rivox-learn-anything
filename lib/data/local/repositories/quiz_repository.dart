@@ -164,6 +164,8 @@ class QuizRepository {
     required String quizUuid,
     required List<Question> answeredQuestions,
     required int timeTakenSeconds,
+    double? avgWordsPerMinute,
+    int? totalFillerWords,
   }) async {
     final session = await getSession(quizUuid);
     if (session == null) throw StateError('Quiz not found');
@@ -180,6 +182,8 @@ class QuizRepository {
       ..scorePercent = accuracy
       ..timeTakenSeconds = timeTakenSeconds
       ..completedAt = DateTime.now();
+    if (avgWordsPerMinute != null) session.avgWordsPerMinute = avgWordsPerMinute;
+    if (totalFillerWords != null) session.totalFillerWords = totalFillerWords;
 
     await _db.writeTxn(() async {
       await _db.quizSessions.put(session);

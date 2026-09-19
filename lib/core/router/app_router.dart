@@ -240,6 +240,7 @@ final appRouter = GoRouter(
           quizId: state.pathParameters['id']!,
           voiceMode: state.uri.queryParameters['voice'] == '1',
           interviewPersona: state.uri.queryParameters['persona'],
+          scoringTone: state.uri.queryParameters['tone'],
         ),
         state: state,
       ),

@@ -47,6 +47,18 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get commonGoHome => 'Go Home';
   @override
+  String get voiceInterviewToneLabel => 'Feedback tone';
+  @override
+  String get voiceInterviewToneStrict => 'Strict';
+  @override
+  String get voiceInterviewToneFriendly => 'Friendly';
+  @override
+  String get resultsSpeechDeliveryTitle => 'Speech delivery';
+  @override
+  String resultsSpeechPace(int wpm) => '$wpm words/min';
+  @override
+  String resultsSpeechFillerWords(int count) => '$count filler words';
+  @override
   String get cameraScanTitle => 'Scan pages';
   @override
   String get cameraScanCaptureButton => 'Capture';

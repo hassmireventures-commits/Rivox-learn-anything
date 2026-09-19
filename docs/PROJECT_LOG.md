@@ -15,6 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-09-19 | feature | B37 voice interview: WPM/filler feedback + persona-aware scoring tone | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
 | 2026-09-19 | feature | Camera-to-Quiz: on-device OCR ingestion into Library (B34) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-09-19 | bugfix | 2048 board squeezed by vendor .game-intro float | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-19 | feature | B36 `.rivox` encrypted local sharing; B18 satisfied by it | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |

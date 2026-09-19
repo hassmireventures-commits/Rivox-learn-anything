@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/interview_persona.dart';
+import '../../../core/constants/scoring_tone.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../core/locale/app_localizations_ext.dart';
 import '../../../core/locale/locale_utils.dart';
@@ -33,6 +34,7 @@ class VoiceInterviewHubScreen extends ConsumerStatefulWidget {
 class _VoiceInterviewHubScreenState extends ConsumerState<VoiceInterviewHubScreen>
     with SingleTickerProviderStateMixin {
   InterviewPersona _persona = InterviewPersona.tech;
+  ScoringTone _tone = ScoringTone.friendly;
   bool _loading = true;
   bool _generating = false;
   bool _used = false;
@@ -161,11 +163,12 @@ class _VoiceInterviewHubScreenState extends ConsumerState<VoiceInterviewHubScree
       await ref.read(telemetryServiceProvider).emit('voice_interview_started', {
         'persona': _persona.id,
         'theme': _theme,
+        'tone': _tone.id,
       });
 
       if (!mounted) return;
       context.pushReplacement(
-        '/quiz/play/$quizId?voice=1&persona=${_persona.id}',
+        '/quiz/play/$quizId?voice=1&persona=${_persona.id}&tone=${_tone.id}',
       );
     } on AppException catch (e) {
       await _showError(e);
@@ -448,6 +451,36 @@ class _VoiceInterviewHubScreenState extends ConsumerState<VoiceInterviewHubScree
                             color: selected ? accent : Colors.white12,
                           ),
                           onSelected: (_) => setState(() => _theme = t),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      l10n.voiceInterviewToneLabel,
+                      style: theme.textTheme.titleSmall?.copyWith(color: Colors.white70),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: ScoringTone.values.map((t) {
+                        final selected = _tone == t;
+                        final label = t == ScoringTone.strict
+                            ? l10n.voiceInterviewToneStrict
+                            : l10n.voiceInterviewToneFriendly;
+                        return FilterChip(
+                          label: Text(label),
+                          selected: selected,
+                          showCheckmark: false,
+                          labelStyle: TextStyle(
+                            color: selected ? Colors.white : Colors.white70,
+                          ),
+                          selectedColor: VoiceInterviewTheme.techAccent.withValues(alpha: 0.35),
+                          backgroundColor: VoiceInterviewTheme.surface,
+                          side: BorderSide(
+                            color: selected ? VoiceInterviewTheme.techAccent : Colors.white12,
+                          ),
+                          onSelected: (_) => setState(() => _tone = t),
                         );
                       }).toList(),
                     ),

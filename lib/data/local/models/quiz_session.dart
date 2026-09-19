@@ -70,4 +70,10 @@ class QuizSession {
 
   /// JSON list of RAG citation chunk IDs used for this quiz.
   String? citationChunkIdsJson;
+
+  /// B37 — voice interview speech-delivery metrics, word-count-weighted
+  /// across all open answers. Null for non-interview quizzes, or an
+  /// interview where no duration could be measured.
+  double? avgWordsPerMinute;
+  int? totalFillerWords;
 }

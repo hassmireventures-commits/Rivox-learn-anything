@@ -241,6 +241,36 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen>
               ),
             ),
             const SizedBox(height: 16),
+            if (session.avgWordsPerMinute != null) ...[
+              AppCard(
+                child: Row(
+                  children: [
+                    Icon(Icons.speed_rounded, color: theme.colorScheme.primary),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.resultsSpeechDeliveryTitle,
+                            style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${l10n.resultsSpeechPace(session.avgWordsPerMinute!.round())} · '
+                            '${l10n.resultsSpeechFillerWords(session.totalFillerWords ?? 0)}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
           ],
           AppCard(
             child: Column(

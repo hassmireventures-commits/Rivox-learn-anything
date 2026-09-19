@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../../../core/constants/scoring_tone.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../core/services/built_in_ai_config.dart';
 import '../../../core/services/built_in_ai_quota.dart';
@@ -12,11 +13,21 @@ import '../../local/models/question.dart';
 class InterviewRubricScorer {
   const InterviewRubricScorer();
 
+  static String _toneInstruction(ScoringTone tone) => switch (tone) {
+        ScoringTone.strict =>
+          'Feedback tone: strict. Be terse and direct. Do not soften criticism with encouragement or praise — '
+              'state weaknesses plainly. Only mention strengths if they are genuinely exceptional.',
+        ScoringTone.friendly =>
+          'Feedback tone: friendly. Be warm and encouraging. Lead with something the candidate did well before '
+              'noting any gaps, and phrase criticism constructively.',
+      };
+
   Future<void> scoreOpenAnswers({
     required AiProviderConfig config,
     required String apiKey,
     required List<Question> questions,
     required String roleContext,
+    ScoringTone scoringTone = ScoringTone.friendly,
   }) async {
     final open = questions.where(_isOpen).toList();
     if (open.isEmpty) return;
@@ -55,7 +66,9 @@ class InterviewRubricScorer {
           systemPrompt:
               'You are an interview judge. Respond with JSON only: {"score":0.0,"feedback":"..."}. score is 0 - 1. '
               'There is often no single 100% correct answer for experience, motivation, or company-fit questions. '
-              'Score substance, relevance to the role, and honesty. Do not require the candidate to match a model answer word-for-word.',
+              'Score substance, relevance to the role, and honesty. Do not require the candidate to match a model answer word-for-word. '
+              '${_toneInstruction(scoringTone)} The tone instruction changes only how "feedback" reads — never adjust '
+              '"score" based on tone.',
           userPrompt: '''
 Role / company context: $roleContext
 Question: ${q.text}

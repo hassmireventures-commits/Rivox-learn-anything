@@ -8,7 +8,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/error/app_exception.dart';
 import '../../../core/constants/quiz_kind.dart';
+import '../../../core/constants/scoring_tone.dart';
 import '../../../core/locale/app_localizations_ext.dart';
+import '../../../core/services/speech_delivery_metrics.dart';
 import '../../../core/services/study_session_tracker.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/theme/app_theme.dart';
@@ -29,11 +31,13 @@ class QuizPlayScreen extends ConsumerStatefulWidget {
     required this.quizId,
     this.voiceMode = false,
     this.interviewPersona,
+    this.scoringTone,
   });
 
   final String quizId;
   final bool voiceMode;
   final String? interviewPersona;
+  final String? scoringTone;
 
   @override
   ConsumerState<QuizPlayScreen> createState() => _QuizPlayScreenState();
@@ -49,6 +53,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
   final Map<int, String> _textAnswers = {};
   final Map<int, int> _timeSpent = {};
   final Map<int, TextEditingController> _textControllers = {};
+  final Map<int, SpeechDeliveryMetrics> _speechMetricsByQuestion = {};
   Timer? _timer;
   Timer? _examTimer;
   // Ticking every second via a ValueNotifier (not setState) so only the
@@ -234,6 +239,10 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
     setState(() {});
   }
 
+  void _setVoiceSpeechMetrics(SpeechDeliveryMetrics metrics) {
+    _speechMetricsByQuestion[_index] = metrics;
+  }
+
   void _goTo(int index) {
     if (index < 0 || index >= _questions.length) return;
     if (index > _index && !_canAdvanceFromCurrent()) {
@@ -333,6 +342,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
               apiKey: key,
               questions: _questions,
               roleContext: profile.goalContext,
+              scoringTone: ScoringTone.fromId(widget.scoringTone),
             );
           }
         } catch (_) {}
@@ -342,10 +352,13 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
           ? 0
           : DateTime.now().difference(_quizStartedAt!).inSeconds;
 
+      final speechSummary = aggregateSpeechDeliveryMetrics(_speechMetricsByQuestion.values.toList());
       final completed = await ref.read(quizRepositoryProvider).completeQuiz(
             quizUuid: widget.quizId,
             answeredQuestions: _questions,
             timeTakenSeconds: elapsed,
+            avgWordsPerMinute: speechSummary?.wordsPerMinute,
+            totalFillerWords: speechSummary?.fillerWordCount,
           );
       await ref.read(statsRepositoryProvider).recordCompletion(completed);
 
@@ -689,6 +702,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                                     persona: persona,
                                     darkTheme: true,
                                     onTranscript: _setVoiceTranscript,
+                                    onSpeechMetrics: _setVoiceSpeechMetrics,
                                   )
                                 else
                                   Expanded(

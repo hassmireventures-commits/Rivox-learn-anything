@@ -77,6 +77,12 @@ abstract class AppLocalizations {
   String get commonNone;
   String get commonOff;
   String get commonGoHome;
+  String get voiceInterviewToneLabel;
+  String get voiceInterviewToneStrict;
+  String get voiceInterviewToneFriendly;
+  String get resultsSpeechDeliveryTitle;
+  String resultsSpeechPace(int wpm);
+  String resultsSpeechFillerWords(int count);
   String get cameraScanTitle;
   String get cameraScanCaptureButton;
   String cameraScanDoneButton(int count);
