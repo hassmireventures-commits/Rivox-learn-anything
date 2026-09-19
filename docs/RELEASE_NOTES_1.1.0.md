@@ -1,127 +1,56 @@
-# Rivox 1.1.0 (build 13)
+# Rivox 1.1.0 (build 14)
 
-**Release date:** 2026-09-14  
-**Version:** 1.1.0  
-**Version code:** 13  
+**Release date:** 2026-09-19
+**Version:** 1.1.0
+**Version code:** 14
 **Package:** `com.aiquiz.ai_quiz_app`
 
-Upload this AAB to Play. Do not upload builds 7–12 if 13 is the next store version.
+Upload this AAB to Play. Do not upload builds 7–13 if 14 is the next store version.
 
-## What's new (since last Play upload)
+## What's new (since build 13)
 
 ### Accounts
-- Optional sign-in during onboarding: Google or email/password (still skippable)
-- Official Google G on the Google button
-- Show/hide password on email sign-in
-- Forgot password sends a Firebase reset email
-- Email sign-up asks for your name and saves it on the account
+- Official Google "Sign in with Google" icon (from Google's own branding kit) on the onboarding and Cloud Backup sign-in buttons, replacing an earlier hand-drawn version
 
-### AI Chat
-- New **Chat** tab: a single continuous, RAG-grounded conversation that can answer questions about your library content, quiz history, and mistakes
-- Chat can **propose** — but never perform on its own — generating a quiz or learning path on a topic; tapping the suggestion runs the same quota/firewall checks as Create Quiz/Learn
-- New **Learner Memory**: a daily-refreshed picture of your goals, library, quiz-pattern (per-topic accuracy, streaks, frequently-missed topics), and recent daily content, so chat can answer "how am I doing" style questions without re-deriving everything from scratch every message
-- Fixed: chat could describe having performed an action (adding content, enabling something) that it never actually did
-- Fixed: a chat-generated quiz/path could finish without any visible way to open it
-- The floating chat button is now draggable to either edge of the screen, and no longer appears on quiz-play or learning-path screens
-- Fixed: the chat button could appear on top of the reminder-setup sheet (during onboarding, Settings, or the Dashboard) and, more generally, on top of any modal bottom sheet or dialog
+### Sharing & export
+- **Share quiz results and learning-path progress as an image** — a branded card (score/topic/date, or path completion %) rendered to PNG and shared via the system share sheet
+- **Local encrypted `.rivox` file sharing** — export a learning path as an encrypted file protected by a 6-digit PIN (shared separately from the file), for sharing with classmates/students without any cloud account; import prompts for the PIN and offers to replace your current path
 
-### Generation & quota
-- New global "ready" indicator: any quiz, learning path, or daily-content job that finishes while you're away from where it started now shows a tap-to-open banner, everywhere in the app
-- Fixed a real concurrency bug where watching a rewarded ad to unlock more generations didn't always take effect afterward
-- Removed the daily cap on watching rewarded ads to unlock more generations — watch as many as you like, one ad now unlocks exactly one more generation
-- Starting a new quiz while a previous one is sitting ready-but-unopened now takes you to that one instead of discarding it
+### Learning path
+- **Alternate "Map view"** — a visual, connected-node sequence of a path's modules (locked/current/completed), next to the existing list view
+- **Video chapters** — Daily Pack videos with captions now get 3-5 AI-derived chapter markers; tap a chapter chip to jump to that point in the video
 
-### Flashcards
-- Flashcard answers now include a separate "why" explanation, not just the bare answer
-- Fixed cramped rating-button alignment on the review screen; made the flashcard itself tappable to reveal the answer
+### Camera-to-Quiz
+- **Scan pages into your Library** — point the camera at printed or handwritten pages, capture one or more, review and edit the extracted text, then add it to your Library like any other upload. Fully on-device text recognition, no cloud OCR call
 
-### Dashboard
-- Fixed an overlapping/unreadable y-axis on the weekly-activity and difficulty-mix charts
-- "Today's AI brief" now refreshes in about half the time
-- Clearer wording ("Continue quiz") for a not-yet-completed Quiz of the Day
+### Voice interview
+- **Speech-delivery feedback** — words-per-minute and filler-word count shown on interview results
+- **Feedback tone** — choose Strict or Friendly scoring tone, independent of the HR/Tech question persona
+- **Questions read aloud** — interview questions are now spoken via on-device text-to-speech, with a mute toggle
 
-### Performance
-- Timed quizzes and mock exams no longer redraw the entire question screen every second just to update the countdown — only the small timer widget updates now
+### Home screen
+- **Streak widget** (Android) — shows your current streak on the home screen, tapping through to the app
 
-### Analytics & privacy
-- Real Firebase Analytics (GA4) added, gated behind the existing "Help improve Rivox" opt-in (off by default, same as the existing anonymized telemetry)
+### Pacing
+- New Settings toggle: "Prefer shorter sessions" — shows a one-time gentle break reminder at the halfway point of quizzes with 10+ questions
+
+### Website
+- Second batch of study-technique blog posts (active recall, short study sessions, JD-to-study-list, mock-exam mistakes)
+- Ad placement rework and a mobile layout fix on the 2048 mini-game
+
+## Known/accepted trade-offs in this build
+- Home-screen widget is Android only (iOS WidgetKit not built); its static labels are English-only
+- Voice interview pause-time detection was not built (kept to words-per-minute + filler words, which don't depend on unverified Whisper API timing support)
+- APK size grew ~10-15MB per ABI from new native dependencies (camera, on-device text recognition, text-to-speech, home-screen widget support) — worth a Play Console size/App Bundle check after this upload
 
 ## Build artifacts
 
 | Artifact | Path |
 |----------|------|
-| arm64-v8a APK | `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` |
-| armeabi-v7a APK | `build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk` |
-| x86_64 APK | `build/app/outputs/flutter-apk/app-x86_64-release.apk` |
-| App Bundle (AAB) | `build/app/outputs/bundle/release/app-release.aab` |
-
-## Build command
-
-```powershell
-cd "d:\Documents\App projects\learn-anything\learn-anything"
-flutter test --exclude-tags=live
-flutter build apk --release --split-per-abi --dart-define-from-file=tool/.local_dart_defines.json
-flutter build appbundle --release --dart-define-from-file=tool/.local_dart_defines.json
-```
-
-## Play Store release notes (paste)
-
-```
-Rivox 1.1.0
-
-• New: optional sign-in (Google or email) in onboarding — skip anytime
-• New: show/hide password, forgot-password email, name on email sign-up
-• New: AI Chat — library, quiz history, and mistakes; can suggest a quiz or path
-• New: Learner Memory so chat can answer how-you're-doing questions
-• New: flashcard answers include a "why" explanation
-• Improved: no daily cap on rewarded ads for extra generations
-• Fixed: chat button over sheets; overlapping dashboard charts; slow AI brief
-```
-
-- New **Chat** tab: a single continuous, RAG-grounded conversation that can answer questions about your library content, quiz history, and mistakes
-- Chat can **propose** — but never perform on its own — generating a quiz or learning path on a topic; tapping the suggestion runs the same quota/firewall checks as Create Quiz/Learn
-- New **Learner Memory**: a daily-refreshed picture of your goals, library, quiz-pattern (per-topic accuracy, streaks, frequently-missed topics), and recent daily content, so chat can answer "how am I doing" style questions without re-deriving everything from scratch every message
-- Fixed: chat could describe having performed an action (adding content, enabling something) that it never actually did
-- Fixed: a chat-generated quiz/path could finish without any visible way to open it
-- The floating chat button is now draggable to either edge of the screen, and no longer appears on quiz-play or learning-path screens
-- Fixed: the chat button could appear on top of the reminder-setup sheet (during onboarding, Settings, or the Dashboard) and, more generally, on top of any modal bottom sheet or dialog
-
-### Generation & quota
-- New global "ready" indicator: any quiz, learning path, or daily-content job that finishes while you're away from where it started now shows a tap-to-open banner, everywhere in the app
-- Fixed a real concurrency bug where watching a rewarded ad to unlock more generations didn't always take effect afterward
-- Removed the daily cap on watching rewarded ads to unlock more generations — watch as many as you like, one ad now unlocks exactly one more generation
-- Starting a new quiz while a previous one is sitting ready-but-unopened now takes you to that one instead of discarding it
-
-### Flashcards
-- Flashcard answers now include a separate "why" explanation, not just the bare answer
-- Fixed cramped rating-button alignment on the review screen; made the flashcard itself tappable to reveal the answer
-
-### Dashboard
-- Fixed an overlapping/unreadable y-axis on the weekly-activity and difficulty-mix charts
-- "Today's AI brief" now refreshes in about half the time
-- Clearer wording ("Continue quiz") for a not-yet-completed Quiz of the Day
-
-### Performance
-- Timed quizzes and mock exams no longer redraw the entire question screen every second just to update the countdown — only the small timer widget updates now
-
-### Analytics & privacy
-- Real Firebase Analytics (GA4) added, gated behind the existing "Help improve Rivox" opt-in (off by default, same as the existing anonymized telemetry)
-
-### Behind the scenes
-- Groundwork for optional, end-to-end encrypted cloud backup/restore (Google Sign-In based) — built and tested, not yet enabled for users
-- Full test suite: 195 automated tests (up from 140), all passing
-- Removed redundant blanket ProGuard/R8 keep rules for Firebase/Play Services/AdMob, fixing a Play Console app-optimization warning (build 8 only — see version-code note above)
-
-## Build artifacts
-
-| Artifact | Path |
-|----------|------|
-| arm64-v8a APK | `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` |
-| armeabi-v7a APK | `build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk` |
-| x86_64 APK | `build/app/outputs/flutter-apk/app-x86_64-release.apk` |
-| App Bundle (AAB) | `build/app/outputs/bundle/release/app-release.aab` |
-
-*Split APKs above are from the prior build at this same code revision; rebuild with the command below if you need them re-stamped at 1.1.0+7 specifically (e.g. for sideloading).*
+| arm64-v8a APK | `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` (47.5MB) |
+| armeabi-v7a APK | `build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk` (41.9MB) |
+| x86_64 APK | `build/app/outputs/flutter-apk/app-x86_64-release.apk` (49.8MB) |
+| App Bundle (AAB) | `build/app/outputs/bundle/release/app-release.aab` (build separately if needed for Play upload) |
 
 ## Build command
 
@@ -137,11 +66,12 @@ flutter build appbundle --release --dart-define-from-file=tool/.local_dart_defin
 ```
 Rivox 1.1.0
 
-• New: AI Chat — ask questions about your library, quiz history, and mistakes; can suggest (never auto-start) a quiz or learning path
-• New: Learner Memory gives chat an up-to-date picture of your goals and study pattern
-• New: Flashcard answers now include a "why" explanation
-• Improved: rewarded ads to unlock more generations have no daily cap — one ad, one more generation
-• Improved: a global "ready" banner shows whenever a quiz/path/daily content finishes in the background
-• Fixed: overlapping chart labels on the dashboard; slow AI brief refresh; cramped flashcard buttons
-• Faster: timed quizzes no longer redraw the whole screen every second
+• New: scan physical pages into your Library with the camera (on-device text recognition)
+• New: share quiz results and learning path progress as an image
+• New: share a learning path as an encrypted file, no cloud account needed
+• New: learning path map view, and AI-generated video chapters in Daily Pack
+• New: voice interview — speech pace/filler-word feedback, strict/friendly tone, questions read aloud
+• New: home-screen streak widget
+• New: "Prefer shorter sessions" option with a gentle break reminder
+• Improved: official Google sign-in icon
 ```

@@ -15,6 +15,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-09-19 | release | Rivox 1.1.0 (build 14): backlog batch (B28/B34/B36/B18/B20/B37/B2/B19/B35/B39) — see [RELEASE_NOTES_1.1.0.md](RELEASE_NOTES_1.1.0.md) | (n/a) |
 | 2026-09-19 | feature | Android home-screen streak widget (B19) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-09-19 | feature | B35 Daily Pack video chapters; B39 learning path map view | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
 | 2026-09-19 | feature | B2 voice interview: TTS question readout | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |

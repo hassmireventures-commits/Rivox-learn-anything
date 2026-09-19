@@ -17,6 +17,19 @@
 -dontwarn com.google.firebase.**
 -dontwarn com.google.android.gms.**
 
+# google_mlkit_text_recognition (B34 Camera-to-Quiz) references optional
+# script-specific recognizer classes (Chinese/Japanese/Korean/Devanagari)
+# from its generic initialize() dispatch, regardless of which script a
+# caller actually requests. This app only depends on the Latin script
+# recognizer (see lib/core/services/ocr_service.dart) and never calls the
+# other scripts' code paths, so those classes are legitimately absent from
+# the classpath — silence the resulting R8 missing-class errors rather than
+# pulling in unused script models just to satisfy static analysis.
+-dontwarn com.google.mlkit.vision.text.chinese.**
+-dontwarn com.google.mlkit.vision.text.japanese.**
+-dontwarn com.google.mlkit.vision.text.korean.**
+-dontwarn com.google.mlkit.vision.text.devanagari.**
+
 # MLC LLM / TVM JNI — genuinely required: native code calls into these by
 # exact class/method name.
 -keep class ai.mlc.** { *; }
