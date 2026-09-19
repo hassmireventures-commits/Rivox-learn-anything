@@ -47,6 +47,28 @@ class AppLocalizationsMl extends AppLocalizations {
   @override
   String get commonGoHome => 'Go Home';
   @override
+  String get cameraScanTitle => 'Scan pages';
+  @override
+  String get cameraScanCaptureButton => 'Capture';
+  @override
+  String cameraScanDoneButton(int count) => 'Done ($count)';
+  @override
+  String get cameraScanReviewTitle => 'Review scanned text';
+  @override
+  String get cameraScanReviewHint => "Edit anything OCR got wrong before adding it to your library.";
+  @override
+  String get cameraScanConfirmButton => 'Add to Library';
+  @override
+  String get cameraScanPermissionDenied => 'Camera permission is needed to scan pages.';
+  @override
+  String get cameraScanNoCamera => 'No camera was found on this device.';
+  @override
+  String get cameraScanInitFailed => "Couldn't start the camera. Try again.";
+  @override
+  String get cameraScanOcrFailed => "Couldn't read text from the scanned pages. Try again.";
+  @override
+  String get cameraScanEmptyText => 'No text was found. You can still edit this box manually, or go back and retake the photos.';
+  @override
   String get rivoxShareModuleButton => 'Share module';
   @override
   String get rivoxSharePinTitle => 'Your share PIN';

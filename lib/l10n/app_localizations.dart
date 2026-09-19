@@ -77,6 +77,17 @@ abstract class AppLocalizations {
   String get commonNone;
   String get commonOff;
   String get commonGoHome;
+  String get cameraScanTitle;
+  String get cameraScanCaptureButton;
+  String cameraScanDoneButton(int count);
+  String get cameraScanReviewTitle;
+  String get cameraScanReviewHint;
+  String get cameraScanConfirmButton;
+  String get cameraScanPermissionDenied;
+  String get cameraScanNoCamera;
+  String get cameraScanInitFailed;
+  String get cameraScanOcrFailed;
+  String get cameraScanEmptyText;
   String get rivoxShareModuleButton;
   String get rivoxSharePinTitle;
   String rivoxSharePinBody(String pin);

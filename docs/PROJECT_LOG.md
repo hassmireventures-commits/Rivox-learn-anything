@@ -15,6 +15,8 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-09-19 | feature | Camera-to-Quiz: on-device OCR ingestion into Library (B34) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
+| 2026-09-19 | bugfix | 2048 board squeezed by vendor .game-intro float | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-19 | feature | B36 `.rivox` encrypted local sharing; B18 satisfied by it | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
 | 2026-09-19 | feature | B28 shareable result/path images; B20 manual "shorter sessions" pacing preference | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
 | 2026-09-19 | feature | B25 second batch: 4 study posts, human copy, playable games + ad placement | [FEATURES_LOG](logs/FEATURES_LOG.md) |

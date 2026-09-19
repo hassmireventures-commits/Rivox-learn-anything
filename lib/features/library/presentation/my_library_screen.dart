@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../core/ai_platform/ai_consent_gate.dart';
 import '../../../core/error/app_exception.dart';
@@ -112,6 +115,57 @@ class _MyLibraryScreenState extends ConsumerState<MyLibraryScreen> {
         type: type,
         title: title,
         sourceFilePath: path,
+        consent: _consent,
+      );
+      try {
+        await repo.indexSource(source.uuid);
+      } catch (e) {
+        await repo.deleteSource(source.uuid);
+        rethrow;
+      }
+      ref.invalidate(knowledgeSourcesProvider(_goalMode));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.libraryIndexed(title))),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_libraryErrorMessage(e))),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _scanPages() async {
+    final l10n = context.l10n;
+    if (!_consent) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.libraryConsentRequired)),
+      );
+      return;
+    }
+    final text = await context.push<String>('/library/scan');
+    if (text == null || text.trim().isEmpty || !mounted) return;
+
+    setState(() => _busy = true);
+    try {
+      final now = DateTime.now();
+      final title =
+          '${l10n.cameraScanTitle} ${now.day}/${now.month}/${now.year} ${now.hour}:${now.minute.toString().padLeft(2, '0')}';
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/scan_${now.millisecondsSinceEpoch}.txt');
+      await file.writeAsString(text);
+
+      final repo = ref.read(knowledgeRepositoryProvider);
+      final source = await repo.addFileSource(
+        goalMode: _goalMode,
+        type: 'notes',
+        title: title,
+        sourceFilePath: file.path,
         consent: _consent,
       );
       try {
@@ -361,6 +415,12 @@ class _MyLibraryScreenState extends ConsumerState<MyLibraryScreen> {
             onPressed: _busy ? null : _addWebsite,
             icon: const Icon(Icons.language_rounded),
             label: Text(l10n.libraryAddWebsite),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: _busy ? null : _scanPages,
+            icon: const Icon(Icons.camera_alt_rounded),
+            label: Text(l10n.cameraScanTitle),
           ),
           const SizedBox(height: 20),
           Text(l10n.libraryYourSources, style: Theme.of(context).textTheme.titleMedium),

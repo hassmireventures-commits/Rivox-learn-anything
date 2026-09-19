@@ -33,6 +33,7 @@ import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/shell/presentation/app_shell.dart';
 import '../../features/legal/presentation/legal_document_screen.dart';
 import '../../features/guidance/presentation/help_center_screen.dart';
+import '../../features/library/presentation/camera_scan_screen.dart';
 import '../../features/library/presentation/my_library_screen.dart';
 import '../../features/support/presentation/support_screen.dart';
 
@@ -305,6 +306,10 @@ final appRouter = GoRouter(
         final goal = state.uri.queryParameters['goal'];
         return _pushPage(child: MyLibraryScreen(initialGoalMode: goal), state: state);
       },
+    ),
+    GoRoute(
+      path: '/library/scan',
+      pageBuilder: (context, state) => _pushPage(child: const CameraScanScreen(), state: state),
     ),
     GoRoute(
       path: '/support',

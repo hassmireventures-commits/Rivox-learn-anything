@@ -1,5 +1,17 @@
 # Features Log
 
+## 2026-09-19 (Phase 3) — Camera-to-Quiz: on-device OCR ingestion into Library (B34)
+
+- **Type:** feature
+- **Area:** library, ai, ocr
+- **Files:** new `lib/core/services/ocr_service.dart`, new `lib/features/library/presentation/camera_scan_screen.dart`; `lib/features/library/presentation/my_library_screen.dart`, `lib/core/router/app_router.dart`, `android/app/src/main/AndroidManifest.xml`, `pubspec.yaml` (added `camera: ^0.11.1`, `google_mlkit_text_recognition: ^0.15.0`), l10n.
+- **Problem / Goal:** Continuing Phase 3 of the prioritized 12-item backlog batch: B34, the most-requested genuinely new capability in past beta feedback and independently named in a separate "how Google would build this" pass — scan physical pages (textbooks, handwritten notes, whiteboards) straight into the Library, not just already-digital files.
+- **Solution:** See `docs/BACKLOG.md` B34 for the full write-up. In short: both new packages run fully on-device (no cloud OCR call, consistent with this app's local-first stance); camera permission requested via the same `permission_handler` pattern the existing Whisper voice-interview mic access already uses; a new scan screen supports capturing multiple pages with a thumbnail strip before running OCR once, then a mandatory review step with an editable text field (OCR is never silently trusted); the reviewed text is written to a temp file and fed through the exact same file-upload ingestion path (`addFileSource` → `indexSource`) the manual `.txt` upload already uses, so no new Isar schema was needed.
+- **Not done this pass:** The optional "Scan → instant quiz" single-capture fast path suggested alongside this item, and explicit image downsampling before OCR (assessed as a different, likely smaller risk than the file_picker case it was compared to, since captured photos are never persisted to Library or shown at full resolution) — both flagged in the backlog entry for a future pass if warranted.
+- **Regression risks:** Low — entirely new, additive screen/service/route; the Library ingestion call site is unchanged in behavior, just fed a temp file from a new source. `CAMERA` is requested at runtime, not required at install (`android:required="false"` on the manifest's `uses-feature`), so devices without a camera aren't blocked from installing.
+- **Verified:** `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test` (217 passed/1 skipped, unchanged — no new automated tests for this item, consistent with this codebase's existing lack of tests for other camera/mic-hardware-dependent surfaces like the Whisper voice interview recording path).
+- **Source:** `docs/BACKLOG.md` B34.
+
 ## 2026-09-19 — Website blog (B25 second batch): 4 study-technique posts + ad rework
 
 - **Type:** feature
