@@ -15,8 +15,9 @@ Master index for all changes. **Agents must read this file and the relevant sect
 ## Chronological index
 
 | Date | Type | Title | Log |
+| 2026-09-19 | feature | B36 `.rivox` encrypted local sharing; B18 satisfied by it | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
 | 2026-09-19 | feature | B28 shareable result/path images; B20 manual "shorter sessions" pacing preference | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
-| 2026-09-19 | feature | B25 second content batch (4 study-technique blog posts) + ad placement rework | [FEATURES_LOG](logs/FEATURES_LOG.md) |
+| 2026-09-19 | feature | B25 second batch: 4 study posts, human copy, playable games + ad placement | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-09-19 | enhancement | Swapped hand-drawn Google G for Google's official icon asset (from user-supplied branding kit) | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
 | 2026-09-14 | release | Rivox 1.1.0 (build 13): onboarding sign-in polish — see [RELEASE_NOTES_1.1.0.md](RELEASE_NOTES_1.1.0.md) | (n/a) |
 | 2026-09-14 | enhancement | Google logo, show-password, reset email, username on signup | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |

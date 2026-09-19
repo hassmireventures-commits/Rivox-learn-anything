@@ -3,11 +3,12 @@
 ## 2026-09-19 — Website blog (B25 second batch): 4 study-technique posts + ad rework
 
 - **Type:** feature
-- **Area:** hosting (website), seo, content
-- **Files:** new `hosting/blog/active-recall-vs-rereading/`, `hosting/blog/fifteen-minute-study-sessions/`, `hosting/blog/job-description-to-study-list/`, `hosting/blog/mock-exam-mistakes/`; updated `hosting/blog/index.html`, `hosting/sitemap.xml`, `hosting/ads.js`, `hosting/styles.css`, nav updates across other hosting pages.
-- **Problem / Goal:** Continuing B25 (content build-out for long-tail SEO) — the first batch (2026-09-07) targeted product-feature phrases (BYOK, local-first flashcards, exam prep); this batch targets practical study-technique queries instead, a different, complementary long-tail cluster.
-- **Solution:** 4 real, substantive posts, each independently validated for single-`<h1>` and valid JSON-LD via a throwaway checker script before publishing. Also reworked ad slot placement (`homeTop` moved after Features, `doc` slot repurposed for blog mid-article placement, dedicated hub-page slots for games/blog) and fixed a `.ad-banner--pending` CSS state that could block clicks on content underneath it before an ad loaded.
-- **Regression risks:** None expected for the new posts (additive). Ad placement changes touch every page's layout slightly — worth a visual spot-check on the live site.
+- **Area:** hosting (website), seo, content, ads, games
+- **Files:** `hosting/index.html`, `hosting/blog/index.html`, 3 rewritten posts, 4 new posts (`active-recall-vs-rereading`, `fifteen-minute-study-sessions`, `job-description-to-study-list`, `mock-exam-mistakes`), `hosting/games/index.html`, `hosting/games/dino/index.html`, `hosting/games/2048/index.html`, `hosting/privacy/index.html`, `hosting/terms/index.html`, `hosting/ads.js`, `hosting/styles.css`, `hosting/sitemap.xml`
+- **Problem / Goal:** Continuing B25 with practical study-skill posts (not app marketing). Also humanise homepage/blog copy, and stop ads from sitting above content, leaving empty boxes, appearing on legal pages, or stealing taps/Space on Dino and 2048.
+- **Solution:** Four long-form guides with BlogPosting + FAQ JSON-LD; Rivox only as a last-paragraph closer. Humanised homepage (optional sign-in, Built-in AI, chat mentioned once), blog hub, and the three existing posts. Play pages load adsbygoogle **without** the `?client=` Auto ads param; empty `gamesBottom` in-article units removed; one Display unit (`3346149333` via `gamesTop`) sits below `.game-stage`. Unfilled banners use `pointer-events: none` until `.ad-banner--filled`. Home Display sits after Features; empty `native` slot removed; hub ads sit below cards; Privacy and Terms load no AdSense. B25 remains **partial** (7 posts, still not a comparison/programmatic mill).
+- **Regression risks:** Auto ads still run on non-play pages that load the client script. Do not place the same Display unit twice on one page. Legal pages no longer show ads.
+- **Verified:** Tag-balance (14 site `index.html` pages, one `h1` each); JSON-LD parse; play pages have no `client=ca-pub` and no `gamesBottom`; privacy/terms have no ads scripts. Browser check of Home, a new post, Dino, and 2048 after `firebase deploy --only hosting`.
 - **Source:** `docs/BACKLOG.md` B25 (partial, second batch).
 
 ## 2026-09-08 — Learner Memory: daily-refreshed context snapshot for chat

@@ -23,7 +23,7 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 | B15 | Freemium hosted AI tier with budget guardrails | backlog (proposed 2026-08-29) | ai, monetization | Should have |
 | B16 | Achievement badges & milestone challenges | done (2026-08-29) | gamification, dashboard | Should have |
 | B17 | Mark-for-review / flag questions in mock exams | done (2026-08-29) | exam | Should have |
-| B18 | Shared / cohort learning packs | backlog (proposed 2026-08-29) | social, learn | Could have |
+| B18 | Shared / cohort learning packs | done (2026-09-19, satisfied by B36's file-based mechanism) | social, learn | Could have |
 | B19 | Home-screen widget (streak / daily quiz) | backlog (proposed 2026-08-29) | platform, retention | Could have |
 | B20 | Neurodiversity-aware adaptive pacing | done (2026-09-19, manual preference only) | ai, accessibility | Could have |
 | B21 | Marketplace / enterprise SKU / learning-intelligence API | backlog (proposed 2026-08-29) | growth, enterprise | Won't have (this cycle) |
@@ -41,7 +41,7 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 | B33 | Launch Loop: demo video + community feedback posts | backlog (proposed 2026-09-07) | marketing, growth | Could have |
 | B34 | Camera-to-Quiz (OCR ingestion into Library) | backlog (proposed 2026-09-07) | library, ai, ocr | Should have |
 | B35 | Daily Pack: timestamped video chapters/summary | backlog (proposed 2026-09-07) | learn, daily content | Could have |
-| B36 | Local `.rivox` encrypted export/import (no-cloud sharing) | backlog (proposed 2026-09-07) | learn, sharing, privacy | Should have |
+| B36 | Local `.rivox` encrypted export/import (no-cloud sharing) | done (2026-09-19) | learn, sharing, privacy | Should have |
 | B37 | Voice interview: speech-delivery feedback + persona-aware scoring | backlog (proposed 2026-09-07) | career, ai, voice | Should have |
 | B38 | Flashcards already use SM-2 (superset of Leitner) — no algorithm change | backlog (proposed 2026-09-07) | learn, flashcards | Won't have (algorithm) |
 | B39 | Learning path visual mind-map view | backlog (proposed 2026-09-07) | learn, ux | Could have |
@@ -240,13 +240,14 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
 
 ### B18 — Shared / cohort learning packs
 
-- **Status:** backlog (proposed 2026-08-29)
+- **Status:** done (2026-09-19) — satisfied by B36's `.rivox` mechanism, no separate feature built
 - **Area:** social, learn
 - **MoSCoW:** Could have
 - **Why it exists:** `billion-dollar-roadmap.md` names cohort/shared-pack network effects as a growth-loop step (habit → investment → social). Genuinely useful but needs moderation and identity work this app doesn't have yet (no accounts — see B13).
-- **Suggested next step:** Do not start before B13 (accounts) lands. Scope v1 as read-only shared packs (export/import a learning path), not live social features, to avoid a moderation system on day one.
-- **Risks:** Content moderation, abuse, and spam surface area — the reason this is Could have, not Should have, until accounts exist.
-- **Source:** `docs/reviews/billion-dollar-roadmap.md`.
+- **Shipped:** This item's own "suggested next step" below asked for exactly what B36 (done same day) builds: read-only export/import of a learning path as a file, no live social features, no moderation system. A teacher (or any sharer) exports a path once and shares the `.rivox` file + PIN with an entire group — every recipient imports the same file independently. No accounts/backend/identity system needed for this, since it's a plain file, not a server-mediated share. Building a second, parallel mechanism for "cohort" packs specifically would have been pure duplication.
+- **Suggested next step (original, now satisfied):** Do not start before B13 (accounts) lands. Scope v1 as read-only shared packs (export/import a learning path), not live social features, to avoid a moderation system on day one.
+- **Risks:** None remaining for this v1 scope — no moderation/abuse surface exists because there's no server-mediated sharing at all, only local file export/import.
+- **Source:** `docs/reviews/billion-dollar-roadmap.md`; `docs/BACKLOG.md` B36 (the mechanism this is satisfied by).
 
 ### B19 — Home-screen widget (streak / daily quiz)
 
@@ -316,8 +317,8 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
 - **MoSCoW:** Could have
 - **Why it exists:** The 2026-08-29 keyword research found that real top-ranking competitors in this space win via scale — e.g. PracticeMock-style programmatic SEO (one indexed page per exam/topic, ~500+ pages) and RemNote-style long-form comparison posts ("Best Anki Alternatives" with tables, named competitors, FAQ sections). A handful of static marketing pages cannot compete head-on with that; winnable long-tail phrases (BYOK AI quiz generation, local-first flashcards, AI quiz for competitive exams) need actual content to rank for, not just better meta tags on the homepage.
 - **Shipped (first batch, 2026-09-07):** 3 real, substantive posts (`/blog/byok-ai-quiz-generation`, `/blog/local-first-flashcards-spaced-repetition`, `/blog/ai-quiz-competitive-exam-prep`), one per identified winnable phrase, each explaining the underlying concept genuinely (not just restating app marketing copy) plus an FAQ section, and a `/blog` hub page. See `docs/logs/FEATURES_LOG.md` 2026-09-07 entry.
-- **Shipped (second batch, 2026-09-19):** 4 more posts covering study-technique/practical long-tail queries rather than product-feature queries — `/blog/active-recall-vs-rereading` (self-quiz from notes), `/blog/fifteen-minute-study-sessions` (busy-schedule study habits), `/blog/job-description-to-study-list` (interview prep from a JD), `/blog/mock-exam-mistakes` (syllabus-mapped mistake review) — each independently validated per-page (single `<h1>`, valid JSON-LD) via a throwaway checker script, `/blog` hub and `sitemap.xml` updated.
-- **Suggested next step:** Decide whether to invest further (comparison-style posts, e.g. "Rivox vs [named competitor]", or the larger programmatic-SEO approach) only after seeing whether these batches get any real traffic/indexing — per this entry's own original caution against building more speculatively.
+- **Shipped (second batch, 2026-09-19):** 4 study-skill guides (`/blog/active-recall-vs-rereading`, `/blog/fifteen-minute-study-sessions`, `/blog/job-description-to-study-list`, `/blog/mock-exam-mistakes`), humanised hub/homepage/existing posts, and ad/game-play fixes (no Auto ads on Dino/2048, no ads on Privacy/Terms). Still not comparison pages or a programmatic mill.
+- **Suggested next step:** Hold comparison posts and programmatic SEO until these 7 pages show real indexing/traffic. Do not add thin filler.
 - **Risks:** Thin/low-quality pages built purely for SEO can actively hurt rankings (Google's stated policy against "scaled content abuse") — the shipped batch was written to be genuinely useful on its own merits, not filler; any further batch must hold the same bar.
 - **Source:** `docs/logs/FEATURES_LOG.md` 2026-08-29 SEO audit keyword research; 2026-09-07 shipped batch.
 
@@ -438,9 +439,11 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
 
 ### B36 — Local `.rivox` encrypted export/import (no-cloud sharing)
 
-- **Status:** backlog (proposed 2026-09-07)
+- **Status:** done (2026-09-19)
 - **Area:** learn, sharing, privacy
 - **MoSCoW:** Should have
+- **Shipped:** New `lib/core/services/rivox_pack_service.dart`. Reused B13's existing `backup_crypto.dart` (AES-256-GCM + PBKDF2-HMAC-SHA256) rather than adding a second crypto dependency — the file format is genuinely just a different envelope around the same primitives. A `.rivox` file is one JSON object: cleartext `format`/`version`/`contentType`/`title`/`salt`/`iterations` fields (so the receiving app can show `"{title}" was shared with you` before asking for the PIN) plus a base64 `payload` (the AES-GCM ciphertext of `{title, topics, steps}`, using `PathStepsStorage`'s existing raw step-JSON shape directly — no new serialization needed). PBKDF2 iterations set to 100k (not B13's 600k) since this is a casual-sharing PIN, not an account passphrase, and both sides (export + every recipient's import) need to feel fast. **Export:** a new "Share module" button on `path_detail_screen.dart`'s app bar generates a 6-digit PIN, shows it to the sharer in a dialog (told explicitly to relay it separately from the file), writes the `.rivox` file to a temp path, and shares it via the already-present `share_plus`. **Import:** a new "Import shared module" entry on `learn_screen.dart` picks a `.rivox` file, shows the pack's title and a PIN prompt, decrypts, and — if the learner already has an active path (this app only allows one at a time) — asks for confirmation before replacing it, then inserts via the existing `LearnerRepository.savePath()` write path (imported content becomes an ordinary local path, indistinguishable from one generated locally).
+- **Verified:** 8 new unit tests (`test/rivox_pack_service_test.dart`) covering round-trip, wrong-PIN, malformed/non-JSON/wrong-format-tag/unsupported-version/wrong-content-type rejection, and PIN generation shape. `flutter analyze` (0 new issues); `flutter test` (217 passed/1 skipped, up from 209).
 - **Why it exists:** Beta feedback: "Let us export a lightweight, encrypted file format (.rivox) to share custom modules with classmates over WhatsApp without cloud syncing." Unlike B13/B18/B31 (which need accounts + a backend), this is genuinely **cloud-free** and fits this app's existing "local-first, privacy-focused" positioning better than any other item in this report — a real differentiator, not a compromise. `quiz_repository.dart:350`'s existing `exportData()` already produces a JSON shape of sessions/questions (currently a raw local-backup format, not a shareable/encrypted artifact) — a real, if partial, starting point.
 - **Suggested next step (structural plan):**
   - **File format:** a `.rivox` file = AES-256-GCM-encrypted JSON payload (a learning path or quiz, in the same shape `exportData()`/`LearningPath`'s existing serialization already produces — do not invent a new schema, reuse the existing `toJson()` on whatever model is being shared) + a small unencrypted header (format version, content type, a human-readable title) so the app can show "Alice shared 'Intro to Biology' with you" before decrypting.

@@ -47,6 +47,34 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get commonGoHome => 'முகப்புக்கு செல்';
   @override
+  String get rivoxShareModuleButton => 'Share module';
+  @override
+  String get rivoxSharePinTitle => 'Your share PIN';
+  @override
+  String rivoxSharePinBody(String pin) => "Give this PIN to whoever you're sending the file to, separately from the file itself: $pin. They'll need it to open the pack in Rivox.";
+  @override
+  String get rivoxShareFileButton => 'Share file';
+  @override
+  String get rivoxImportButton => 'Import shared module';
+  @override
+  String get rivoxImportPinPrompt => 'Enter the PIN whoever shared this pack gave you.';
+  @override
+  String get rivoxImportPinLabel => '6-digit PIN';
+  @override
+  String get rivoxImportConfirmButton => 'Import';
+  @override
+  String rivoxImportTitleFor(String title) => '"$title" was shared with you';
+  @override
+  String get rivoxImportReplaceWarning => 'You already have an active learning path. Importing this pack will replace it.';
+  @override
+  String get rivoxImportReplaceConfirmButton => 'Replace and import';
+  @override
+  String rivoxImportSuccess(String title) => 'Imported "$title".';
+  @override
+  String get rivoxImportInvalidFile => "This doesn't look like a valid Rivox pack file.";
+  @override
+  String get rivoxImportWrongPin => 'Incorrect PIN, or the file is corrupted.';
+  @override
   String get quizBreakNudge => 'Halfway there. Feel free to take a short break before continuing.';
   @override
   String get settingsPacingTitle => 'Prefer shorter sessions';

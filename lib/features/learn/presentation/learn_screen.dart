@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,9 +16,11 @@ import '../../../core/services/built_in_ai_quota.dart';
 import '../../../core/services/generation_job_service.dart';
 import '../../../core/services/generation_sizing.dart';
 import '../../../core/services/learner_goal_guard.dart';
+import '../../../core/services/rivox_pack_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/local/models/learning_path.dart';
 import '../../../data/remote/ai/learning_orchestrator.dart';
+import '../../../data/remote/backup/backup_crypto.dart' show BackupDecryptionException;
 import '../../../shared/navigation/study_path_navigation.dart';
 import '../../../shared/widgets/ai_status_badge.dart';
 import '../../../shared/widgets/api_limit_dialog.dart';
@@ -73,6 +78,121 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
     setState(() {
       _pathsFuture = ref.read(learnerRepositoryProvider).activePaths();
       _completedPathsFuture = ref.read(learnerRepositoryProvider).completedPaths();
+    });
+  }
+
+  Future<String?> _promptForPin(String sharedTitle) {
+    final l10n = context.l10n;
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.rivoxImportTitleFor(sharedTitle)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.rivoxImportPinPrompt),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              maxLength: 6,
+              autofocus: true,
+              decoration: InputDecoration(labelText: l10n.rivoxImportPinLabel),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.commonCancel)),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+            child: Text(l10n.rivoxImportConfirmButton),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _importSharedPack() async {
+    final l10n = context.l10n;
+    final picked = await FilePicker.pickFile(
+      type: FileType.custom,
+      allowedExtensions: const ['rivox'],
+    );
+    if (picked == null || picked.path == null) return;
+
+    late final String contents;
+    late final RivoxPackHeader header;
+    try {
+      contents = await File(picked.path!).readAsString();
+      header = readPackHeader(contents);
+      if (header.contentType != kRivoxPackContentTypeLearningPath) {
+        throw const RivoxPackFormatException('Unsupported content type');
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.rivoxImportInvalidFile)),
+      );
+      return;
+    }
+
+    if (!mounted) return;
+    final pin = await _promptForPin(header.title);
+    if (pin == null || pin.isEmpty || !mounted) return;
+
+    final RivoxLearningPathPack pack;
+    try {
+      pack = await decodeLearningPathPack(contents, pin);
+    } on BackupDecryptionException {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.rivoxImportWrongPin)),
+      );
+      return;
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.rivoxImportInvalidFile)),
+      );
+      return;
+    }
+
+    final repo = ref.read(learnerRepositoryProvider);
+    if (await repo.hasActivePath()) {
+      if (!mounted) return;
+      final replace = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          content: Text(l10n.rivoxImportReplaceWarning),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.commonCancel)),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(l10n.rivoxImportReplaceConfirmButton),
+            ),
+          ],
+        ),
+      );
+      if (replace != true) return;
+    }
+
+    final newPath = await repo.savePath(
+      title: pack.title,
+      topics: pack.topics,
+      source: 'imported',
+      steps: pack.steps.isEmpty ? null : pack.steps,
+      forceReplace: true,
+    );
+    if (!mounted) return;
+    await _refresh();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.rivoxImportSuccess(pack.title))),
+    );
+    context.push('/paths/${newPath.uuid}').then((_) {
+      if (mounted) _onReturnFromPath();
     });
   }
 
@@ -452,6 +572,16 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
                         onTap: () => context
                             .push('/flashcards?goal=$goalMode')
                             .then((_) => ref.invalidate(flashcardsDueCountProvider(goalMode))),
+                      ),
+                    ),
+                    SizedBox(height: layout.sectionGap * 0.5),
+                    AppCard(
+                      onTap: _importSharedPack,
+                      child: ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.move_to_inbox_rounded),
+                        title: Text(l10n.rivoxImportButton),
+                        trailing: const Icon(Icons.chevron_right_rounded),
                       ),
                     ),
                     SizedBox(height: layout.sectionGap * 0.5),

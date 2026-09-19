@@ -1,13 +1,18 @@
-﻿import 'package:flutter_markdown/flutter_markdown.dart';
+﻿import 'dart:io';
+
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/network/network_service.dart';
 import '../../../core/services/generation_job_service.dart';
 import '../../../core/services/module_notes_cache.dart';
+import '../../../core/services/rivox_pack_service.dart';
 import '../../../core/services/study_session_tracker.dart';
 import '../../../core/services/youtube_reject_store.dart';
 import '../../../core/constants/official_learning_domains.dart';
@@ -18,6 +23,7 @@ import '../../../core/locale/l10n_helpers.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/local/models/learning_path.dart';
+import '../../../data/local/path_steps_storage.dart';
 import '../../../data/local/repositories/learner_repository.dart';
 import '../../../data/remote/ai/models/learning_pattern_context.dart';
 import '../../../shared/widgets/api_limit_dialog.dart';
@@ -46,6 +52,7 @@ class _PathDetailScreenState extends ConsumerState<PathDetailScreen> {
   int? _summarizingIndex;
   late Future<LearningPath?> _pathFuture;
   Future<List<PathStepData>>? _stepsFuture;
+  bool _sharingPack = false;
 
   @override
   void initState() {
@@ -84,6 +91,44 @@ class _PathDetailScreenState extends ConsumerState<PathDetailScreen> {
       ),
       fileNamePrefix: 'rivox_path_progress',
     );
+  }
+
+  Future<void> _shareAsPack(LearningPath path) async {
+    if (_sharingPack) return;
+    final l10n = context.l10n;
+    setState(() => _sharingPack = true);
+    try {
+      final rawSteps = await PathStepsStorage.instance.loadSteps(path.uuid);
+      final topics = ref.read(learnerRepositoryProvider).pathTopics(path);
+      final pin = generateSharePin();
+      final packJson = await buildLearningPathPack(
+        pin: pin,
+        title: path.title,
+        topics: topics,
+        steps: rawSteps,
+      );
+      final dir = await getTemporaryDirectory();
+      final safeName = path.title.replaceAll(RegExp(r'[^A-Za-z0-9]+'), '_').toLowerCase();
+      final file = File('${dir.path}/${safeName}_${DateTime.now().millisecondsSinceEpoch}.rivox');
+      await file.writeAsString(packJson);
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(l10n.rivoxSharePinTitle),
+          content: Text(l10n.rivoxSharePinBody(pin)),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(l10n.rivoxShareFileButton),
+            ),
+          ],
+        ),
+      );
+      await SharePlus.instance.share(ShareParams(files: [XFile(file.path)]));
+    } finally {
+      if (mounted) setState(() => _sharingPack = false);
+    }
   }
 
   @override
@@ -396,6 +441,17 @@ class _PathDetailScreenState extends ConsumerState<PathDetailScreen> {
                         tooltip: l10n.shareAsImageButton,
                         icon: const Icon(Icons.image_rounded),
                         onPressed: () => _shareAsImage(path, steps),
+                      ),
+                      IconButton(
+                        tooltip: l10n.rivoxShareModuleButton,
+                        icon: _sharingPack
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.ios_share_rounded),
+                        onPressed: _sharingPack ? null : () => _shareAsPack(path),
                       ),
                     ],
                   ),

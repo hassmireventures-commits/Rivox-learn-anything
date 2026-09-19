@@ -1,5 +1,15 @@
 ﻿# Enhancements Log
 
+## 2026-09-19 (Phase 2) — B36 `.rivox` encrypted local sharing; B18 satisfied by it
+
+- **Type:** feature (backlog B36, B18)
+- **Area:** learn, sharing, privacy
+- **Files:** new `lib/core/services/rivox_pack_service.dart`, new `test/rivox_pack_service_test.dart`; `lib/features/learn/presentation/path_detail_screen.dart`, `lib/features/learn/presentation/learn_screen.dart`, l10n.
+- **Problem / Goal:** Continuing Phase 2 of the prioritized 12-item backlog batch: B36 (local encrypted `.rivox` export/import, no cloud) and B18 (cohort/shared learning packs), sequenced together since B18's own suggested v1 scope is nearly identical to B36's mechanism.
+- **Solution:** See `docs/BACKLOG.md` B36/B18 for the full write-up. In short: reused B13's existing AES-256-GCM + PBKDF2 crypto helpers (no new dependency) with a lighter 100k-iteration PIN derivation suited to casual sharing rather than an account passphrase; a `.rivox` file is one JSON envelope (cleartext header + encrypted payload); export lives on `path_detail_screen.dart`, import on `learn_screen.dart`, with an explicit confirm-before-replace step since this app only allows one active learning path at a time. B18 needed no separate implementation — its own scope note asked for exactly this file-based mechanism, so building a second parallel system would have been pure duplication.
+- **Regression risks:** Low. New service is self-contained (no existing code path modified beyond two additive UI entry points); imported content lands through the same `LearnerRepository.savePath()` write path any locally-generated path already uses, so it can't introduce a new data shape Isar hasn't seen before. Untrusted decrypted JSON is validated (type-checked field by field) before being trusted, per this item's own risk note.
+- **Verified:** 8 new unit tests for the pack service (round-trip, wrong-PIN, malformed/format/version/content-type rejection); `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test` (217 passed/1 skipped, up from 209).
+
 ## 2026-09-19 (later) — B28 shareable result/path images, B20 manual pacing preference
 
 - **Type:** feature (backlog B28, B20)
