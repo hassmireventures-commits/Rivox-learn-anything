@@ -375,6 +375,7 @@ a {
 
 .game-stage {
   position: relative;
+  z-index: 1;
   min-height: 260px;
   margin: 1.5rem 0 2rem;
   padding: 1.5rem 0;
@@ -382,6 +383,43 @@ a {
   border-radius: 0.75rem;
   background: #fafafa;
   overflow: hidden;
+}
+
+/* 2048 vendor CSS floats .game-intro (the in-board tagline next to New Game).
+   Our page intro uses the same class, so reset the shell and restore the
+   tagline only inside .game-stage. Do not edit vendor/2048/style/main.css. */
+body.game-page {
+  margin: 0;
+  padding: 0;
+}
+
+body.game-page ins.adsbygoogle-noablate,
+body.game-page iframe#google_esf {
+  pointer-events: none !important;
+}
+
+body.game-page main > section.game-intro {
+  float: none;
+  width: auto;
+  line-height: inherit;
+  display: block;
+  box-sizing: border-box;
+  margin-bottom: 0;
+}
+
+.game-stage .puzzle-intro {
+  float: left;
+  line-height: 42px;
+  margin-bottom: 0;
+}
+
+@media screen and (max-width: 520px) {
+  .game-stage .puzzle-intro {
+    width: 55%;
+    display: block;
+    box-sizing: border-box;
+    line-height: 1.65;
+  }
 }
 
 .game-credit {

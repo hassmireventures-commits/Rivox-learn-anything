@@ -1,5 +1,15 @@
 # Bug Fix Log
 
+## 2026-09-19 — 2048 board squeezed by vendor .game-intro float
+
+- **Type:** bugfix
+- **Area:** games, hosting
+- **Files:** `hosting/styles.css`
+- **Problem / Goal:** On phone-width viewports the 2048 page intro sat beside a ~125px clipped board, so the puzzle looked broken even after Auto ads were removed.
+- **Solution:** The vendored 2048 stylesheet floats `.game-intro` (the in-board tagline next to New Game). Our page intro uses the same class. Reset that class on `body.game-page main > section.game-intro` and restore the float only on `.game-stage .puzzle-intro`. Also zero vendor `body` margin/padding on game pages and keep Auto ads placeholders from eating taps (`ins.adsbygoogle-noablate`).
+- **Regression risks:** Dino hub/play pages share `body.game-page` and `.game-intro`; the reset makes the site intro full width there too, which is the intended layout. Do not edit `hosting/games/vendor/2048/style/main.css`.
+- **Verified:** Live 2048 at ~370px width: intro stacked above a full-width stage; tiles still move with arrow keys.
+
 ## 2026-09-14 (later): chat FAB over nested dialogs, video suggestion had no link, real article links, navigate-to-tab, saved articles moved into Library
 
 - **Type:** bugfix + feature
