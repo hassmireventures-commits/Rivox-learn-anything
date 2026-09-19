@@ -7,7 +7,7 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 | ID | Title | Status | Area | MoSCoW |
 |----|-------|--------|------|--------|
 | B1 | In-app learning chatbot | done (2026-09-07) | chat, learn, ai | Should have |
-| B2 | Voice interview agent | partial (STT shipped) | career / interview | Should have |
+| B2 | Voice interview agent | partial (STT + TTS question readout shipped 2026-09-19) | career / interview | Should have |
 | B3 | On-device / local LLM | coming soon | ai, llm | Won't have (this cycle) |
 | B4 | Persist and translate 2026-08-23 l10n keys | done | l10n | — |
 | B5 | Article relevance vs empty resources | done | learn, daily content | — |
@@ -65,13 +65,15 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 
 ## B2 — Voice interview agent
 
-- **Status:** partial (2026-08-24) — Whisper STT for spoken answers; no TTS/realtime agent yet
+- **Status:** partial (2026-09-19) — Whisper STT for spoken answers + TTS question readout; no realtime conversational loop (see B42, Won't-have-this-cycle)
 - **Area:** career / interview
 - **Why it exists:** User request #21 (2026-08-23) asked for a premium voice interview agent. `drill_create_screen.dart` showed **Voice interview (Coming soon)** only.
-- **Shipped:** NVIDIA Whisper Large v3 via `WHISPER_API_KEY` dart-define; mic record → `/v1/audio/transcriptions`; Career **Voice interview** → `/quiz/play/:id?voice=1`; rubric scoring unchanged on transcribed text. Skill: `.cursor/skills/interviewer-voice/SKILL.md`.
-- **Suggested next step:** TTS question readout, realtime voice loop, premium entitlement, STT quota if needed.
+- **Shipped (2026-08-24):** NVIDIA Whisper Large v3 via `WHISPER_API_KEY` dart-define; mic record → `/v1/audio/transcriptions`; Career **Voice interview** → `/quiz/play/:id?voice=1`; rubric scoring unchanged on transcribed text. Skill: `.cursor/skills/interviewer-voice/SKILL.md`.
+- **Shipped (2026-09-19):** TTS question readout — new `lib/core/services/interview_tts_service.dart` wraps `flutter_tts` (on-device platform TTS, no network call, no API key — a genuinely different, much lower-risk capability than a realtime conversational loop). Each interview question is read aloud automatically once per index; a mute/unmute toggle sits in the quiz-play app bar next to the existing flag button; reading stops the moment the candidate starts recording their answer (an additive `onRecordingStart` callback on `InterviewVoiceInputBar`, kept separate from the existing `onTranscript` contract) so the interviewer's voice never competes with the mic.
+- **Suggested next step:** Realtime voice loop remains out of scope this cycle (see B42). Premium entitlement and STT quota remain unaddressed, tracked separately if monetization work picks up (see B30).
 - **Risks:** Keys must stay in dart-define only; Whisper is batch not streaming; mic permission required on device.
 - **Risks:** Mic permissions; cost; quality; must not break resume/JD grounding or LLM-as-judge scoring.
+- **Verified (TTS addition):** `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test` (225 passed/1 skipped, unchanged — no new automated tests, consistent with this codebase's existing lack of tests for other audio/hardware-dependent UI).
 - **Source:** `lib/features/career/presentation/drill_create_screen.dart`; [EXAM_AND_CAREER_MODULES.md](EXAM_AND_CAREER_MODULES.md) non-goals.
 
 ## B3 — On-device / local LLM

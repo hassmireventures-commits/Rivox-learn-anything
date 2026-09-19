@@ -1,5 +1,15 @@
 ﻿# Enhancements Log
 
+## 2026-09-19 (Phase 4 cont.) — B2 voice interview: TTS question readout
+
+- **Type:** feature (backlog B2)
+- **Area:** career, ai, voice
+- **Files:** new `lib/core/services/interview_tts_service.dart`; `lib/core/providers/app_providers.dart`, `lib/features/quiz/presentation/quiz_play_screen.dart`, `lib/features/career/presentation/interview_voice_input_bar.dart`, l10n. Added `flutter_tts: ^4.2.0`.
+- **Problem / Goal:** B2's own "suggested next step" named TTS question readout as the natural increment after STT shipped. Sequenced after B37 (delivery metrics/tone) per the original prioritization, since it's a separate, if smaller, native-audio addition.
+- **Solution:** `flutter_tts` wraps the platform's on-device TTS engine — no network call, no API key, genuinely lower-risk than a realtime conversational loop (out of scope, see B42). Each interview question is read aloud automatically once per index (`_speakCurrentQuestionIfNeeded`, guarded against re-speaking on unrelated rebuilds); a mute/unmute toggle sits in the quiz-play app bar; reading stops immediately when the candidate starts recording, via a new additive `onRecordingStart` callback on `InterviewVoiceInputBar` kept separate from the existing `onTranscript` contract.
+- **Regression risks:** Low — new provider, new optional callback, no existing behavior changed for non-interview quizzes (`_voiceInterview` guard on every new code path).
+- **Verified:** `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test` (225 passed/1 skipped, unchanged — no new automated tests, consistent with other audio/hardware-dependent UI in this codebase).
+
 ## 2026-09-19 (Phase 4) — B37 voice interview: WPM/filler feedback + persona-aware scoring tone
 
 - **Type:** feature (backlog B37)

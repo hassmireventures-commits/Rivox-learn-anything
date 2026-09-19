@@ -19,6 +19,7 @@ class InterviewVoiceInputBar extends StatefulWidget {
     required this.stt,
     required this.onTranscript,
     this.onSpeechMetrics,
+    this.onRecordingStart,
     this.persona,
     this.darkTheme = false,
   });
@@ -31,6 +32,10 @@ class InterviewVoiceInputBar extends StatefulWidget {
   /// measured. Separate from [onTranscript] rather than changing its
   /// signature, so the existing single-String contract stays untouched.
   final ValueChanged<SpeechDeliveryMetrics>? onSpeechMetrics;
+
+  /// B2 follow-up — called right as recording begins, so a caller reading
+  /// the question aloud (TTS) can stop before the mic starts.
+  final VoidCallback? onRecordingStart;
   final InterviewPersona? persona;
   final bool darkTheme;
 
@@ -174,6 +179,7 @@ class _InterviewVoiceInputBarState extends State<InterviewVoiceInputBar>
       return;
     }
 
+    widget.onRecordingStart?.call();
     setState(() => _busy = true);
     try {
       await widget.stt.startLiveTranscription(

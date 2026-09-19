@@ -33,6 +33,7 @@ import '../services/generation_job_service.dart';
 import '../services/llm_manager.dart';
 import '../services/quiz_of_the_day_service.dart';
 import '../services/built_in_ai_quota.dart';
+import '../services/interview_tts_service.dart';
 import '../services/whisper_stt_service.dart';
 import '../services/article_bookmark_store.dart';
 import '../models/provider_usage.dart';
@@ -307,6 +308,12 @@ final todaysDailyQuizProvider = FutureProvider<QuizSession?>((ref) async {
 
 final whisperSttServiceProvider = Provider<WhisperSttService>((ref) {
   final service = WhisperSttService(secureStorage: ref.watch(secureKeyStorageProvider));
+  ref.onDispose(service.dispose);
+  return service;
+});
+
+final interviewTtsServiceProvider = Provider<InterviewTtsService>((ref) {
+  final service = InterviewTtsService();
   ref.onDispose(service.dispose);
   return service;
 });

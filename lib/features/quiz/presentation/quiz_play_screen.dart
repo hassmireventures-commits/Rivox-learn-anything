@@ -66,6 +66,8 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
   bool _preferShorterSessions = false;
   bool _breakNudgeShownThisSession = false;
   bool _submitting = false;
+  bool _ttsMuted = false;
+  int? _ttsSpokenForIndex;
 
   bool get _voiceInterview => widget.voiceMode;
 
@@ -113,6 +115,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
   void dispose() {
     if (widget.voiceMode) {
       ref.read(whisperSttServiceProvider).cancelRecording();
+      ref.read(interviewTtsServiceProvider).stop();
     }
     StudySessionTracker.instance.endStudy();
     _timer?.cancel();
@@ -150,6 +153,28 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
       await VoiceInterviewEntitlement.instance.markFreeSessionUsed(
         personaId: widget.interviewPersona ?? InterviewPersona.tech.id,
       );
+    }
+    _speakCurrentQuestionIfNeeded();
+  }
+
+  /// B2 follow-up — reads the current question aloud once per index, so
+  /// the interview feels read-to-you rather than read-by-you. Skipped
+  /// entirely outside voice interviews, and a no-op if already spoken for
+  /// this index (avoids re-speaking on unrelated rebuilds).
+  void _speakCurrentQuestionIfNeeded() {
+    if (!_voiceInterview || _ttsMuted || _questions.isEmpty) return;
+    if (_ttsSpokenForIndex == _index) return;
+    _ttsSpokenForIndex = _index;
+    unawaited(ref.read(interviewTtsServiceProvider).speak(_questions[_index].text));
+  }
+
+  void _toggleTtsMuted() {
+    setState(() => _ttsMuted = !_ttsMuted);
+    if (_ttsMuted) {
+      ref.read(interviewTtsServiceProvider).stop();
+    } else {
+      _ttsSpokenForIndex = null;
+      _speakCurrentQuestionIfNeeded();
     }
   }
 
@@ -259,6 +284,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
       _selectedIndex = _answers[index];
     });
     _startQuestionTimer();
+    _speakCurrentQuestionIfNeeded();
   }
 
   void _autoAdvance() {
@@ -602,6 +628,12 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
               ),
               onPressed: _toggleFlag,
             ),
+          if (_voiceInterview)
+            IconButton(
+              tooltip: _ttsMuted ? l10n.interviewTtsUnmute : l10n.interviewTtsMute,
+              icon: Icon(_ttsMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded),
+              onPressed: _toggleTtsMuted,
+            ),
           TextButton(
             onPressed: _submitting ? null : _submit,
             child: Text(l10n.quizSubmit),
@@ -703,6 +735,8 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                                     darkTheme: true,
                                     onTranscript: _setVoiceTranscript,
                                     onSpeechMetrics: _setVoiceSpeechMetrics,
+                                    onRecordingStart: () =>
+                                        ref.read(interviewTtsServiceProvider).stop(),
                                   )
                                 else
                                   Expanded(

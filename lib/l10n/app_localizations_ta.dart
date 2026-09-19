@@ -47,6 +47,10 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get commonGoHome => 'முகப்புக்கு செல்';
   @override
+  String get interviewTtsMute => 'Mute question readout';
+  @override
+  String get interviewTtsUnmute => 'Read questions aloud';
+  @override
   String get voiceInterviewToneLabel => 'Feedback tone';
   @override
   String get voiceInterviewToneStrict => 'Strict';

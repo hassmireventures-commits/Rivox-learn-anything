@@ -28,6 +28,8 @@
   "commonNone": "none",
   "commonOff": "Off",
   "commonGoHome": "Go Home",
+  "interviewTtsMute": "Mute question readout",
+  "interviewTtsUnmute": "Read questions aloud",
   "voiceInterviewToneLabel": "Feedback tone",
   "voiceInterviewToneStrict": "Strict",
   "voiceInterviewToneFriendly": "Friendly",
