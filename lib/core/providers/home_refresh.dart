@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/ai_status_service.dart';
 import '../services/daily_quiz_scheduler.dart';
+import '../services/home_widget_service.dart';
 import '../services/learner_memory_scheduler.dart';
 import '../utils/calendar_day.dart';
 import 'app_providers.dart';
@@ -19,6 +20,12 @@ void invalidateHomeProviders(WidgetRef ref) {
   ref.invalidate(todaysDailyQuizProvider);
   ref.read(todayStudyProgressProvider.notifier).refresh();
   ref.read(learningDataEpochProvider.notifier).state++;
+  unawaited(
+    ref
+        .read(dashboardStatsProvider.future)
+        .then((stats) => HomeWidgetService.updateStreak(stats.currentStreak))
+        .catchError((_) {}),
+  );
 }
 
 /// Remounts ad slots so banner/native widgets request a fresh fill.

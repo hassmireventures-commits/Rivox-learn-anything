@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#000000</color>
+    <!-- Streak widget (B19) — matches AppTheme.purpleStart/purpleEnd. -->
+    <color name="streak_widget_gradient_start">#00B4D8</color>
+    <color name="streak_widget_gradient_end">#9D4EDD</color>
+    <color name="streak_widget_text">#FFFFFF</color>
 </resources>

@@ -1,5 +1,16 @@
 # Features Log
 
+## 2026-09-19 (Phase 6) — Android home-screen streak widget (B19)
+
+- **Type:** feature
+- **Area:** platform, retention
+- **Files:** new `lib/core/services/home_widget_service.dart`; new native `android/app/src/main/kotlin/com/aiquiz/ai_quiz_app/StreakWidgetProvider.kt`, `res/layout/streak_widget.xml`, `res/xml/streak_widget_info.xml`, `res/drawable/streak_widget_background.xml`; `android/app/src/main/AndroidManifest.xml`, `android/app/src/main/res/values/colors.xml`, `lib/features/onboarding/presentation/splash_screen.dart`, `lib/core/providers/home_refresh.dart`, `pubspec.yaml` (added `home_widget: ^0.7.0`).
+- **Problem / Goal:** Continuing the prioritized backlog batch: B19, a home-screen widget showing the learner's streak with a tap-through to Home.
+- **Solution:** See `docs/BACKLOG.md` B19 for the full write-up. Used the `home_widget` package rather than hand-rolling the Flutter↔native data bridge; the widget's tap target reuses this app's existing `app_links` deep-link handling via a plain `ACTION_VIEW` intent rather than adopting the package's own separate launch mechanism. Android only (iOS explicitly deferred, per this item's own v1 scope).
+- **Regression risks:** Low — new provider, new native files, two additive call sites in existing refresh hooks; nothing in the widget path can affect the main app if it fails (best-effort, catch-and-ignore).
+- **Verified:** `flutter analyze` (0 new issues, 35 pre-existing baseline). `flutter build apk --debug` completed successfully with the new native code compiled in. **Not verified**: actually placing the widget on a home screen and confirming render/update/tap-through — not possible from this environment (no device/emulator with a home-screen launcher).
+- **Source:** `docs/BACKLOG.md` B19.
+
 ## 2026-09-19 (Phase 3) — Camera-to-Quiz: on-device OCR ingestion into Library (B34)
 
 - **Type:** feature

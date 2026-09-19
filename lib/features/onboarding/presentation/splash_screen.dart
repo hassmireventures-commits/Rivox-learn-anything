@@ -9,6 +9,7 @@ import '../../../core/locale/app_localizations_ext.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/services/daily_content_scheduler.dart';
 import '../../../core/services/daily_quiz_scheduler.dart';
+import '../../../core/services/home_widget_service.dart';
 import '../../../core/services/learner_memory_scheduler.dart';
 import '../../../core/theme/app_theme.dart';
 
@@ -73,6 +74,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       unawaited(ref.read(learnerMemorySchedulerProvider).trySchedule());
       unawaited(
         ref.read(anonAnalyticsSyncProvider).syncIfOptedIn().catchError((_) {}),
+      );
+      unawaited(
+        ref.read(statsRepositoryProvider).getDashboardStats().then(
+              (stats) => HomeWidgetService.updateStreak(stats.currentStreak),
+            ),
       );
     } catch (_) {}
   }
