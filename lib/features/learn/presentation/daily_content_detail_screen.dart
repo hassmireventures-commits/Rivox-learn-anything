@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../../core/locale/app_localizations_ext.dart';
 import '../../../core/providers/app_providers.dart';
@@ -11,8 +12,10 @@ import '../../../core/services/daily_content_scheduler.dart';
 import '../../../core/services/daily_content_service.dart';
 import '../../../core/services/generation_job_service.dart';
 import '../../../core/services/learner_goal_guard.dart';
+import '../../../core/services/video_chapter.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../data/remote/ai/daily_video_chapters_service.dart';
 import '../../../data/remote/ai/resource_link_validator.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../shared/widgets/api_limit_dialog.dart';
@@ -47,6 +50,8 @@ class _DailyContentDetailScreenState extends ConsumerState<DailyContentDetailScr
   bool _videoActive = false;
   bool _videoSearchOnly = false;
   bool _fromSnapshot = false;
+  YoutubePlayerController? _ytController;
+  bool _chaptersAttempted = false;
 
   @override
   void initState() {
@@ -94,6 +99,58 @@ class _DailyContentDetailScreenState extends ConsumerState<DailyContentDetailScr
 
   Future<void> _markPackOpened() async {
     await ref.read(dailyContentSchedulerProvider).markOpenedToday();
+  }
+
+  void _onVideoControllerReady(YoutubePlayerController controller) {
+    _ytController = controller;
+    _maybeGenerateChapters();
+  }
+
+  void _onVideoControllerDisposed() {
+    _ytController = null;
+  }
+
+  /// B35 — best-effort, once per video. Never blocks or errors visibly;
+  /// today's plain-video experience is unchanged if this fails or if no
+  /// usable transcript exists.
+  Future<void> _maybeGenerateChapters() async {
+    final pack = _pack;
+    final video = pack?.video;
+    if (pack == null || video == null) return;
+    if (video.chapters != null || _chaptersAttempted) return;
+    final id = video.youtubeVideoId ?? ResourceLinkValidator.extractYouTubeId(video.url);
+    if (id == null || id.isEmpty) return;
+    _chaptersAttempted = true;
+
+    try {
+      final provider = await ref.read(defaultAiProviderProvider.future);
+      if (provider == null) return;
+      final key = await ref.read(providerRepositoryProvider).getApiKey(provider.uuid);
+      if (key == null || key.isEmpty) return;
+      final chapters = await const DailyVideoChaptersService().generateChapters(
+        videoId: id,
+        config: provider,
+        apiKey: key,
+      );
+      if (chapters.isEmpty) return;
+      await ref.read(dailyContentServiceProvider).saveVideoChapters(chapters);
+      if (!mounted) return;
+      setState(() {
+        _pack = pack.copyWithVideo(video.copyWithChapters(chapters));
+      });
+    } catch (_) {
+      // Best-effort; leave the plain-video experience untouched.
+    }
+  }
+
+  void _seekToChapter(VideoChapter chapter) {
+    _ytController?.seekTo(seconds: chapter.timestampSeconds.toDouble(), allowSeekAhead: true);
+  }
+
+  String _formatChapterTime(int seconds) {
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    return '$m:${s.toString().padLeft(2, '0')}';
   }
 
   Future<void> _load({bool forceGenerate = false}) async {
@@ -418,7 +475,30 @@ class _DailyContentDetailScreenState extends ConsumerState<DailyContentDetailScr
                               _videoActive = false;
                               _videoSearchOnly = true;
                             }),
+                            onControllerReady: _onVideoControllerReady,
+                            onControllerDisposed: _onVideoControllerDisposed,
                           ),
+                          if (video.chapters != null && video.chapters!.isNotEmpty) ...[
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              height: 36,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: video.chapters!.length,
+                                separatorBuilder: (_, _) => const SizedBox(width: 8),
+                                itemBuilder: (context, index) {
+                                  final chapter = video.chapters![index];
+                                  return ActionChip(
+                                    avatar: const Icon(Icons.play_circle_outline_rounded, size: 16),
+                                    label: Text(
+                                      '${_formatChapterTime(chapter.timestampSeconds)} · ${chapter.label}',
+                                    ),
+                                    onPressed: () => _seekToChapter(chapter),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                           if (!_videoSearchOnly && !_videoFailed) ...[
                             const SizedBox(height: 8),
                             OutlinedButton.icon(

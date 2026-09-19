@@ -20,6 +20,8 @@ class InAppYoutubePlayer extends StatefulWidget {
     required this.onActivate,
     required this.onDeactivate,
     required this.onError,
+    this.onControllerReady,
+    this.onControllerDisposed,
   });
 
   /// May be null when validation stripped the id â€” shows search fallback.
@@ -30,6 +32,12 @@ class InAppYoutubePlayer extends StatefulWidget {
   final VoidCallback onActivate;
   final VoidCallback onDeactivate;
   final VoidCallback onError;
+
+  /// B35 — called once playback starts, so a caller can seek to
+  /// AI-generated chapter timestamps. Null until the learner taps play
+  /// (this widget is tap-to-play, not autoplay-on-mount).
+  final ValueChanged<YoutubePlayerController>? onControllerReady;
+  final VoidCallback? onControllerDisposed;
 
   @override
   State<InAppYoutubePlayer> createState() => _InAppYoutubePlayerState();
@@ -60,6 +68,7 @@ class _InAppYoutubePlayerState extends State<InAppYoutubePlayer> {
     _controller?.close();
     _controller = null;
     _started = false;
+    widget.onControllerDisposed?.call();
   }
 
   void _startPlayback() {
@@ -89,6 +98,7 @@ class _InAppYoutubePlayerState extends State<InAppYoutubePlayer> {
     });
     _started = true;
     widget.onActivate();
+    widget.onControllerReady?.call(_controller!);
     setState(() {});
   }
 

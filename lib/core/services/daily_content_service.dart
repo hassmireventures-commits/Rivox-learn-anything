@@ -14,6 +14,7 @@ import 'learner_goal_guard.dart';
 import 'llm_manager.dart';
 import 'open_knowledge/open_knowledge_service.dart';
 import 'topic_goal_relevance.dart';
+import 'video_chapter.dart';
 
 class DailyContentItem {
   const DailyContentItem({
@@ -24,6 +25,7 @@ class DailyContentItem {
     required this.summary,
     required this.topic,
     this.youtubeVideoId,
+    this.chapters,
   });
 
   final String dateKey;
@@ -34,6 +36,22 @@ class DailyContentItem {
   final String topic;
   final String? youtubeVideoId;
 
+  /// B35 — AI-derived chapter markers, cached once generated. Null means
+  /// "not yet attempted"; an empty list means "attempted, no usable
+  /// transcript was found" — both render the same (no chapter row).
+  final List<VideoChapter>? chapters;
+
+  DailyContentItem copyWithChapters(List<VideoChapter> chapters) => DailyContentItem(
+        dateKey: dateKey,
+        type: type,
+        title: title,
+        url: url,
+        summary: summary,
+        topic: topic,
+        youtubeVideoId: youtubeVideoId,
+        chapters: chapters,
+      );
+
   Map<String, dynamic> toJson() => {
         'date': dateKey,
         'type': type,
@@ -42,9 +60,11 @@ class DailyContentItem {
         'summary': summary,
         'topic': topic,
         'youtubeVideoId': youtubeVideoId,
+        if (chapters != null) 'chapters': chapters!.map((c) => c.toJson()).toList(),
       };
 
   factory DailyContentItem.fromJson(Map<String, dynamic> json) {
+    final chaptersRaw = json['chapters'];
     return DailyContentItem(
       dateKey: json['date']?.toString() ?? '',
       type: json['type']?.toString() ?? 'article',
@@ -53,6 +73,13 @@ class DailyContentItem {
       summary: json['summary']?.toString() ?? '',
       topic: json['topic']?.toString() ?? '',
       youtubeVideoId: json['youtubeVideoId']?.toString(),
+      chapters: chaptersRaw is List
+          ? chaptersRaw
+              .whereType<Map>()
+              .map((m) => VideoChapter.fromJson(Map<String, dynamic>.from(m)))
+              .whereType<VideoChapter>()
+              .toList()
+          : null,
     );
   }
 }
@@ -76,6 +103,14 @@ class DailyContentPack {
   /// across days so a fixed topic doesn't resolve to the same article every
   /// time. See [DailyContentService.kMaxRecentArticleUrls].
   final List<String> recentArticleUrls;
+
+  DailyContentPack copyWithVideo(DailyContentItem video) => DailyContentPack(
+        dateKey: dateKey,
+        topic: topic,
+        article: article,
+        video: video,
+        recentArticleUrls: recentArticleUrls,
+      );
 
   bool get isComplete =>
       article != null &&
@@ -214,6 +249,19 @@ class DailyContentService {
   Future<void> _persist(DailyContentPack pack) async {
     final file = await _file();
     await file.writeAsString(jsonEncode(pack.toJson()));
+  }
+
+  /// B35 — persists generated chapter markers onto today's video item, so
+  /// they're computed once and read back on later views instead of
+  /// re-fetched every time. Silently no-ops if today's pack (or its video)
+  /// no longer exists — this is cache-population, never a required write.
+  Future<void> saveVideoChapters(List<VideoChapter> chapters) async {
+    try {
+      final pack = await findTodaysPack();
+      final video = pack?.video;
+      if (pack == null || video == null) return;
+      await _persist(pack.copyWithVideo(video.copyWithChapters(chapters)));
+    } catch (_) {}
   }
 
   /// Deletes today's pack file (Settings reset / clear).

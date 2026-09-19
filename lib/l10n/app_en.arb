@@ -30,6 +30,8 @@
   "commonGoHome": "Go Home",
   "interviewTtsMute": "Mute question readout",
   "interviewTtsUnmute": "Read questions aloud",
+  "pathMapViewButton": "Map view",
+  "pathListViewButton": "List view",
   "voiceInterviewToneLabel": "Feedback tone",
   "voiceInterviewToneStrict": "Strict",
   "voiceInterviewToneFriendly": "Friendly",

@@ -1,5 +1,15 @@
 ﻿# Enhancements Log
 
+## 2026-09-19 (Phase 5+6) — B35 Daily Pack video chapters; B39 learning path map view
+
+- **Type:** feature (backlog B35, B39)
+- **Area:** learn, daily content, ux
+- **Files:** new `lib/core/services/video_chapter.dart`, new `lib/data/remote/ai/daily_video_chapters_service.dart`, new `test/video_chapter_test.dart`, new `lib/features/learn/presentation/path_map_view.dart`; `lib/data/remote/ai/youtube_transcript_fetcher.dart`, `lib/core/services/daily_content_service.dart`, `lib/features/learn/presentation/daily_content_detail_screen.dart`, `lib/shared/widgets/in_app_youtube_player.dart`, `lib/features/learn/presentation/path_detail_screen.dart`.
+- **Problem / Goal:** Continuing the prioritized backlog batch: B35 (clickable video chapter timestamps) and B39 (a visual alternate view of learning path modules).
+- **Solution:** See `docs/BACKLOG.md` B35/B39 for full write-ups. B35: kept caption timing data (previously discarded) to derive 3-5 LLM chapter markers per Daily Pack video, cached in the existing sidecar file so it's computed once; a chapter-chip row seeks the embedded YouTube player. Not combined with SponsorBlock (a different concept — skip segments, not chapters) as the Google-advice cross-check suggested, to avoid under-baking two separate features in one pass. B39: built a connected-node "path" view instead of adopting a graph-layout package, since a learning path's modules are a plain sequential chain with no branching — a graph package would solve a harder problem than this data poses.
+- **Regression risks:** Low for both — B35 degrades silently to today's plain-video experience on any failure (no transcript, LLM error); B39 is a pure additive view toggle, list view stays the default and unchanged.
+- **Verified:** 6 new unit tests for `VideoChapter`; `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test` (231 passed/1 skipped, up from 225). Neither live-tested against a real video/transcript/LLM call.
+
 ## 2026-09-19 (Phase 4 cont.) — B2 voice interview: TTS question readout
 
 - **Type:** feature (backlog B2)

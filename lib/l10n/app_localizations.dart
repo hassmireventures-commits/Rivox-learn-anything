@@ -79,6 +79,8 @@ abstract class AppLocalizations {
   String get commonGoHome;
   String get interviewTtsMute;
   String get interviewTtsUnmute;
+  String get pathMapViewButton;
+  String get pathListViewButton;
   String get voiceInterviewToneLabel;
   String get voiceInterviewToneStrict;
   String get voiceInterviewToneFriendly;

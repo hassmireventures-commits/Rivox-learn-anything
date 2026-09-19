@@ -32,6 +32,7 @@ import '../../../shared/widgets/generation_overlay.dart';
 import '../../../shared/widgets/in_app_youtube_player.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/share_card.dart';
+import 'path_map_view.dart';
 import 'resource_webview_args.dart';
 
 class PathDetailScreen extends ConsumerStatefulWidget {
@@ -53,6 +54,7 @@ class _PathDetailScreenState extends ConsumerState<PathDetailScreen> {
   late Future<LearningPath?> _pathFuture;
   Future<List<PathStepData>>? _stepsFuture;
   bool _sharingPack = false;
+  bool _showMapView = false;
 
   @override
   void initState() {
@@ -438,6 +440,11 @@ class _PathDetailScreenState extends ConsumerState<PathDetailScreen> {
                     title: Text(path.title),
                     actions: [
                       IconButton(
+                        tooltip: _showMapView ? l10n.pathListViewButton : l10n.pathMapViewButton,
+                        icon: Icon(_showMapView ? Icons.view_list_rounded : Icons.route_rounded),
+                        onPressed: () => setState(() => _showMapView = !_showMapView),
+                      ),
+                      IconButton(
                         tooltip: l10n.shareAsImageButton,
                         icon: const Icon(Icons.image_rounded),
                         onPressed: () => _shareAsImage(path, steps),
@@ -455,7 +462,17 @@ class _PathDetailScreenState extends ConsumerState<PathDetailScreen> {
                       ),
                     ],
                   ),
-                  body: ListView(
+                  body: _showMapView
+                      ? PathMapView(
+                          steps: steps,
+                          currentIndex: path.currentIndex,
+                          isModuleUnlocked: (index) => repo.isModuleUnlocked(path, index),
+                          onTapModule: (index) => setState(() {
+                            _showMapView = false;
+                            _expanded.add(index);
+                          }),
+                        )
+                      : ListView(
                     physics: (showOverlay || _activeVideoIndex != null)
                         ? const NeverScrollableScrollPhysics()
                         : const AlwaysScrollableScrollPhysics(),

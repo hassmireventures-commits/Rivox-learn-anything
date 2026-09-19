@@ -51,6 +51,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get interviewTtsUnmute => 'Read questions aloud';
   @override
+  String get pathMapViewButton => 'Map view';
+  @override
+  String get pathListViewButton => 'List view';
+  @override
   String get voiceInterviewToneLabel => 'Feedback tone';
   @override
   String get voiceInterviewToneStrict => 'Strict';
