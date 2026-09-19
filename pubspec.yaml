@@ -20,6 +20,7 @@ dependencies:
   flutter_secure_storage: ^10.3.1
   dio: ^5.8.0+1
   google_fonts: ^8.1.0
+  screenshot: ^3.0.0
   community_charts_flutter: ^1.0.4
   share_plus: ^13.2.0
   firebase_core: ^4.11.0

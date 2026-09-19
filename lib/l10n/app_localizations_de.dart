@@ -47,6 +47,22 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get commonGoHome => 'Go Home';
   @override
+  String get quizBreakNudge => 'Halfway there. Feel free to take a short break before continuing.';
+  @override
+  String get settingsPacingTitle => 'Prefer shorter sessions';
+  @override
+  String get settingsPacingSubtitle => 'Get a gentle halfway nudge to take a break during longer quizzes.';
+  @override
+  String get shareCardQuizEyebrow => 'QUIZ RESULT';
+  @override
+  String get shareCardPathEyebrow => 'LEARNING PATH';
+  @override
+  String get shareCardCorrectLabel => 'correct';
+  @override
+  String get shareCardCompleteLabel => 'complete';
+  @override
+  String get shareAsImageButton => 'Share as image';
+  @override
   String get authOnboardTitle => 'Sign in to Rivox';
   @override
   String get authOnboardSubtitle => 'Save your progress and sync across devices. You can skip this and sign in anytime from Settings.';

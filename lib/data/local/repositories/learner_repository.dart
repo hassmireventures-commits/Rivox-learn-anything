@@ -93,6 +93,7 @@ class LearnerRepository {
     Map<String, double>? navAffinity,
     double? skillLevel,
     bool? helpImproveOptIn,
+    bool? preferShorterSessions,
     bool touchLayoutChange = false,
   }) async {
     final profile = await getOrCreateProfile();
@@ -125,6 +126,7 @@ class LearnerRepository {
     if (navAffinity != null) profile.navAffinityJson = jsonEncode(navAffinity);
     if (skillLevel != null) profile.skillLevel = skillLevel;
     if (helpImproveOptIn != null) profile.helpImproveOptIn = helpImproveOptIn;
+    if (preferShorterSessions != null) profile.preferShorterSessions = preferShorterSessions;
     if (touchLayoutChange) profile.lastLayoutChangeAt = DateTime.now();
     profile.updatedAt = DateTime.now();
 

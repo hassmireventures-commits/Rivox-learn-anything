@@ -1,5 +1,15 @@
 # Features Log
 
+## 2026-09-19 — Website blog (B25 second batch): 4 study-technique posts + ad rework
+
+- **Type:** feature
+- **Area:** hosting (website), seo, content
+- **Files:** new `hosting/blog/active-recall-vs-rereading/`, `hosting/blog/fifteen-minute-study-sessions/`, `hosting/blog/job-description-to-study-list/`, `hosting/blog/mock-exam-mistakes/`; updated `hosting/blog/index.html`, `hosting/sitemap.xml`, `hosting/ads.js`, `hosting/styles.css`, nav updates across other hosting pages.
+- **Problem / Goal:** Continuing B25 (content build-out for long-tail SEO) — the first batch (2026-09-07) targeted product-feature phrases (BYOK, local-first flashcards, exam prep); this batch targets practical study-technique queries instead, a different, complementary long-tail cluster.
+- **Solution:** 4 real, substantive posts, each independently validated for single-`<h1>` and valid JSON-LD via a throwaway checker script before publishing. Also reworked ad slot placement (`homeTop` moved after Features, `doc` slot repurposed for blog mid-article placement, dedicated hub-page slots for games/blog) and fixed a `.ad-banner--pending` CSS state that could block clicks on content underneath it before an ad loaded.
+- **Regression risks:** None expected for the new posts (additive). Ad placement changes touch every page's layout slightly — worth a visual spot-check on the live site.
+- **Source:** `docs/BACKLOG.md` B25 (partial, second batch).
+
 ## 2026-09-08 — Learner Memory: daily-refreshed context snapshot for chat
 
 - **Type:** feature

@@ -21,6 +21,7 @@ import '../../../data/local/repositories/quiz_repository.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/bottom_native_ad_slot.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../../shared/widgets/share_card.dart';
 import '../../career/presentation/interview_feedback_buttons.dart';
 import '../../career/presentation/voice_interview_theme.dart';
 import '../../../core/constants/interview_persona.dart';
@@ -129,6 +130,25 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen>
       s.topic,
     )}\n\n${l10n.resultsShareChallengeCta}\n$deepLink\n\n${l10n.resultsShareGetApp}\n${AppConstants.playStoreUrl}';
     await SharePlus.instance.share(ShareParams(text: text));
+  }
+
+  Future<void> _shareAsImage() async {
+    final l10n = context.l10n;
+    final s = _session;
+    if (s == null) return;
+    final accuracy = (s.accuracy ?? 0).round();
+    final date = s.completedAt ?? s.startedAt;
+    await shareCardAsImage(
+      ShareCard(
+        eyebrow: l10n.shareCardQuizEyebrow,
+        title: s.topic,
+        statValue: '${s.correctCount ?? 0}/${s.questionCount}',
+        statLabel: l10n.shareCardCorrectLabel,
+        metaLine: '$accuracy% · ${date.day}/${date.month}/${date.year}',
+        icon: Icons.emoji_events_rounded,
+      ),
+      fileNamePrefix: 'rivox_quiz_result',
+    );
   }
 
   List<Question> get _wrongQuestions =>
@@ -564,6 +584,12 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen>
             onPressed: _share,
             icon: const Icon(Icons.share_rounded),
             label: Text(l10n.resultsShareScore),
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            onPressed: _shareAsImage,
+            icon: const Icon(Icons.image_rounded),
+            label: Text(l10n.shareAsImageButton),
           ),
           ScrollableNativeAdSlot(slotId: 'results_${widget.quizId}'),
         ],

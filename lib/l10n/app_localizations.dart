@@ -77,6 +77,14 @@ abstract class AppLocalizations {
   String get commonNone;
   String get commonOff;
   String get commonGoHome;
+  String get quizBreakNudge;
+  String get settingsPacingTitle;
+  String get settingsPacingSubtitle;
+  String get shareCardQuizEyebrow;
+  String get shareCardPathEyebrow;
+  String get shareCardCorrectLabel;
+  String get shareCardCompleteLabel;
+  String get shareAsImageButton;
   String get authOnboardTitle;
   String get authOnboardSubtitle;
   String get authContinueWithGoogle;

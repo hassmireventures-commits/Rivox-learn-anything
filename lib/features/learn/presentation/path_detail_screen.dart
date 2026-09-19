@@ -25,6 +25,7 @@ import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/generation_overlay.dart';
 import '../../../shared/widgets/in_app_youtube_player.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../../shared/widgets/share_card.dart';
 import 'resource_webview_args.dart';
 
 class PathDetailScreen extends ConsumerStatefulWidget {
@@ -65,6 +66,24 @@ class _PathDetailScreenState extends ConsumerState<PathDetailScreen> {
       _pathFuture = ref.read(learnerRepositoryProvider).getPath(widget.pathId);
       _stepsFuture = null;
     });
+  }
+
+  Future<void> _shareAsImage(LearningPath path, List<PathStepData> steps) async {
+    final l10n = context.l10n;
+    final total = steps.length;
+    final completed = total == 0 ? 0 : path.currentIndex.clamp(0, total);
+    final percent = total == 0 ? 0 : ((completed / total) * 100).round();
+    await shareCardAsImage(
+      ShareCard(
+        eyebrow: l10n.shareCardPathEyebrow,
+        title: path.title,
+        statValue: '$percent%',
+        statLabel: l10n.shareCardCompleteLabel,
+        metaLine: '$completed/$total modules',
+        icon: Icons.route_rounded,
+      ),
+      fileNamePrefix: 'rivox_path_progress',
+    );
   }
 
   @override
@@ -370,7 +389,16 @@ class _PathDetailScreenState extends ConsumerState<PathDetailScreen> {
             return Stack(
               children: [
                 Scaffold(
-                  appBar: AppBar(title: Text(path.title)),
+                  appBar: AppBar(
+                    title: Text(path.title),
+                    actions: [
+                      IconButton(
+                        tooltip: l10n.shareAsImageButton,
+                        icon: const Icon(Icons.image_rounded),
+                        onPressed: () => _shareAsImage(path, steps),
+                      ),
+                    ],
+                  ),
                   body: ListView(
                     physics: (showOverlay || _activeVideoIndex != null)
                         ? const NeverScrollableScrollPhysics()

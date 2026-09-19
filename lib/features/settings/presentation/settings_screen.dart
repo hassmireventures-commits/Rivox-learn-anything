@@ -207,6 +207,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  AppCard(
+                    child: SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(l10n.settingsPacingTitle),
+                      subtitle: Text(l10n.settingsPacingSubtitle),
+                      value: learner?.preferShorterSessions ?? false,
+                      onChanged: (v) async {
+                        await ref.read(learnerRepositoryProvider).updateProfile(preferShorterSessions: v);
+                        ref.invalidate(learnerProfileProvider);
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   const _AiLibrarySettingsCard(),
                   const SizedBox(height: 8),
                 ],

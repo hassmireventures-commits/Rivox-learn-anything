@@ -58,6 +58,8 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
   DateTime? _questionStartedAt;
   DateTime? _quizStartedAt;
   bool _loading = true;
+  bool _preferShorterSessions = false;
+  bool _breakNudgeShownThisSession = false;
   bool _submitting = false;
 
   bool get _voiceInterview => widget.voiceMode;
@@ -125,12 +127,14 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
     if (_voiceInterview) {
       questions = questions.where(_isOpenQuestion).toList();
     }
+    final learnerProfile = await ref.read(learnerRepositoryProvider).getOrCreateProfile();
     if (!mounted) return;
     setState(() {
       _session = session;
       _questions = questions;
       _loading = false;
       _quizStartedAt = DateTime.now();
+      _preferShorterSessions = learnerProfile.preferShorterSessions;
     });
     if (_isTimedMock) {
       _startExamTimer();
@@ -249,11 +253,22 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
   }
 
   void _autoAdvance() {
+    _maybeShowBreakNudge();
     if (_index < _questions.length - 1) {
       _goTo(_index + 1);
     } else {
       _submit();
     }
+  }
+
+  void _maybeShowBreakNudge() {
+    if (!_preferShorterSessions || _breakNudgeShownThisSession) return;
+    if (_questions.length < 10) return;
+    if (_index + 1 != _questions.length ~/ 2) return;
+    _breakNudgeShownThisSession = true;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.l10n.quizBreakNudge)),
+    );
   }
 
   Future<void> _submit() async {

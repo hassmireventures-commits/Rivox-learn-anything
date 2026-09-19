@@ -78,23 +78,28 @@ const LearnerProfileSchema = CollectionSchema(
       name: r'navOrderJson',
       type: IsarType.string,
     ),
-    r'preferredFormatsJson': PropertySchema(
+    r'preferShorterSessions': PropertySchema(
       id: 13,
+      name: r'preferShorterSessions',
+      type: IsarType.bool,
+    ),
+    r'preferredFormatsJson': PropertySchema(
+      id: 14,
       name: r'preferredFormatsJson',
       type: IsarType.string,
     ),
     r'roleSeniority': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'roleSeniority',
       type: IsarType.string,
     ),
     r'skillLevel': PropertySchema(
-      id: 15,
+      id: 16,
       name: r'skillLevel',
       type: IsarType.double,
     ),
     r'updatedAt': PropertySchema(
-      id: 16,
+      id: 17,
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
@@ -164,10 +169,11 @@ void _learnerProfileSerialize(
   writer.writeString(offsets[10], object.layoutModeOverride);
   writer.writeString(offsets[11], object.navAffinityJson);
   writer.writeString(offsets[12], object.navOrderJson);
-  writer.writeString(offsets[13], object.preferredFormatsJson);
-  writer.writeString(offsets[14], object.roleSeniority);
-  writer.writeDouble(offsets[15], object.skillLevel);
-  writer.writeDateTime(offsets[16], object.updatedAt);
+  writer.writeBool(offsets[13], object.preferShorterSessions);
+  writer.writeString(offsets[14], object.preferredFormatsJson);
+  writer.writeString(offsets[15], object.roleSeniority);
+  writer.writeDouble(offsets[16], object.skillLevel);
+  writer.writeDateTime(offsets[17], object.updatedAt);
 }
 
 LearnerProfile _learnerProfileDeserialize(
@@ -191,10 +197,11 @@ LearnerProfile _learnerProfileDeserialize(
   object.layoutModeOverride = reader.readString(offsets[10]);
   object.navAffinityJson = reader.readString(offsets[11]);
   object.navOrderJson = reader.readString(offsets[12]);
-  object.preferredFormatsJson = reader.readString(offsets[13]);
-  object.roleSeniority = reader.readStringOrNull(offsets[14]);
-  object.skillLevel = reader.readDouble(offsets[15]);
-  object.updatedAt = reader.readDateTime(offsets[16]);
+  object.preferShorterSessions = reader.readBool(offsets[13]);
+  object.preferredFormatsJson = reader.readString(offsets[14]);
+  object.roleSeniority = reader.readStringOrNull(offsets[15]);
+  object.skillLevel = reader.readDouble(offsets[16]);
+  object.updatedAt = reader.readDateTime(offsets[17]);
   return object;
 }
 
@@ -232,12 +239,14 @@ P _learnerProfileDeserializeProp<P>(
     case 12:
       return (reader.readString(offset)) as P;
     case 13:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 14:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 15:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 16:
+      return (reader.readDouble(offset)) as P;
+    case 17:
       return (reader.readDateTime(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1917,6 +1926,18 @@ extension LearnerProfileQueryFilter
   }
 
   QueryBuilder<LearnerProfile, LearnerProfile, QAfterFilterCondition>
+  preferShorterSessionsEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'preferShorterSessions',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LearnerProfile, LearnerProfile, QAfterFilterCondition>
   preferredFormatsJsonEqualTo(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -2536,6 +2557,20 @@ extension LearnerProfileQuerySortBy
   }
 
   QueryBuilder<LearnerProfile, LearnerProfile, QAfterSortBy>
+  sortByPreferShorterSessions() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'preferShorterSessions', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LearnerProfile, LearnerProfile, QAfterSortBy>
+  sortByPreferShorterSessionsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'preferShorterSessions', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LearnerProfile, LearnerProfile, QAfterSortBy>
   sortByPreferredFormatsJson() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'preferredFormatsJson', Sort.asc);
@@ -2783,6 +2818,20 @@ extension LearnerProfileQuerySortThenBy
   }
 
   QueryBuilder<LearnerProfile, LearnerProfile, QAfterSortBy>
+  thenByPreferShorterSessions() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'preferShorterSessions', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LearnerProfile, LearnerProfile, QAfterSortBy>
+  thenByPreferShorterSessionsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'preferShorterSessions', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LearnerProfile, LearnerProfile, QAfterSortBy>
   thenByPreferredFormatsJson() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'preferredFormatsJson', Sort.asc);
@@ -2942,6 +2991,13 @@ extension LearnerProfileQueryWhereDistinct
   }
 
   QueryBuilder<LearnerProfile, LearnerProfile, QDistinct>
+  distinctByPreferShorterSessions() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'preferShorterSessions');
+    });
+  }
+
+  QueryBuilder<LearnerProfile, LearnerProfile, QDistinct>
   distinctByPreferredFormatsJson({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(
@@ -3065,6 +3121,13 @@ extension LearnerProfileQueryProperty
   navOrderJsonProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'navOrderJson');
+    });
+  }
+
+  QueryBuilder<LearnerProfile, bool, QQueryOperations>
+  preferShorterSessionsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'preferShorterSessions');
     });
   }
 

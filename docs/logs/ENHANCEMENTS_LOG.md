@@ -1,5 +1,17 @@
 ﻿# Enhancements Log
 
+## 2026-09-19 (later) — B28 shareable result/path images, B20 manual pacing preference
+
+- **Type:** feature (backlog B28, B20)
+- **Area:** quiz, learn, settings, sharing, accessibility
+- **Files:** new `lib/shared/widgets/share_card.dart`; `lib/features/quiz/presentation/results_screen.dart`, `lib/features/learn/presentation/path_detail_screen.dart`, `lib/features/quiz/presentation/quiz_play_screen.dart`, `lib/features/settings/presentation/settings_screen.dart`, `lib/data/local/models/learner_profile.dart` (+ generated), `lib/data/local/repositories/learner_repository.dart`, l10n, `pubspec.yaml` (added `screenshot: ^3.0.0`).
+- **Problem / Goal:** Continuing the prioritized Phase 1 of the 12-item backlog batch requested this session: B28 (shareable result/path images) and B20 (neurodiversity-aware pacing, scoped per its own entry to a manual preference, not adaptive detection).
+- **Solution:**
+  1. **B28:** Generic `ShareCard` widget (gradient brand background, eyebrow/title/big stat/meta line/logo) plus a `shareCardAsImage()` helper shared by both call sites — captures the card off-screen via `screenshot`'s `ScreenshotController`, writes a temp PNG, opens the share sheet via the already-present `share_plus`. Wired into `results_screen.dart` (topic, correct/total, accuracy, date) and `path_detail_screen.dart`'s app bar (path title, completion %, modules done/total). No new Isar schema — both render from data already loaded on-screen.
+  2. **B20:** Added `LearnerProfile.preferShorterSessions` (safe nullable-default addition) with a Settings toggle. Gave it exactly one honest, deterministic effect instead of a dead toggle: a single SnackBar break nudge at the halfway point of quizzes with 10+ questions, shown once per session, only when the preference is on. Considered defaulting the AI-generated question count lower when the preference is on, but the create-quiz screen already defaults to the lowest option (5), so no lever existed there.
+- **Regression risks:** Low. B28 is additive UI + one new lightweight package. B20's Isar field is a nullable-safe default addition (no migration); the break nudge is gated behind an explicit opt-in toggle that defaults off, so it changes nothing for existing users unless they turn it on.
+- **Verified:** `flutter analyze` (0 new issues, 35 pre-existing baseline); `flutter test` (209 passed/1 skipped, unchanged).
+
 ## 2026-09-19 — Swapped hand-drawn Google G for Google's official icon asset
 
 - **Type:** enhancement (follow-up)

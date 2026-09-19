@@ -46,4 +46,8 @@ class LearnerProfile {
   late bool helpImproveOptIn;
   DateTime? lastLayoutChangeAt;
   late DateTime updatedAt;
+
+  /// Manual "shorter sessions / more breaks" pacing preference (B20). Purely
+  /// a user-set preference, no behavioral inference. Defaults off.
+  bool preferShorterSessions = false;
 }
