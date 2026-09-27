@@ -316,13 +316,14 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
 
 ### B25 — Content build-out for long-tail SEO keywords (blog / comparison pages)
 
-- **Status:** partial (2026-09-19) — second batch of 4 shipped, 7 total
+- **Status:** partial (2026-09-27) — third batch of 4 exam posts shipped, 11 total
 - **Area:** hosting, content, seo
 - **MoSCoW:** Could have
 - **Why it exists:** The 2026-08-29 keyword research found that real top-ranking competitors in this space win via scale — e.g. PracticeMock-style programmatic SEO (one indexed page per exam/topic, ~500+ pages) and RemNote-style long-form comparison posts ("Best Anki Alternatives" with tables, named competitors, FAQ sections). A handful of static marketing pages cannot compete head-on with that; winnable long-tail phrases (BYOK AI quiz generation, local-first flashcards, AI quiz for competitive exams) need actual content to rank for, not just better meta tags on the homepage.
 - **Shipped (first batch, 2026-09-07):** 3 real, substantive posts (`/blog/byok-ai-quiz-generation`, `/blog/local-first-flashcards-spaced-repetition`, `/blog/ai-quiz-competitive-exam-prep`), one per identified winnable phrase, each explaining the underlying concept genuinely (not just restating app marketing copy) plus an FAQ section, and a `/blog` hub page. See `docs/logs/FEATURES_LOG.md` 2026-09-07 entry.
 - **Shipped (second batch, 2026-09-19):** 4 study-skill guides (`/blog/active-recall-vs-rereading`, `/blog/fifteen-minute-study-sessions`, `/blog/job-description-to-study-list`, `/blog/mock-exam-mistakes`), humanised hub/homepage/existing posts, and ad/game-play fixes (no Auto ads on Dino/2048, no ads on Privacy/Terms). Still not comparison pages or a programmatic mill.
-- **Suggested next step:** Hold comparison posts and programmatic SEO until these 7 pages show real indexing/traffic. Do not add thin filler.
+- **Shipped (third batch, 2026-09-27):** 4 exam practice guides (`/blog/ielts-practice-the-paper`, `/blog/neet-ug-syllabus-practice`, `/blog/jee-main-paper-practice`, `/blog/upsc-prelims-from-the-syllabus`). Official paper rules cited; not another “what is an AI quiz” post. Still not comparison pages or a programmatic mill.
+- **Suggested next step:** Hold comparison posts and programmatic SEO until these pages show real indexing/traffic. Do not add thin filler.
 - **Risks:** Thin/low-quality pages built purely for SEO can actively hurt rankings (Google's stated policy against "scaled content abuse") — the shipped batch was written to be genuinely useful on its own merits, not filler; any further batch must hold the same bar.
 - **Source:** `docs/logs/FEATURES_LOG.md` 2026-08-29 SEO audit keyword research; 2026-09-07 shipped batch.
 

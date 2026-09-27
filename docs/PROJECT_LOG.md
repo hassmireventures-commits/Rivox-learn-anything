@@ -16,6 +16,7 @@ Master index for all changes. **Agents must read this file and the relevant sect
 
 | Date | Type | Title | Log |
 |------|------|-------|-----|
+| 2026-09-27 | feature | IELTS, NEET, JEE Main, and UPSC practice posts (B25) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-09-27 | bugfix | Live probe quiz scored 0 on an opaque Built-in AI error | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-27 | bugfix | Quiz card gap, mixed question formats, remembered Google sign-in | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-27 | feature | Show passage, chart, table, or transcript on questions that need them (B46) | [FEATURES_LOG](logs/FEATURES_LOG.md) |

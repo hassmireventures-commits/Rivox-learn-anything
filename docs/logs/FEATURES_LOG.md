@@ -1,5 +1,15 @@
 # Features Log
 
+## 2026-09-27 — Exam practice posts: IELTS, NEET, JEE Main, UPSC (B25)
+
+- **Type:** feature
+- **Area:** hosting, seo
+- **Files:** `hosting/blog/ielts-practice-the-paper/index.html`, `hosting/blog/neet-ug-syllabus-practice/index.html`, `hosting/blog/jee-main-paper-practice/index.html`, `hosting/blog/upsc-prelims-from-the-syllabus/index.html`, `hosting/blog/index.html`, `hosting/sitemap.xml`
+- **Problem / Goal:** Search traffic for named exams was thin. The existing competitive-exam post covers SSC, banking, and CAT as a general AI-quiz note, not the paper itself.
+- **Solution:** Four practice guides. IELTS timings from ielts.org and the British Council. NEET UG 2026 counts from the NTA bulletin (180 questions, +4/-1) and the NMC syllabus notice. JEE Main 2026 Paper 1 from the NTA bulletin (75 questions, numerical answers, +4/-1). UPSC prelims as a syllabus-first method, with the year’s notice on upsc.gov.in as the rule. Each post has one mid-article Display unit, FAQ schema, and a Play Store closer. B25 stays partial.
+- **Regression risks:** Auto ads still load on blog pages via the client script. Do not place the same Display unit twice. Do not mark B25 done. Do not invent later exam-pattern changes; the posts tell the reader to follow a newer bulletin.
+- **Verified:** HTML structure checked locally (one h1, FAQ text matches JSON-LD). Live pages checked in the browser after hosting deploy.
+
 ## 2026-09-27 — Question stimulus: passage, chart, table, or spoken transcript (B46)
 
 - **Type:** feature
