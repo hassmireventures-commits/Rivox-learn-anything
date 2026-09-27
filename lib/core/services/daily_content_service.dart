@@ -5,12 +5,15 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../data/local/repositories/learner_repository.dart';
 import '../../data/local/repositories/quiz_repository.dart';
+import '../../data/remote/ai/input_kind_prompt.dart';
 import '../../data/remote/ai/resource_link_validator.dart';
 import '../error/app_exception.dart';
 import 'agentic/goal_content_validation_agent.dart';
 import 'daily_content_fallbacks.dart';
 import 'goal_topic_resolver.dart';
+import 'language_exam_resources.dart';
 import 'learner_goal_guard.dart';
+import 'skill_articles.dart';
 import 'llm_manager.dart';
 import 'open_knowledge/open_knowledge_service.dart';
 import 'topic_goal_relevance.dart';
@@ -233,6 +236,7 @@ class DailyContentService {
         } catch (_) {}
         return null;
       }
+      if (_isStaleExamOverview(pack)) return null;
       return pack;
     } catch (_) {
       return null;
@@ -298,7 +302,15 @@ class DailyContentService {
     final resolvedTopic = resolved?.effectiveTopic ?? pickedTopic;
     var resolutionBlock = resolved?.promptBlock ?? '';
 
-    if (!resolutionBlock.contains('OPEN KNOWLEDGE')) {
+    final practiceTopic = SkillArticles.preferredTopic(
+      resolved: resolvedTopic,
+      picked: pickedTopic,
+      goalContext: profile.goalContext,
+      goals: goals,
+    );
+    final contentTopic = practiceTopic ?? resolvedTopic;
+
+    if (practiceTopic == null && !resolutionBlock.contains('OPEN KNOWLEDGE')) {
       final openBlock =
           await OpenKnowledgeService().gatherPromptContext(resolvedTopic);
       if (openBlock.isNotEmpty) {
@@ -317,54 +329,54 @@ class DailyContentService {
     final dateKey = _dateKey(DateTime.now());
     var article = await _generateValidated(
       type: 'article',
-      topic: resolvedTopic,
+      topic: contentTopic,
       dateKey: dateKey,
       topicResolutionBlock: resolutionBlock,
       recentArticleUrls: recentArticleUrlSet,
     );
     var video = await _generateValidated(
       type: 'video',
-      topic: resolvedTopic,
+      topic: contentTopic,
       dateKey: dateKey,
       topicResolutionBlock: resolutionBlock,
     );
     article ??= await DailyContentFallbacks.pick(
       type: 'article',
-      topic: resolvedTopic,
+      topic: contentTopic,
       dateKey: dateKey,
       excludeUrls: recentArticleUrlSet,
     );
     video ??= await DailyContentFallbacks.pick(
       type: 'video',
-      topic: resolvedTopic,
+      topic: contentTopic,
       dateKey: dateKey,
     );
     article ??= await DailyContentFallbacks.pick(
       type: 'article',
-      topic: resolvedTopic,
+      topic: contentTopic,
       dateKey: dateKey,
       trustedOnly: true,
       excludeUrls: recentArticleUrlSet,
     );
     video ??= await DailyContentFallbacks.pick(
       type: 'video',
-      topic: resolvedTopic,
+      topic: contentTopic,
       dateKey: dateKey,
       trustedOnly: true,
     );
     article ??= await DailyContentFallbacks.topicAwareMinimumArticle(
-      topic: resolvedTopic,
+      topic: contentTopic,
       dateKey: dateKey,
       excludeUrls: recentArticleUrlSet,
     );
     video ??= DailyContentFallbacks.topicAwareMinimumVideo(
-      topic: resolvedTopic,
+      topic: contentTopic,
       dateKey: dateKey,
     );
 
     final pack = DailyContentPack(
       dateKey: dateKey,
-      topic: resolvedTopic,
+      topic: contentTopic,
       article: article,
       video: video,
       recentArticleUrls: _withRecentUrl(recentArticleUrls, article.url),
@@ -433,8 +445,37 @@ class DailyContentService {
     String topic, {
     String topicResolutionBlock = '',
     Set<String> avoidUrls = const {},
-  }) => '''
-${topicResolutionBlock.isNotEmpty ? '$topicResolutionBlock\n' : ''}Pick one FREE, real article/tutorial for this topic: "$topic".
+  }) {
+    if (LanguageExamResources.matches(topic)) {
+      return '''
+Pick one FREE article that teaches an IELTS skill, starting from the basics of that skill. Topic: "$topic".
+Return a single JSON object only:
+{"type":"article","title":"...","url":"https://...","summary":"1-2 sentences"}
+
+Rules:
+- The article must practice or explain a real task: reading question types, listening sections, writing task 1 or 2, or speaking parts 1–3.
+- Do NOT pick a Wikipedia page, a page about the history of the exam, fees, or "what IELTS stands for".
+- Use ONLY https URLs on: ieltsliz.com, takeielts.britishcouncil.org, www.ielts.org, ielts.idp.com
+- Prefer this order when it is a new learner: reading techniques, then listening, then writing, then speaking.
+- URL must be a real article page (not a homepage or search results).
+${avoidUrls.isEmpty ? '' : '- Do not suggest any of these URLs again: ${avoidUrls.join(', ')}\n'}''';
+    }
+    if (SkillArticles.isPracticeTopic(topic)) {
+      return '''
+Pick one FREE lesson that teaches a skill for "$topic", starting from the basics of that skill.
+Return a single JSON object only:
+{"type":"article","title":"...","url":"https://...","summary":"1-2 sentences"}
+
+Rules:
+- The page must teach a task: a tutorial, a worked example, or the first chapter of an official guide.
+- Do NOT pick a Wikipedia page, a page about the history of the exam or language, fees, or "what $topic stands for".
+- Use ONLY https URLs on: www.w3schools.com, www.geeksforgeeks.org, developer.mozilla.org, www.khanacademy.org, docs.python.org, react.dev, docs.flutter.dev, dart.dev, docs.aws.amazon.com, learn.microsoft.com, cloud.google.com, kubernetes.io, docs.docker.com, go.dev, kotlinlang.org, javascript.info, realpython.com, www.freecodecamp.org
+- URL must be a real lesson page (not a homepage or search results).
+${avoidUrls.isEmpty ? '' : '- Do not suggest any of these URLs again: ${avoidUrls.join(', ')}\n'}''';
+    }
+    return '''
+${topicResolutionBlock.isNotEmpty ? '$topicResolutionBlock\n' : ''}${InputKindPrompt.articleRules(topic)}
+Pick one FREE, real article/tutorial for this topic: "$topic".
 Return a single JSON object only:
 {"type":"article","title":"...","url":"https://...","summary":"1-2 sentences"}
 
@@ -453,9 +494,36 @@ Rules:
 - URL must be a real article page (not a site homepage or search results).
 - Never invent paths. Prefer a different URL on each retry.
 ${avoidUrls.isEmpty ? '' : '- Do not suggest any of these URLs again, pick a different real article: ${avoidUrls.join(', ')}\n'}''';
+  }
 
-  String _videoPrompt(String topic, {String topicResolutionBlock = ''}) => '''
-${topicResolutionBlock.isNotEmpty ? '$topicResolutionBlock\n' : ''}Pick one FREE, real YouTube tutorial video for this topic: "$topic".
+  String _videoPrompt(String topic, {String topicResolutionBlock = ''}) {
+    if (LanguageExamResources.matches(topic)) {
+      return '''
+Pick one FREE YouTube lesson that teaches an IELTS skill (reading, listening, writing, or speaking), not an overview of the exam brand. Topic: "$topic".
+Return a single JSON object only:
+{"type":"video","title":"...","url":"https://www.youtube.com/watch?v=VIDEO_ID","summary":"1-2 sentences"}
+
+Rules:
+- Prefer channels: IELTS Liz, E2 IELTS, IELTS Advantage, British Council.
+- Do NOT suggest a video whose title is only "What is IELTS" or a band-score chart.
+- URL must be a real watch URL (https://www.youtube.com/watch?v=VIDEO_ID) with an 11-character ID. Never invent IDs.
+''';
+    }
+    if (SkillArticles.isPracticeTopic(topic)) {
+      return '''
+Pick one FREE YouTube lesson that teaches a skill for "$topic", starting from the basics. Not an overview of the brand or the exam.
+Return a single JSON object only:
+{"type":"video","title":"...","url":"https://www.youtube.com/watch?v=VIDEO_ID","summary":"1-2 sentences"}
+
+Rules:
+- Prefer a worked example, a first lesson, or a practice walkthrough.
+- Do NOT suggest a video whose title is only "What is $topic" or a fee or syllabus chart.
+- URL must be a real watch URL (https://www.youtube.com/watch?v=VIDEO_ID) with an 11-character ID. Never invent IDs.
+''';
+    }
+    return '''
+${topicResolutionBlock.isNotEmpty ? '$topicResolutionBlock\n' : ''}${InputKindPrompt.videoRules(topic)}
+Pick one FREE, real YouTube tutorial video for this topic: "$topic".
 Return a single JSON object only:
 {"type":"video","title":"...","url":"https://www.youtube.com/watch?v=VIDEO_ID","summary":"1-2 sentences"}
 
@@ -473,6 +541,7 @@ Rules:
   that exists and is publicly embeddable today. Never invent or guess IDs.
 - Prefer a different video each retry.
 ''';
+  }
 
   Future<DailyContentItem?> _parseAndValidate(
     String raw, {
@@ -493,6 +562,13 @@ Rules:
       final title = data['title']?.toString().trim();
       final summary = data['summary']?.toString().trim() ?? '';
       if (url.isEmpty) return null;
+
+      if (type == 'article' && SkillArticles.isPracticeTopic(topic)) {
+        final host = Uri.tryParse(url)?.host.toLowerCase() ?? '';
+        if (host.contains('wikipedia') || host.contains('wikihow') || host.contains('britannica')) {
+          return null;
+        }
+      }
 
       final accepted = await ResourceLinkValidator.acceptDailyResource(
         type: type == 'video' ? 'video' : 'article',
@@ -557,6 +633,16 @@ Rules:
       topic: topic,
       youtubeVideoId: null,
     );
+  }
+
+  static bool _isStaleExamOverview(DailyContentPack pack) {
+    final aboutSkill = SkillArticles.isPracticeTopic(pack.topic) ||
+        SkillArticles.isPracticeTopic(pack.article?.topic ?? '');
+    if (!aboutSkill) return false;
+    final host = Uri.tryParse(pack.article?.url ?? '')?.host.toLowerCase() ?? '';
+    return host.contains('wikipedia') ||
+        host.contains('wikihow') ||
+        host.contains('britannica');
   }
 
   static String? _pickTopic({required List<String> goals, required List<String> weak}) {

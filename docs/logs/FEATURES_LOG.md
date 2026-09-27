@@ -1,5 +1,15 @@
 # Features Log
 
+## 2026-09-27 — Question stimulus: passage, chart, table, or spoken transcript (B46)
+
+- **Type:** feature
+- **Area:** quiz
+- **Files:** `lib/data/local/models/question.dart`, `lib/data/local/models/question.g.dart`, `lib/data/remote/ai/models/question_stimulus.dart`, `lib/data/remote/ai/models/generated_quiz.dart`, `lib/data/remote/ai/prompt_builder.dart`, `lib/data/remote/ai/language_exam_prompt.dart`, `lib/data/remote/ai/input_kind_prompt.dart`, `lib/data/local/repositories/quiz_repository.dart`, `lib/features/quiz/presentation/question_stimulus_view.dart`, `lib/features/quiz/presentation/quiz_play_screen.dart`, `lib/features/quiz/presentation/results_screen.dart`, `lib/data/local/isar_service.dart`, `test/question_stimulus_test.dart`
+- **Problem / Goal:** Results referred to a chart, a table, or audio the screen never showed. The question title was also cut to two lines, so a passage inside the stem could not be read.
+- **Solution:** The generator may attach a stimulus object. The app stores it, draws charts and tables, shows passages and cue cards, and reads transcripts aloud. The block is omitted when the question has none. On the play screen the figure and the question share a scroll area so the options stay on screen. Expanded results also show the full question text.
+- **Regression risks:** Existing quizzes have a null stimulus until regenerated. Isar schema version is 3 for the new nullable column. Interview quizzes are unchanged.
+- **Verified:** `flutter test test/question_stimulus_test.dart test/language_exam_prompt_test.dart` (6 passed, including a widget check that a chart, table, transcript, and passage render, and a question with no stimulus renders nothing). Analyzer on the new view reported no issues. Not checked on a device.
+
 ## 2026-09-19 (Phase 6) — Android home-screen streak widget (B19)
 
 - **Type:** feature

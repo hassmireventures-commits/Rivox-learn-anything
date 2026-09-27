@@ -1,4 +1,7 @@
 import 'competitive_exam_prompt.dart';
+import 'input_kind_prompt.dart';
+import 'language_exam_prompt.dart';
+import 'skill_practice_prompt.dart';
 import 'quiz_consistency_prompt.dart';
 import 'topic_specificity_prompt.dart';
 import 'models/learning_pattern_context.dart';
@@ -19,14 +22,16 @@ class PromptBuilder {
     final difficulty = _sanitize(request.difficulty);
 
     final typeInstruction = switch (request.questionType) {
-      'mcq' => 'All MCQ with exactly 4 options.',
-      'true_false' => 'All True/False; options ["True","False"].',
-      'fill_blank' => 'Fill-in-the-blank with 4 plausible options each.',
+      'mcq' => 'All MCQ with exactly 4 options. Set type to "mcq" on every question.',
+      'true_false' =>
+        'All True/False; options ["True","False"]. Set type to "true_false" on every question.',
+      'fill_blank' =>
+        'Fill-in-the-blank: each stem contains _____ and exactly 4 short options. Set type to "fill_blank" on every question.',
       'interview' => _interviewInstruction(
           request.interviewPersona,
           voiceOnly: request.voiceInterviewOnly,
         ),
-      _ => 'Mix MCQ / TrueFalse / fill-blank; always include options arrays.',
+      _ => _mixedInstruction(request.questionCount),
     };
 
     final explanationInstruction = request.generateExplanations
@@ -47,18 +52,25 @@ class PromptBuilder {
 
     final patternNote = _patternBlock(request.learningPattern, difficulty);
     final skill = request.skillLevel;
-    final competitiveNote = CompetitiveExamPrompt.block(request);
+    final inputKindNote = InputKindPrompt.quizBlock(request);
+    final skillPracticeNote = SkillPracticePrompt.block(request);
+    final competitiveNote = skillPracticeNote.isNotEmpty
+        ? ''
+        : CompetitiveExamPrompt.block(request);
+    final languageExamNote = LanguageExamPrompt.block(request);
     final consistencyNote = QuizConsistencyPrompt.block(request);
     final specificityNote = TopicSpecificityPrompt.block(request);
     final resolutionNote = request.topicResolutionBlock.isNotEmpty
         ? '${request.topicResolutionBlock}\n'
         : '';
     final suppressBeginner = CompetitiveExamPrompt.suppressBeginnerTrack(request) ||
-        TopicSpecificityPrompt.suppressBeginnerTrack(request);
+        TopicSpecificityPrompt.suppressBeginnerTrack(request) ||
+        LanguageExamPrompt.applies(request) ||
+        SkillPracticePrompt.applies(request);
     final beginnerNote = suppressBeginner
         ? ''
         : (difficulty == 'easy' || skill == null || skill < 0.5)
-            ? 'BEGINNER TRACK: assume ZERO prior knowledge. Ask the most foundational questions within the EXACT subfield named in the topic — start from absolute basics, not intermediate concepts. No advanced jargon, no expert-only traps.\n'
+            ? 'BEGINNER TRACK: use this only when the input check classifies the topic as a subject. Assume ZERO prior knowledge and ask foundational questions within that subject, not a different field. If the check says language_test, certification, exam, or coding, ignore this track and write practice items instead.\n'
             : '';
     final ragBlock = request.ragContextBlock.isNotEmpty ? '${request.ragContextBlock}\n\n' : '';
     final goalsNote = request.learnerGoals.isEmpty
@@ -71,6 +83,9 @@ class PromptBuilder {
     final refsExample = request.ragContextBlock.isNotEmpty
         ? ',"references":[{"title":"Source","url":"https://example.com"}]'
         : '';
+    final schemaExample = request.questionType == 'mixed'
+        ? '{"questions":[{"text":"What is 2+2?","options":["3","4","5","6"],"correctIndex":1,"type":"mcq","explanation":$explanationExample$refsExample},{"text":"2+2 equals 4.","options":["True","False"],"correctIndex":0,"type":"true_false","explanation":$explanationExample},{"text":"2+2 equals _____.","options":["3","4","5","6"],"correctIndex":1,"type":"fill_blank","explanation":$explanationExample}]}'
+        : '{"questions":[{"text":"What is 2+2?","options":["3","4","5","6"],"correctIndex":1,"type":"mcq","explanation":$explanationExample$refsExample}]}';
     final count = request.questionCount;
     final allowedCounts = AppConstants.questionCounts.join(', ');
     final consistencyVerify = consistencyNote.isNotEmpty
@@ -89,16 +104,32 @@ MANDATORY (must satisfy every line — wrong counts are rejected):
 - Language: $language (all question and option text in this language)
 - Unique question stems only (no duplicate or near-duplicate questions)
 - Every marked-correct answer must be factually accurate and verifiable, not a plausible-sounding guess. If you are not confident an answer is objectively true, pick a different, more well-established question instead of guessing.
-$libraryNote$goalsNote$resolutionNote$specificityNote$competitiveNote$consistencyNote$beginnerNote
+- Add "stimulus" ONLY when the candidate must read or hear material that is not the question itself (a passage, a conversation, a chart, a table, or a cue card). Omit "stimulus" on every other question.
+- stimulus.kind is one of: passage, transcript, chart, table, cue.
+- passage, transcript, or cue: {"kind":"passage","title":"short label","body":"the full text the candidate needs"}
+- chart: {"kind":"chart","title":"Average temperature","unit":"°C","points":[{"label":"London","value":8},{"label":"Cairo","value":22}]}
+- table: {"kind":"table","title":"Weekend visitors","columns":["Place","Saturday"],"rows":[["Museum","120"]]}
+- Never write "see the chart", "the table below", "listen to the audio", or "read the passage" unless that material is inside stimulus. The app draws charts and tables and reads transcripts aloud. Do not invent an audio file or an image.
+$libraryNote$goalsNote$resolutionNote$inputKindNote$specificityNote$competitiveNote$languageExamNote$skillPracticeNote$consistencyNote$beginnerNote
 $explanationInstruction
 $refsInstruction
 $timerNote
 $patternNote
 Rules: correctIndex is 0-based and must match the objectively true, verifiable answer (never a confident-sounding but incorrect one); unique plausible options with full answer text (never letter-only like "A","B","C","D"); return exactly $count questions.$consistencyVerify
 
-Schema (questions array must contain exactly $count objects like this):
-{"questions":[{"text":"What is 2+2?","options":["3","4","5","6"],"correctIndex":1,"type":"mcq","explanation":$explanationExample$refsExample}]}
+Schema (questions array must contain exactly $count objects. A mixed example shows one of each shape; still return exactly $count questions, not 3):
+$schemaExample
 ''';
+  }
+
+  static String _mixedInstruction(int count) {
+    if (count < 3) {
+      return 'Mix the formats. Use at least two of mcq (exactly 4 options), true_false (options exactly ["True","False"]), and fill_blank (the stem contains _____ and exactly 4 short options). Set "type" on every question. Do not make every question an MCQ.';
+    }
+    final trueFalse = (count / 3).floor().clamp(1, count - 2).toInt();
+    final fillBlank = (count / 3).floor().clamp(1, count - trueFalse - 1).toInt();
+    final mcq = count - trueFalse - fillBlank;
+    return 'Mix formats across all $count questions: $mcq with type "mcq" (exactly 4 options), $trueFalse with type "true_false" (options exactly ["True","False"]), and $fillBlank with type "fill_blank" (the stem contains _____ and exactly 4 short options). Set "type" on every question to mcq, true_false, or fill_blank. A set that is all MCQ is invalid.';
   }
 
   static String _interviewInstruction(String? persona, {bool voiceOnly = false}) {

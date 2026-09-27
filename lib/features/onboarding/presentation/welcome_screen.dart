@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -91,6 +93,27 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     _languageCode = SupportedLanguages.defaultCodeForDevice(
       WidgetsBinding.instance.platformDispatcher.locale,
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_restoreSignedInAccount());
+    });
+  }
+
+  /// Firebase starts after the first frame. Once it is up, reuse the account
+  /// saved on this device so the Google sheet is not shown again.
+  Future<void> _restoreSignedInAccount() async {
+    final auth = ref.read(authServiceProvider);
+    for (var i = 0; i < 25 && !auth.isReady; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      if (!mounted) return;
+    }
+    if (!mounted || !auth.isReady || _signedInEmail != null) return;
+    final user = await auth.restoreSession();
+    if (!mounted || user == null) return;
+    final displayName = user.displayName;
+    if (_nameController.text.trim().isEmpty && (displayName?.isNotEmpty ?? false)) {
+      _nameController.text = displayName!;
+    }
+    setState(() => _signedInEmail = user.email);
   }
 
   @override

@@ -51,6 +51,7 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 | B43 | Lock-screen "answer to unlock" gamification | backlog (proposed 2026-09-07) | gamification, platform | Won't have (not feasible) |
 | B44 | Screen-time-aware streak nudge via Android UsageStatsManager | backlog (proposed 2026-09-07) | gamification, platform, retention | Could have |
 | B45 | R8/AGP optimisation: enable optimised resource shrinking + upgrade AGP to 9.0+ | backlog (proposed 2026-09-09) | android, build, platform | Must have |
+| B46 | Show passage, chart, table, or spoken transcript on questions that need them | done (2026-09-27) | quiz | Should have |
 
 ---
 
@@ -571,3 +572,13 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
   2. **Enable optimised resource shrinking on top of the new AGP version.** Verify the exact current Gradle property/DSL for this against AGP 9.x's own release notes at implementation time — Google's naming for this feature has shifted across AGP versions, so do not hardcode a specific flag name here without checking docs first (matching this repo's established fact-check-before-committing convention, e.g. B40/B44's own corrections).
 - **Risks:** AGP major-version bumps are the single highest-risk category of build-config change relative to anything else touched this cycle — real potential for build-breaking changes, namespace/manifest requirements, or plugin incompatibilities that only surface at build time, not via static analysis. Do not bundle this into an unrelated feature change; schedule it as its own dedicated pass with a full analyze+test+build+device-install verification cycle, the same diligence already applied to the obfuscation proguard fix.
 - **Source:** Play Console "App optimisation" panel, 2026-09-09 (user-reported, verbatim: "Optimised resource shrinking isn't enabled" / "Upgrade your Android Gradle plug-in to version 9.0 or higher"); this session's own Flutter build warnings and `android/settings.gradle.kts`/`android/gradle/wrapper/gradle-wrapper.properties` (confirmed current AGP 8.11.1/Gradle 8.14/Kotlin 2.2.20); `docs/logs/BUGFIX_LOG.md` 2026-09-08 entry (the related obfuscation fix, same Play Console panel).
+
+### B46 — Show passage, chart, table, or spoken transcript on questions that need them
+
+- **Status:** done (2026-09-27)
+- **Area:** quiz
+- **MoSCoW:** Should have
+- **Why it exists:** IELTS-style results referred to a chart, a graph, or a conversation ("listen to the following") but the play screen and the results list only showed a two-line question title. There was no field for that material, and the model was told to mention a figure without a place to put the figure.
+- **Shipped:** Optional `stimulus` on generated questions, stored as `Question.stimulusJson`. Kinds: passage, transcript, chart, table, cue. The play screen and the expanded result show it only when present. Transcripts have a listen button that reads the text aloud on the device. Charts are drawn from the numbers in the stimulus. Questions with no stimulus are unchanged. Quizzes already saved do not gain a chart until they are generated again.
+- **Still out of scope:** Real audio files and picture charts. Listening is the transcript, read by on-device speech.
+- **Source:** User screenshot of quiz results, 2026-09-27. [FEATURES_LOG](logs/FEATURES_LOG.md).

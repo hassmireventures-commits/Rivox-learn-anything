@@ -19,6 +19,7 @@ import '../../../data/local/models/quiz_session.dart';
 import '../../../data/local/repositories/flashcard_repository.dart';
 import '../../../data/local/repositories/quiz_repository.dart';
 import '../../../shared/widgets/app_card.dart';
+import 'question_stimulus_view.dart';
 import '../../../shared/widgets/bottom_native_ad_slot.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/share_card.dart';
@@ -466,6 +467,21 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen>
                   ),
                   childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                   children: [
+                    if (q.stimulusJson != null && q.stimulusJson!.trim().isNotEmpty)
+                      QuestionStimulusView(
+                        key: ValueKey('result-stimulus-$i'),
+                        raw: q.stimulusJson,
+                      ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        q.text,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              height: 1.35,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(

@@ -136,6 +136,9 @@ class ProviderErrorMapper {
 
     final map = Map<String, dynamic>.from(data);
     final error = map['error'];
+    if (error is String && error.trim().isNotEmpty) {
+      return _truncate(error.trim());
+    }
     if (error is Map) {
       final message = error['message']?.toString();
       if (message != null && message.trim().isNotEmpty) {

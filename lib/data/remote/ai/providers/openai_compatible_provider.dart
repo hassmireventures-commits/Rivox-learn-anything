@@ -71,8 +71,12 @@ class OpenAiCompatibleProvider implements AiProvider {
               activeModel: activeModel,
               useJsonObjectMode: preferJsonObjectMode,
               questionCount: request.questionCount,
+              questionType: request.questionType,
             );
-            return QuizJsonParser.parse(content, expectedCount: request.questionCount);
+            return QuizJsonParser.parse(
+              content,
+              expectedCount: request.questionCount,
+            );
           },
         );
       }
@@ -82,6 +86,7 @@ class OpenAiCompatibleProvider implements AiProvider {
         messages: messages,
         useJsonObjectMode: preferJsonObjectMode,
         questionCount: request.questionCount,
+        questionType: request.questionType,
       );
       return QuizJsonParser.parse(content, expectedCount: request.questionCount);
     } on AppException {
@@ -96,6 +101,7 @@ class OpenAiCompatibleProvider implements AiProvider {
     required List<Map<String, String>> messages,
     required bool useJsonObjectMode,
     required int questionCount,
+    String? questionType,
   }) async {
     if (providerType == AiProviderType.builtin) {
       return BuiltInAiRouter.withModelFallback(
@@ -106,6 +112,7 @@ class OpenAiCompatibleProvider implements AiProvider {
           activeModel: activeModel,
           useJsonObjectMode: useJsonObjectMode,
           questionCount: questionCount,
+          questionType: questionType,
         ),
       );
     }
@@ -117,6 +124,7 @@ class OpenAiCompatibleProvider implements AiProvider {
         activeModel: model,
         useJsonObjectMode: useJsonObjectMode,
         questionCount: questionCount,
+        questionType: questionType,
       );
     } on DioException catch (e) {
       throw ProviderErrorMapper.map(e);
@@ -129,6 +137,7 @@ class OpenAiCompatibleProvider implements AiProvider {
     required String activeModel,
     required bool useJsonObjectMode,
     required int questionCount,
+    String? questionType,
   }) async {
     Future<Response<Map<String, dynamic>>> send({
       required String activeModel,
@@ -168,7 +177,11 @@ class OpenAiCompatibleProvider implements AiProvider {
       if (AiOutputGate.needsStrictRetry(
         content,
         validateContent: (text) =>
-            QuizJsonParser.accepts(text, expectedCount: questionCount),
+            QuizJsonParser.accepts(
+              text,
+              expectedCount: questionCount,
+              questionType: questionType,
+            ),
       )) {
         final retry = await send(
           activeModel: activeModel,

@@ -3,6 +3,7 @@ import 'agentic/goal_content_validation_agent.dart';
 import 'coding_tutorial_sources.dart';
 import 'goal_topic_resolver.dart';
 import 'open_knowledge/wikipedia_source.dart';
+import 'skill_articles.dart';
 import 'topic_grounding_service.dart';
 
 /// Reachable allowlisted article resolved for any learning topic.
@@ -76,6 +77,23 @@ class LearningArticleResolver {
   }) async {
     final trimmedTopic = topic.trim();
     if (trimmedTopic.isEmpty || limit < 1) return const [];
+
+    if (SkillArticles.isPracticeTopic(trimmedTopic)) {
+      final article = SkillArticles.curated(
+        trimmedTopic,
+        excludeUrls: excludeUrls,
+      );
+      if (article != null) {
+        return [
+          ResolvedLearningArticle(
+            title: article.title,
+            url: article.url,
+            summary: article.summary,
+            score: 30,
+          ),
+        ];
+      }
+    }
 
     final validateGoal = _validationGoal(goalContext, trimmedTopic);
     final condensed = condenseLearningTitle(trimmedTopic);
@@ -176,40 +194,42 @@ class LearningArticleResolver {
       }
     }
 
-    final queries = buildSearchQueries(
-      topic: trimmedTopic,
-      goalContext: goalContext,
-      pathTitle: pathTitle,
-    );
-    for (var qi = 0; qi < queries.length; qi++) {
-      final hits = await _wikipedia.searchArticles(queries[qi], limit: 5);
-      for (var ri = 0; ri < hits.length; ri++) {
-        final hit = hits[ri];
-        final url = hit.url;
-        if (url == null) continue;
-        if (validateForGoal != null &&
-            !_validator
-                .validateOpenKnowledgeArticle(
-                  goal: validateForGoal,
-                  title: hit.title,
-                  summary: hit.summary,
-                )
-                .approved) {
-          continue;
+    if (!SkillArticles.isPracticeTopic(trimmedTopic)) {
+      final queries = buildSearchQueries(
+        topic: trimmedTopic,
+        goalContext: goalContext,
+        pathTitle: pathTitle,
+      );
+      for (var qi = 0; qi < queries.length; qi++) {
+        final hits = await _wikipedia.searchArticles(queries[qi], limit: 5);
+        for (var ri = 0; ri < hits.length; ri++) {
+          final hit = hits[ri];
+          final url = hit.url;
+          if (url == null) continue;
+          if (validateForGoal != null &&
+              !_validator
+                  .validateOpenKnowledgeArticle(
+                    goal: validateForGoal,
+                    title: hit.title,
+                    summary: hit.summary,
+                  )
+                  .approved) {
+            continue;
+          }
+          add(ArticleCandidate(
+            title: hit.title,
+            url: url,
+            summary: hit.summary,
+            source: 'wikipedia',
+            queryRank: qi,
+            resultRank: ri,
+          ));
         }
-        add(ArticleCandidate(
-          title: hit.title,
-          url: url,
-          summary: hit.summary,
-          source: 'wikipedia',
-          queryRank: qi,
-          resultRank: ri,
-        ));
       }
-    }
 
-    for (final h in _heuristicCandidates(condensed, trimmedTopic, goalContext)) {
-      add(h);
+      for (final h in _heuristicCandidates(condensed, trimmedTopic, goalContext)) {
+        add(h);
+      }
     }
 
     return out;

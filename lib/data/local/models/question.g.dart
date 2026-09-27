@@ -58,15 +58,20 @@ const QuestionSchema = CollectionSchema(
       name: r'rubricJson',
       type: IsarType.string,
     ),
-    r'text': PropertySchema(id: 9, name: r'text', type: IsarType.string),
+    r'stimulusJson': PropertySchema(
+      id: 9,
+      name: r'stimulusJson',
+      type: IsarType.string,
+    ),
+    r'text': PropertySchema(id: 10, name: r'text', type: IsarType.string),
     r'timeSpentMs': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'timeSpentMs',
       type: IsarType.long,
     ),
-    r'type': PropertySchema(id: 11, name: r'type', type: IsarType.string),
+    r'type': PropertySchema(id: 12, name: r'type', type: IsarType.string),
     r'userAnswer': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'userAnswer',
       type: IsarType.string,
     ),
@@ -127,6 +132,12 @@ int _questionEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  {
+    final value = object.stimulusJson;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.text.length * 3;
   bytesCount += 3 + object.type.length * 3;
   {
@@ -153,10 +164,11 @@ void _questionSerialize(
   writer.writeString(offsets[6], object.quizUuid);
   writer.writeString(offsets[7], object.referencesJson);
   writer.writeString(offsets[8], object.rubricJson);
-  writer.writeString(offsets[9], object.text);
-  writer.writeLong(offsets[10], object.timeSpentMs);
-  writer.writeString(offsets[11], object.type);
-  writer.writeString(offsets[12], object.userAnswer);
+  writer.writeString(offsets[9], object.stimulusJson);
+  writer.writeString(offsets[10], object.text);
+  writer.writeLong(offsets[11], object.timeSpentMs);
+  writer.writeString(offsets[12], object.type);
+  writer.writeString(offsets[13], object.userAnswer);
 }
 
 Question _questionDeserialize(
@@ -176,10 +188,11 @@ Question _questionDeserialize(
   object.quizUuid = reader.readString(offsets[6]);
   object.referencesJson = reader.readStringOrNull(offsets[7]);
   object.rubricJson = reader.readStringOrNull(offsets[8]);
-  object.text = reader.readString(offsets[9]);
-  object.timeSpentMs = reader.readLongOrNull(offsets[10]);
-  object.type = reader.readString(offsets[11]);
-  object.userAnswer = reader.readStringOrNull(offsets[12]);
+  object.stimulusJson = reader.readStringOrNull(offsets[9]);
+  object.text = reader.readString(offsets[10]);
+  object.timeSpentMs = reader.readLongOrNull(offsets[11]);
+  object.type = reader.readString(offsets[12]);
+  object.userAnswer = reader.readStringOrNull(offsets[13]);
   return object;
 }
 
@@ -209,12 +222,14 @@ P _questionDeserializeProp<P>(
     case 8:
       return (reader.readStringOrNull(offset)) as P;
     case 9:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 10:
-      return (reader.readLongOrNull(offset)) as P;
-    case 11:
       return (reader.readString(offset)) as P;
+    case 11:
+      return (reader.readLongOrNull(offset)) as P;
     case 12:
+      return (reader.readString(offset)) as P;
+    case 13:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1441,6 +1456,170 @@ extension QuestionQueryFilter
     });
   }
 
+  QueryBuilder<Question, Question, QAfterFilterCondition> stimulusJsonIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'stimulusJson'),
+      );
+    });
+  }
+
+  QueryBuilder<Question, Question, QAfterFilterCondition>
+  stimulusJsonIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'stimulusJson'),
+      );
+    });
+  }
+
+  QueryBuilder<Question, Question, QAfterFilterCondition> stimulusJsonEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'stimulusJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Question, Question, QAfterFilterCondition>
+  stimulusJsonGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'stimulusJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Question, Question, QAfterFilterCondition> stimulusJsonLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'stimulusJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Question, Question, QAfterFilterCondition> stimulusJsonBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'stimulusJson',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Question, Question, QAfterFilterCondition>
+  stimulusJsonStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'stimulusJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Question, Question, QAfterFilterCondition> stimulusJsonEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'stimulusJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Question, Question, QAfterFilterCondition> stimulusJsonContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'stimulusJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Question, Question, QAfterFilterCondition> stimulusJsonMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'stimulusJson',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Question, Question, QAfterFilterCondition>
+  stimulusJsonIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'stimulusJson', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<Question, Question, QAfterFilterCondition>
+  stimulusJsonIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'stimulusJson', value: ''),
+      );
+    });
+  }
+
   QueryBuilder<Question, Question, QAfterFilterCondition> textEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -2087,6 +2266,18 @@ extension QuestionQuerySortBy on QueryBuilder<Question, Question, QSortBy> {
     });
   }
 
+  QueryBuilder<Question, Question, QAfterSortBy> sortByStimulusJson() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'stimulusJson', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Question, Question, QAfterSortBy> sortByStimulusJsonDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'stimulusJson', Sort.desc);
+    });
+  }
+
   QueryBuilder<Question, Question, QAfterSortBy> sortByText() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'text', Sort.asc);
@@ -2258,6 +2449,18 @@ extension QuestionQuerySortThenBy
     });
   }
 
+  QueryBuilder<Question, Question, QAfterSortBy> thenByStimulusJson() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'stimulusJson', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Question, Question, QAfterSortBy> thenByStimulusJsonDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'stimulusJson', Sort.desc);
+    });
+  }
+
   QueryBuilder<Question, Question, QAfterSortBy> thenByText() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'text', Sort.asc);
@@ -2376,6 +2579,14 @@ extension QuestionQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Question, Question, QDistinct> distinctByStimulusJson({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'stimulusJson', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Question, Question, QDistinct> distinctByText({
     bool caseSensitive = true,
   }) {
@@ -2466,6 +2677,12 @@ extension QuestionQueryProperty
   QueryBuilder<Question, String?, QQueryOperations> rubricJsonProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'rubricJson');
+    });
+  }
+
+  QueryBuilder<Question, String?, QQueryOperations> stimulusJsonProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'stimulusJson');
     });
   }
 

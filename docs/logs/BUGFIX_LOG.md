@@ -1,5 +1,65 @@
 # Bug Fix Log
 
+## 2026-09-27 — Live probe quiz scored 0 when Built-in AI returned an opaque error
+
+- **Type:** bugfix
+- **Area:** ai, quiz, ci
+- **Files:** `lib/core/services/built_in_ai_router.dart`, `lib/data/remote/ai/provider_error_mapper.dart`, `test/model_generation_live_probe_test.dart`, `test/built_in_ai_router_test.dart`
+- **Problem / Goal:** The `live-probe` job scored quiz 0/10 with "Built-in AI is unavailable. Try again." Every other task scored 10/10. A timeout or an NVIDIA `error` string stopped the router on the first model, and the probe kept a non-JSON quiz reply instead of asking that model again.
+- **Solution:** Timeouts, 408/409/425/429/5xx, and error text that says the model is unavailable now try the next Built-in model. A string `error` field is read, so the message is no longer dropped. The probe asks again when the first quiz reply is not valid JSON, and it uses the same token cap as a 5-question quiz in the app. A 401 still fails immediately.
+- **Regression risks:** A bad API key still fails on the first model. A transient failure now waits on the fallback model as well. The live probe was not re-run here.
+- **Verified:** `flutter test test/built_in_ai_router_test.dart`.
+
+## 2026-09-27 — Quiz card gap, mixed formats, and remembered Google sign-in
+
+- **Type:** bugfix
+- **Area:** quiz, onboarding, auth
+- **Files:** `lib/features/quiz/presentation/quiz_play_screen.dart`, `lib/data/remote/ai/prompt_builder.dart`, `lib/data/remote/ai/language_exam_prompt.dart`, `lib/data/remote/ai/models/generated_quiz.dart`, `lib/data/remote/ai/quiz_json_parser.dart`, `lib/data/remote/ai/providers/gemini_provider.dart`, `lib/data/remote/ai/providers/claude_provider.dart`, `lib/data/remote/ai/providers/openai_compatible_provider.dart`, `lib/data/remote/ai/providers/local_mlc_provider.dart`, `lib/data/remote/auth/auth_service.dart`, `lib/features/onboarding/presentation/welcome_screen.dart`, `lib/core/services/app_bootstrap.dart`, `test/must_gates_test.dart`
+- **Problem / Goal:** The question card stretched under the options and left a large empty region. Mixed quizzes came back as multiple choice only. Google sign-in showed the account picker again because the saved session was not restored. Learning memory needed a check against what the app can store.
+- **Solution:** The play card now ends at the last option and scrolls when the passage is long. A mixed quiz must include multiple choice, true/false, and fill-in-the-blank, and an all-MCQ reply is regenerated once. True/false and fill-in-the-blank show a label on the question. On launch the app reuses the Firebase user, or the last Google account without the picker, and writes that account onto the local profile when one exists. Learner memory (goals, accuracy, missed topics, streak) is already stored on the device and used by chat. A cloud copy of that data exists in code and stays off until cloud backup is enabled.
+- **Regression risks:** MCQ-only and interview quizzes keep their previous format. A mixed generation that is still all multiple choice after one retry is kept rather than failing the quiz. Uninstalling the app clears both the Google session and on-device learning data. Cloud backup remains disabled.
+- **Verified:** `flutter test test/must_gates_test.dart test/language_exam_prompt_test.dart`. Not checked on a device.
+
+## 2026-09-26 — Prompts classified a topic only when the name was on a list
+
+- **Type:** bugfix
+- **Area:** quiz, learn, daily content
+- **Files:** `lib/data/remote/ai/input_kind_prompt.dart`, `lib/data/remote/ai/prompt_builder.dart`, `lib/data/remote/ai/path_prompt_builder.dart`, `lib/core/services/daily_content_service.dart`, `test/skill_practice_prompt_test.dart`, `test/model_generation_live_probe_test.dart`
+- **Problem / Goal:** Quiz, daily, and path prompts switched to practice items only for names already matched in code. Any other exam or certificate was treated as a general subject and got definition questions or a Wikipedia page.
+- **Solution:** Those prompts now start with an input check. The model classifies the topic as a language test, certification, exam, coding skill, or ordinary subject, including names it has not seen before, and only then writes the questions, lesson, or path. The easy-question track applies only after that check says the topic is an ordinary subject. Known lists still add a tighter format on top.
+- **Regression risks:** SSC reasoning, IELTS papers, and curated daily lessons are unchanged. Biology and history still allow foundational questions and Wikipedia. Interview quizzes do not get the input check.
+- **Verified:** `flutter test test/skill_practice_prompt_test.dart`.
+
+## 2026-09-26 — Exams, certifications, and coding quizzes asked about the subject
+
+- **Type:** bugfix
+- **Area:** quiz, learn, daily content
+- **Files:** `lib/data/remote/ai/skill_practice_prompt.dart`, `lib/data/remote/ai/prompt_builder.dart`, `lib/data/remote/ai/competitive_exam_prompt.dart`, `lib/data/remote/ai/learning_orchestrator.dart`, `lib/core/services/exam_cert_resources.dart`, `lib/core/services/skill_articles.dart`, `lib/core/services/coding_tutorial_sources.dart`, `lib/core/services/daily_content_service.dart`, `lib/core/services/daily_content_fallbacks.dart`, `lib/core/services/learning_article_resolver.dart`, `lib/core/constants/official_learning_domains.dart`, `test/skill_practice_prompt_test.dart`
+- **Problem / Goal:** The IELTS fix did not cover other exams, certifications, or coding. Easy quizzes still used the beginner track ("what is this?"), and the daily pack still resolved Python, JEE, NEET, AWS, and similar goals to Wikipedia.
+- **Solution:** Coding topics and exam or certification topics get practice items (a snippet, scenario, or calculation) and are forbidden from asking what the name stands for, who owns it, or what it costs. Reasoning papers such as SSC keep the syllogism prompt, including on easy difficulty. Daily articles for these topics rotate through tutorial and official lesson pages (W3Schools, GeeksforGeeks, Khan Academy, AWS, Azure, Kubernetes, Docker, and language docs) and skip the Wikipedia lookup. A pack already saved with a Wikipedia URL for one of these topics is discarded. Biology, history, and product names such as Azure DevOps still use the general path.
+- **Regression risks:** SSC / banking reasoning prompts still apply and still require syllogisms. Azure DevOps is not treated as the Azure certification or as a coding topic. General subjects still use Wikipedia. An exam-prep goal suppresses the beginner track for that quiz even when the topic is a syllabus unit.
+- **Verified:** `flutter test test/skill_practice_prompt_test.dart test/language_exam_prompt_test.dart test/coding_tutorial_sources_test.dart test/must_gates_test.dart`.
+
+## 2026-09-26 — IELTS quizzes and daily articles were about the exam, not the paper
+
+- **Type:** bugfix
+- **Area:** quiz, learn, daily content
+- **Files:** `lib/data/remote/ai/language_exam_prompt.dart`, `lib/data/remote/ai/prompt_builder.dart`, `lib/data/remote/ai/competitive_exam_prompt.dart`, `lib/core/services/language_exam_resources.dart`, `lib/core/services/daily_content_service.dart`, `lib/core/services/daily_content_fallbacks.dart`, `lib/core/services/learning_article_resolver.dart`, `lib/core/constants/official_learning_domains.dart`, `test/language_exam_prompt_test.dart`
+- **Problem / Goal:** An IELTS goal produced quiz items about the test itself (what it stands for, which section is which). The daily pack then resolved that topic to a Wikipedia overview. Same pattern for TOEFL, PTE, and similar English exams.
+- **Solution:** Language-exam quizzes must include a short passage, transcript, writing task, or cue card, and are forbidden from asking meta facts about the exam. Beginner-track "what is this" wording is suppressed for these topics, and they are not routed through the SSC reasoning prompt. Daily articles come from a fixed IELTS Liz sequence (reading, listening, writing task 2, writing task 1, speaking). Wikipedia hosts are rejected for these topics, so the pack does not wait on a Wikipedia search.
+- **Regression risks:** SSC / banking reasoning prompts are unchanged unless the topic or exam name matches IELTS, TOEFL, PTE, OET, CELPIP, TOEIC, Cambridge English, or Duolingo English. Other topics still use Wikipedia when that is the best allowlisted page.
+- **Verified:** `flutter test test/language_exam_prompt_test.dart`.
+
+## 2026-09-26 — What's new sheet on every launch
+
+- **Type:** bugfix
+- **Area:** guidance, shell
+- **Files:** `lib/core/guidance/guidance_controller.dart`, `lib/features/shell/presentation/app_shell.dart`
+- **Problem / Goal:** The What's new sheet appeared on every cold start, including after Dismiss.
+- **Solution:** The shell decided to show the sheet from the controller's in-memory snapshot, which was still empty when the dashboard built the provider. Disk prefs were only copied into that snapshot when the saved walkthrough version was greater than 0, so a saved `whatsNewSeenVersion` was ignored for anyone who had not finished the tour, and could lose a race even when they had. The shell now `refresh()`es from disk before the check. Closing the sheet any way (Dismiss or swipe) writes the current app version. In-flight loads cannot overwrite a newer save.
+- **Regression risks:** Replay tour in Settings still clears only the walkthrough, not the seen What's new version. Opening What's new from Settings does not reset it. A real version bump of `AppConstants.appVersion` still shows the sheet once.
+- **Verified:** Code path review. Not run on a device in this session.
+
 ## 2026-09-19 — 2048 board squeezed by vendor .game-intro float
 
 - **Type:** bugfix

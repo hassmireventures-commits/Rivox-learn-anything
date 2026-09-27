@@ -5,13 +5,27 @@ import 'ai_output_gate.dart';
 import 'models/generated_quiz.dart';
 
 class QuizJsonParser {
-  static bool accepts(String content, {required int expectedCount}) {
+  static bool accepts(
+    String content, {
+    required int expectedCount,
+    String? questionType,
+  }) {
     try {
-      parse(content, expectedCount: expectedCount);
-      return true;
+      final quiz = parse(content, expectedCount: expectedCount);
+      return _matchesRequestedMix(quiz, questionType);
     } catch (_) {
       return false;
     }
+  }
+
+  /// Mixed quizzes must not come back as a single format. Used to trigger
+  /// one regeneration; [parse] still accepts a uniform set so a second miss
+  /// does not fail the whole quiz.
+  static bool _matchesRequestedMix(GeneratedQuiz quiz, String? questionType) {
+    if (questionType != 'mixed' || quiz.questions.length < 3) return true;
+    const formats = {'mcq', 'true_false', 'fill_blank'};
+    final used = quiz.questions.map((q) => q.type).where(formats.contains).toSet();
+    return used.length >= 2;
   }
 
   static GeneratedQuiz parse(String content, {required int expectedCount}) {

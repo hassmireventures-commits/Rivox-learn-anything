@@ -198,6 +198,74 @@ class CodingTutorialSources {
         'C# programming tutorials and examples.',
       );
     }
+    if (_matches(lower, ['git'])) {
+      add(
+        'https://www.w3schools.com/git/default.asp',
+        'Git Tutorial — W3Schools',
+        'Commits, branches, and the first Git commands.',
+      );
+      add(
+        'https://docs.github.com/en/get-started/using-git/about-git',
+        'About Git — GitHub Docs',
+        'What a repository, commit, and branch are, from the official docs.',
+      );
+    }
+    if (_matches(lower, ['operating system', 'compiler'])) {
+      add(
+        'https://www.geeksforgeeks.org/operating-systems/',
+        'Operating systems — GeeksforGeeks',
+        'Processes, memory, and scheduling from the first OS topics.',
+      );
+    }
+    if (_matches(lower, ['object oriented', 'oop'])) {
+      add(
+        'https://www.geeksforgeeks.org/introduction-of-object-oriented-programming/',
+        'Object-oriented programming — GeeksforGeeks',
+        'Classes, objects, and the four OOP ideas with examples.',
+      );
+    }
+    if (_matches(lower, ['golang', ' go '])) {
+      add(
+        'https://go.dev/tour/welcome/1',
+        'A Tour of Go',
+        'Official Go tutorial, starting from the first program.',
+      );
+    }
+    if (_matches(lower, ['rust'])) {
+      add(
+        'https://doc.rust-lang.org/book/ch01-00-getting-started.html',
+        'The Rust book: getting started',
+        'Install Rust and write the first program.',
+      );
+    }
+    if (_matches(lower, ['kotlin'])) {
+      add(
+        'https://kotlinlang.org/docs/getting-started.html',
+        'Get started with Kotlin',
+        'Official Kotlin basics and the first program.',
+      );
+    }
+    if (_matches(lower, ['php'])) {
+      add(
+        'https://www.php.net/manual/en/introduction.php',
+        'PHP introduction',
+        'What a PHP page looks like, from the official manual.',
+      );
+    }
+    if (_matches(lower, ['ruby'])) {
+      add(
+        'https://www.ruby-lang.org/en/documentation/quickstart/',
+        'Ruby in twenty minutes',
+        'Official Ruby quickstart, from the first program.',
+      );
+    }
+    if (_matches(lower, ['node', 'nodejs'])) {
+      add(
+        'https://www.w3schools.com/nodejs/default.asp',
+        'Node.js Tutorial — W3Schools',
+        'Run JavaScript on the server, starting from the first script.',
+      );
+    }
 
     // Language-specific coding fallbacks only — never generic DSA for unrelated goals.
     if (out.isEmpty && isCodingTopic(topic)) {
@@ -228,6 +296,19 @@ class CodingTutorialSources {
     }
 
     return out;
+  }
+
+  /// Next unseen tutorial. Null when this coding topic has no curated page.
+  static ({String url, String title, String summary})? nextArticle(
+    String topic, {
+    Set<String> excludeUrls = const {},
+  }) {
+    final all = articleCandidates(topic);
+    if (all.isEmpty) return null;
+    for (final article in all) {
+      if (!excludeUrls.contains(article.url)) return article;
+    }
+    return all.first;
   }
 
   static bool _matches(String lower, List<String> keys) {

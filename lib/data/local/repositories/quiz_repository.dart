@@ -111,6 +111,7 @@ class QuizRepository {
           ..correctIndex = correctIndex
           ..explanation = q.explanation
           ..referencesJson = q.referencesJson
+          ..stimulusJson = q.stimulusJson
           ..type = q.type
           ..rubricJson = (q.type == 'short_answer' || q.type == 'behavioral')
               ? q.explanation
@@ -392,6 +393,7 @@ class QuizRepository {
                 'correctIndex': q.correctIndex,
                 'explanation': q.explanation,
                 'referencesJson': q.referencesJson,
+                'stimulusJson': q.stimulusJson,
                 'type': q.type,
                 'userAnswer': q.userAnswer,
                 'isCorrect': q.isCorrect,
@@ -445,6 +447,7 @@ class QuizRepository {
         ..correctIndex = m['correctIndex'] as int
         ..explanation = m['explanation'] as String?
         ..referencesJson = m['referencesJson'] as String?
+        ..stimulusJson = m['stimulusJson'] as String?
         ..type = m['type'] as String
         ..userAnswer = m['userAnswer'] as String?
         ..isCorrect = m['isCorrect'] as bool?

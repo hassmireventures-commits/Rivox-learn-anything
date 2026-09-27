@@ -3,6 +3,7 @@ import 'coding_tutorial_sources.dart';
 import 'daily_content_service.dart';
 import 'goal_topic_resolver.dart';
 import 'learning_article_resolver.dart';
+import 'skill_articles.dart';
 import 'topic_grounding_service.dart';
 
 /// Curated / deterministic picks when the LLM returns URLs that fail validation.
@@ -18,6 +19,20 @@ class DailyContentFallbacks {
     bool trustedOnly = false,
     Set<String> excludeUrls = const {},
   }) async {
+    if (type != 'video') {
+      final article = SkillArticles.curated(topic, excludeUrls: excludeUrls);
+      if (article != null) {
+        return DailyContentItem(
+          dateKey: dateKey,
+          type: 'article',
+          title: article.title,
+          url: article.url,
+          summary: article.summary,
+          topic: topic,
+        );
+      }
+    }
+
     if (trustedOnly) {
       return _guaranteedMinimum(
         type: type,
@@ -273,6 +288,27 @@ class DailyContentFallbacks {
     Set<String> excludeUrls = const {},
   }) async {
     final trimmed = topic.trim();
+    final curated = SkillArticles.curated(trimmed, excludeUrls: excludeUrls);
+    if (curated != null) {
+      return DailyContentItem(
+        dateKey: dateKey,
+        type: 'article',
+        title: curated.title,
+        url: curated.url,
+        summary: curated.summary,
+        topic: trimmed,
+      );
+    }
+    if (SkillArticles.isPracticeTopic(trimmed)) {
+      return DailyContentItem(
+        dateKey: dateKey,
+        type: 'article',
+        title: trimmed,
+        url: 'https://www.khanacademy.org/math/algebra',
+        summary: 'Practice the basics of $trimmed instead of an encyclopedia overview.',
+        topic: trimmed,
+      );
+    }
     for (final q in LearningArticleResolver.buildSearchQueries(topic: trimmed)) {
       final wiki = await _grounding.findWikipediaArticle(q, excludeUrls: excludeUrls);
       if (wiki == null) continue;
@@ -535,6 +571,19 @@ class DailyContentFallbacks {
     final slug = _wikiSlug(trimmed);
     final lower = trimmed.toLowerCase();
     final out = <({String url, String title, String summary, bool trusted})>[];
+
+    final curated = SkillArticles.allCurated(trimmed);
+    if (curated.isNotEmpty || SkillArticles.isPracticeTopic(trimmed)) {
+      for (final article in curated) {
+        out.add((
+          url: article.url,
+          title: article.title,
+          summary: article.summary,
+          trusted: true,
+        ));
+      }
+      return out;
+    }
 
     void add(String url, String title, [String? summary, bool trusted = false]) {
       out.add((

@@ -1,10 +1,12 @@
 import 'models/quiz_generation_request.dart';
+import 'language_exam_prompt.dart';
 
 /// Competitive-exam style guidance (SSC, Banking, RRB, CAT DILR, etc.).
 class CompetitiveExamPrompt {
   CompetitiveExamPrompt._();
 
   static bool applies(QuizGenerationRequest request) {
+    if (LanguageExamPrompt.applies(request)) return false;
     if (request.examType == 'competitive') return true;
     if (request.goalMode == 'exam_prep' && _isReasoningFocus(request)) return true;
     if (_isReasoningFocus(request)) return true;
@@ -13,8 +15,11 @@ class CompetitiveExamPrompt {
         request.examType!.isNotEmpty;
   }
 
+  static bool isReasoningFocus(QuizGenerationRequest request) =>
+      _isReasoningFocus(request);
+
   static bool suppressBeginnerTrack(QuizGenerationRequest request) =>
-      applies(request) && request.difficulty != 'easy';
+      applies(request);
 
   static String block(QuizGenerationRequest request) {
     if (!applies(request)) return '';
@@ -59,8 +64,9 @@ Style rules:
     return '''
 COMPETITIVE EXAM PAPER ($examLabel):
 $unitLine
-Questions must match real $examLabel mock difficulty — application and exam phrasing, not textbook summaries.
-Use multi-step problems where the syllabus expects them. Distractors should reflect common candidate mistakes.
+Questions must be practice items a candidate would solve, not trivia about the exam.
+FORBIDDEN: what the exam stands for, who conducts it, fees, dates, eligibility, or the history of the body.
+Use a short problem, scenario, or calculation. Distractors should reflect common candidate mistakes.
 ${_difficultyGuide(request.difficulty)}
 ''';
   }

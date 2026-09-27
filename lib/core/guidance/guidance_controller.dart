@@ -7,18 +7,29 @@ final guidancePreferencesProvider = FutureProvider<GuidancePreferences>((ref) as
 });
 
 class GuidanceController extends Notifier<GuidancePreferences> {
+  int _loadEpoch = 0;
+
   @override
   GuidancePreferences build() {
-    GuidancePreferencesStore.instance.load().then((p) {
-      if (state.walkthroughVersion == 0 && p.walkthroughVersion > 0) {
-        state = p;
-      }
-    });
+    _hydrate();
     return GuidancePreferencesStore.instance.current;
   }
 
-  Future<void> refresh() async {
-    state = await GuidancePreferencesStore.instance.load();
+  /// Loads disk prefs into [state]. A newer [_commit] or a later hydrate
+  /// cancels an in-flight load so a dismiss is not overwritten by stale JSON.
+  Future<void> _hydrate() async {
+    final epoch = ++_loadEpoch;
+    final loaded = await GuidancePreferencesStore.instance.load();
+    if (epoch != _loadEpoch) return;
+    state = loaded;
+  }
+
+  Future<void> refresh() => _hydrate();
+
+  Future<void> _commit(GuidancePreferences next) async {
+    _loadEpoch++;
+    await GuidancePreferencesStore.instance.save(next);
+    state = next;
   }
 
   bool get shouldShowWalkthrough {
@@ -38,8 +49,7 @@ class GuidanceController extends Notifier<GuidancePreferences> {
       legalAcceptedVersion: state.legalAcceptedVersion,
       dismissedHintIds: state.dismissedHintIds,
     );
-    await GuidancePreferencesStore.instance.save(next);
-    state = next;
+    await _commit(next);
   }
 
   Future<void> resetWalkthrough() async {
@@ -50,8 +60,7 @@ class GuidanceController extends Notifier<GuidancePreferences> {
       legalAcceptedVersion: state.legalAcceptedVersion,
       dismissedHintIds: state.dismissedHintIds,
     );
-    await GuidancePreferencesStore.instance.save(next);
-    state = next;
+    await _commit(next);
   }
 
   Future<void> markWhatsNewSeen(String version) async {
@@ -62,8 +71,7 @@ class GuidanceController extends Notifier<GuidancePreferences> {
       legalAcceptedVersion: state.legalAcceptedVersion,
       dismissedHintIds: state.dismissedHintIds,
     );
-    await GuidancePreferencesStore.instance.save(next);
-    state = next;
+    await _commit(next);
   }
 
   Future<void> acceptLegal(String version) async {
@@ -74,8 +82,7 @@ class GuidanceController extends Notifier<GuidancePreferences> {
       legalAcceptedVersion: version,
       dismissedHintIds: state.dismissedHintIds,
     );
-    await GuidancePreferencesStore.instance.save(next);
-    state = next;
+    await _commit(next);
   }
 
   Future<void> dismissHint(String hintId) async {
@@ -87,8 +94,7 @@ class GuidanceController extends Notifier<GuidancePreferences> {
       legalAcceptedVersion: state.legalAcceptedVersion,
       dismissedHintIds: [...state.dismissedHintIds, hintId],
     );
-    await GuidancePreferencesStore.instance.save(next);
-    state = next;
+    await _commit(next);
   }
 }
 

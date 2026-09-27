@@ -1,4 +1,5 @@
 import '../../../core/constants/official_learning_domains.dart';
+import 'input_kind_prompt.dart';
 
 class PathPromptBuilder {
   const PathPromptBuilder._();
@@ -33,7 +34,7 @@ Focus area: ${focus ?? 'based on goals and weak topics'}
 Output language: Write all module titles and summaries in $language.
 
 Requirements:
-$libraryNote- PRIMARY GOAL drives every module — weak topics are hints only when they directly support that goal; never substitute unrelated domains (e.g. Islamic history or biomedical when the goal is a company domain)
+${InputKindPrompt.pathRules(goals)}$libraryNote- PRIMARY GOAL drives every module — weak topics are hints only when they directly support that goal; never substitute unrelated domains (e.g. Islamic history or biomedical when the goal is a company domain)
 - Assume ZERO prior knowledge — module 1 must be the most basic foundations of the primary goal only
 - Exactly $count ordered modules from foundations to practice
 - Each module needs: title, summary, difficulty (easy|medium|hard), estimatedMinutes

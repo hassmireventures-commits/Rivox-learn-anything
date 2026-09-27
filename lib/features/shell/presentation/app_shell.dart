@@ -59,12 +59,16 @@ class _AppShellState extends ConsumerState<AppShell> with WidgetsBindingObserver
 
   Future<void> _maybeStartTour() async {
     if (_tourScheduled || !mounted) return;
-    await GuidancePreferencesStore.instance.load();
+    final guidanceNotifier = ref.read(guidanceControllerProvider.notifier);
+    await guidanceNotifier.refresh();
+    if (!mounted) return;
     final guidance = ref.read(guidanceControllerProvider);
-    if (ref.read(guidanceControllerProvider.notifier).shouldShowWhatsNew(AppConstants.appVersion)) {
+    if (guidanceNotifier.shouldShowWhatsNew(AppConstants.appVersion)) {
       await Future<void>.delayed(const Duration(milliseconds: 400));
       if (!mounted) return;
       await showWhatsNewSheet(context);
+      if (!mounted) return;
+      await guidanceNotifier.markWhatsNewSeen(AppConstants.appVersion);
     }
     if (guidance.walkthroughVersion >= GuidancePreferencesStore.currentWalkthroughVersion) {
       return;

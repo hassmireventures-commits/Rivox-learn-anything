@@ -39,15 +39,34 @@ class BuiltInAiRouter {
     return out;
   }
 
-  /// True when the HTTP error likely means the model id is wrong or retired.
+  /// True when another Built-in model should be tried.
+  /// Auth failures stay on the first model so a bad key is not hidden.
   static bool isRetryableModelError(DioException e) {
+    if (e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.receiveTimeout ||
+        e.type == DioExceptionType.sendTimeout ||
+        e.type == DioExceptionType.connectionError) {
+      return true;
+    }
+
     final status = e.response?.statusCode;
-    if (status == 404 || status == 410) return true;
+    if (status == 404 ||
+        status == 408 ||
+        status == 409 ||
+        status == 410 ||
+        status == 425 ||
+        status == 429 ||
+        (status != null && status >= 500)) {
+      return true;
+    }
 
     final body = _bodyText(e.response?.data)?.toLowerCase() ?? '';
     return body.contains('end of life') ||
         body.contains('not found') ||
-        body.contains('model') && body.contains('unavailable') ||
+        body.contains('unavailable') ||
+        body.contains('overloaded') ||
+        body.contains('timed out') ||
+        body.contains('timeout') ||
         body.contains('unknown model') ||
         body.contains('invalid model');
   }
@@ -107,6 +126,7 @@ class BuiltInAiRouter {
     if (data is String) return data;
     if (data is Map) {
       final error = data['error'];
+      if (error is String && error.trim().isNotEmpty) return error;
       if (error is Map) {
         return error['message']?.toString() ?? error['detail']?.toString();
       }

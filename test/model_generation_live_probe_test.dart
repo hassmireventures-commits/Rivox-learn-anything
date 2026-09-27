@@ -88,7 +88,12 @@ class _ModelProbe {
     _dio.options.headers['Authorization'] = 'Bearer $apiKey';
     return [
       await _runViaRouter('pulse', _pulsePrompts(), _scorePulse, maxTokens: 256),
-      await _runViaRouter('quiz', _quizPrompts(), _scoreQuiz, maxTokens: 1800),
+      await _runViaRouter(
+        'quiz',
+        _quizPrompts(),
+        _scoreQuiz,
+        maxTokens: BuiltInAiConfig.quizMaxTokens(5),
+      ),
       await _runViaRouter('path', _pathPrompts(), _scorePath, maxTokens: 3072),
       await _runViaRouter('daily_article', _dailyArticlePrompts(), _scoreDailyArticle),
       await _runViaRouter('daily_video', _dailyVideoPrompts(), _scoreDailyVideo),
@@ -154,7 +159,12 @@ class _ModelProbe {
     _dio.options.headers['Authorization'] = 'Bearer $apiKey';
     return [
       await _runTask('pulse', _pulsePrompts(), _scorePulse, maxTokens: 256),
-      await _runTask('quiz', _quizPrompts(), _scoreQuiz, maxTokens: 1800),
+      await _runTask(
+        'quiz',
+        _quizPrompts(),
+        _scoreQuiz,
+        maxTokens: BuiltInAiConfig.quizMaxTokens(5),
+      ),
       await _runTask('path', _pathPrompts(), _scorePath, maxTokens: 3072),
       await _runTask('daily_article', _dailyArticlePrompts(), _scoreDailyArticle),
       await _runTask('daily_video', _dailyVideoPrompts(), _scoreDailyVideo),
@@ -271,8 +281,8 @@ class _ModelProbe {
         maxTokens: maxTokens,
         modelOverride: modelOverride,
       );
-      if (AiOutputGate.acceptsJsonObject(first) ||
-          !AiOutputGate.isReasoningChannelModel(activeModel)) {
+      if (AiOutputGate.acceptsJsonObject(first) &&
+          !AiOutputGate.isInstructionLeak(first)) {
         return first;
       }
     } catch (_) {}
@@ -312,7 +322,9 @@ MANDATORY (must satisfy every line — wrong counts are rejected):
 - Question format: All MCQ with exactly 4 options.
 - Language: English (all question and option text in this language)
 - Unique question stems only (no duplicate or near-duplicate questions)
-BEGINNER TRACK: assume ZERO prior knowledge. Ask the most foundational questions within the EXACT subfield named in the topic — start from absolute basics, not intermediate concepts. No advanced jargon, no expert-only traps.
+INPUT CHECK (do this before writing any question):
+Topic is a coding skill (Python). Write snippet tasks, not "what is Python".
+BEGINNER TRACK: use this only when the input check classifies the topic as a subject. If the check says coding, ignore this track and write practice items instead.
 Non-empty short explanation per question (never null).
 Rules: correctIndex is 0-based and must match the true answer; unique plausible options with full answer text (never letter-only like "A","B","C","D"); return exactly 5 questions.
 

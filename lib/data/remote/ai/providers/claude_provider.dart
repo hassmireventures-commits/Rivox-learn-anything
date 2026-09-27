@@ -51,7 +51,11 @@ class ClaudeProvider implements AiProvider {
       if (AiOutputGate.needsStrictRetry(
         content,
         validateContent: (text) =>
-            QuizJsonParser.accepts(text, expectedCount: request.questionCount),
+            QuizJsonParser.accepts(
+              text,
+              expectedCount: request.questionCount,
+              questionType: request.questionType,
+            ),
       )) {
         content = await _complete(dio, userPrompt, strictRetry: true);
       }

@@ -31,18 +31,43 @@ class AuthService {
     return _auth.currentUser;
   }
 
+  bool get isReady => Firebase.apps.isNotEmpty;
+
   Future<void> _ensureGoogleSignInInitialized() async {
     if (_googleSignInInitialized) return;
     await GoogleSignIn.instance.initialize();
     _googleSignInInitialized = true;
   }
 
+  /// Returns the Firebase user already stored on this device, or restores the
+  /// last Google account without showing the account picker. Returns null
+  /// when Firebase is not ready yet, or when nobody has signed in on this
+  /// install.
+  Future<User?> restoreSession() async {
+    if (Firebase.apps.isEmpty) return null;
+    final existing = _auth.currentUser;
+    if (existing != null) return existing;
+    try {
+      await _ensureGoogleSignInInitialized();
+      final pending = GoogleSignIn.instance.attemptLightweightAuthentication();
+      if (pending == null) return null;
+      final account = await pending;
+      if (account == null) return null;
+      return _firebaseUserFor(account);
+    } catch (_) {
+      return _auth.currentUser;
+    }
+  }
+
   /// Signs in with Google and exchanges the resulting ID token for a Firebase
-  /// user. Returns null if Firebase isn't configured or the user cancels the
-  /// Google sign-in sheet; rethrows for any other failure so the caller can
+  /// user. Reuses a session already stored on this device before showing the
+  /// account picker. Returns null if Firebase isn't configured or the user
+  /// cancels the sheet; rethrows for any other failure so the caller can
   /// show an error.
   Future<User?> signInWithGoogle() async {
     if (Firebase.apps.isEmpty) return null;
+    final restored = await restoreSession();
+    if (restored != null) return restored;
     await _ensureGoogleSignInInitialized();
 
     final GoogleSignInAccount account;
@@ -53,6 +78,10 @@ class AuthService {
       rethrow;
     }
 
+    return _firebaseUserFor(account);
+  }
+
+  Future<User?> _firebaseUserFor(GoogleSignInAccount account) async {
     final idToken = account.authentication.idToken;
     final credential = GoogleAuthProvider.credential(idToken: idToken);
     final userCredential = await _auth.signInWithCredential(credential);

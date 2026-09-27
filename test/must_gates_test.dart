@@ -58,6 +58,24 @@ void main() {
       expect(prompt, contains('return exactly 20 questions'));
     });
 
+    test('mixed format requires true/false and fill-in-the-blank, not only MCQ', () async {
+      const request = QuizGenerationRequest(
+        topic: 'IELTS',
+        questionCount: 10,
+        difficulty: 'medium',
+        questionType: 'mixed',
+        language: 'English',
+        randomizeQuestions: true,
+        randomizeOptions: true,
+        generateExplanations: true,
+      );
+      final prompt = await PromptBuilder.build(request);
+      expect(prompt, contains('type "true_false"'));
+      expect(prompt, contains('type "fill_blank"'));
+      expect(prompt, contains('all MCQ is invalid'));
+      expect(prompt, contains('"type":"fill_blank"'));
+    });
+
     test('includes answer/explanation consistency rules for MCQ', () async {
       const request = QuizGenerationRequest(
         topic: 'Human anatomy',
@@ -209,6 +227,35 @@ void main() {
         () => QuizJsonParser.parse(raw, expectedCount: 1),
         throwsA(isA<Exception>()),
       );
+    });
+
+    test('mixed acceptance rejects a set that is only MCQ', () {
+      const raw = '''
+{"questions":[
+  {"text":"One?","options":["a","b","c","d"],"correctIndex":0,"type":"mcq"},
+  {"text":"Two?","options":["a","b","c","d"],"correctIndex":1,"type":"mcq"},
+  {"text":"Three?","options":["a","b","c","d"],"correctIndex":2,"type":"multiple choice"}
+]}''';
+      expect(
+        QuizJsonParser.accepts(raw, expectedCount: 3, questionType: 'mixed'),
+        isFalse,
+      );
+      expect(QuizJsonParser.parse(raw, expectedCount: 3).questions.first.type, 'mcq');
+    });
+
+    test('mixed acceptance keeps MCQ and true/false together', () {
+      const raw = '''
+{"questions":[
+  {"text":"One?","options":["a","b","c","d"],"correctIndex":0,"type":"mcq"},
+  {"text":"Two plus two is four.","options":["True","False"],"correctIndex":0,"type":"true/false"},
+  {"text":"2+2 = _____.","options":["3","4","5","6"],"correctIndex":1,"type":"fill in the blank"}
+]}''';
+      expect(
+        QuizJsonParser.accepts(raw, expectedCount: 3, questionType: 'mixed'),
+        isTrue,
+      );
+      final quiz = QuizJsonParser.parse(raw, expectedCount: 3);
+      expect(quiz.questions.map((q) => q.type).toSet(), {'mcq', 'true_false', 'fill_blank'});
     });
 
     test('throws on invalid JSON', () {

@@ -38,7 +38,8 @@ class IsarService {
   static IsarService get instance => _instance ??= IsarService._();
 
   /// Bump when making additive schema changes; pair with [_runMigrations].
-  static const int schemaVersion = 2;
+  /// 3: Question.stimulusJson (nullable). Isar adds the column on open.
+  static const int schemaVersion = 3;
 
   Isar? _isar;
   Isar get db {
@@ -111,8 +112,8 @@ class IsarService {
   }
 
   Future<void> _runMigrations({required int from, required int to}) async {
-    // Placeholder for additive migrations (from < n <= to).
-    // Example: if (from < 2 && to >= 2) { ... }
+    // Question.stimulusJson (version 3) is a nullable column. Isar fills it
+    // with null on existing rows when the updated schema is opened.
   }
 
   Future<void> clearAll() async {

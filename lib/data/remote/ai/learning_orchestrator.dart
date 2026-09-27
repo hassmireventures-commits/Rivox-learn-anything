@@ -11,6 +11,8 @@ import '../../../core/network/network_service.dart';
 import '../../../core/services/built_in_ai_config.dart';
 import '../../../core/services/built_in_ai_quota.dart';
 import '../../../core/services/goal_topic_resolver.dart';
+import '../../../core/services/skill_articles.dart';
+import 'language_exam_prompt.dart';
 import '../../../core/services/open_knowledge/open_knowledge_service.dart';
 import '../../../core/services/topic_goal_relevance.dart';
 import '../../../core/services/llm_manager.dart';
@@ -408,9 +410,19 @@ class LearningOrchestrator {
     // Kicked off alongside the library RAG lookup (not after it) so this
     // never adds net latency; a slow/unreachable open-knowledge API degrades
     // to no extra context instead of stalling generation.
-    final openKnowledgeFuture = OpenKnowledgeService()
-        .gatherPromptContext(effectiveTopic)
-        .timeout(const Duration(seconds: 6), onTimeout: () => '');
+    final languageExamQuiz = LanguageExamPrompt.appliesTo(
+      topic: effectiveTopic,
+      examName: profile.goalContext,
+    );
+    // Encyclopedia pages describe the brand. They pull items toward
+    // "what does this stand for" and add a network wait. Skip them for
+    // language exams, coding, and other exams or certifications.
+    final openKnowledgeFuture = languageExamQuiz ||
+            SkillArticles.isPracticeTopic(effectiveTopic)
+        ? Future<String>.value('')
+        : OpenKnowledgeService()
+            .gatherPromptContext(effectiveTopic)
+            .timeout(const Duration(seconds: 6), onTimeout: () => '');
     final rag = await aiPipeline.buildRag(
       AiRequestContext(
         task: 'quiz',

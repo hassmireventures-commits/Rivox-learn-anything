@@ -21,6 +21,10 @@ class Question {
   /// Optional JSON list of {title,url} references (module / grounded quizzes).
   String? referencesJson;
 
+  /// Optional JSON stimulus the question depends on: passage, transcript,
+  /// chart, table, or cue card. Null when the question stands alone.
+  String? stimulusJson;
+
   /// mcq | true_false | fill_blank | short_answer | behavioral
   late String type;
 

@@ -21,7 +21,12 @@ class OfficialLearningDomains {
     'firebase.google.com',
     'docs.docker.com',
     'www.rust-lang.org',
+    'doc.rust-lang.org',
     'kotlinlang.org',
+    'www.php.net',
+    'php.net',
+    'www.ruby-lang.org',
+    'ruby-lang.org',
     // Free tutorial sites (daily study + path resources)
     'www.geeksforgeeks.org',
     'geeksforgeeks.org',
@@ -70,6 +75,15 @@ class OfficialLearningDomains {
     'wikihow.com',
     'www.howtogeek.com',
     'howtogeek.com',
+    // English proficiency exam prep (daily pack). Not Wikipedia.
+    'ieltsliz.com',
+    'www.ieltsliz.com',
+    'takeielts.britishcouncil.org',
+    'www.ielts.org',
+    'ielts.org',
+    'ielts.idp.com',
+    'www.ets.org',
+    'ets.org',
   };
 
   static const videoDomains = {
@@ -113,6 +127,9 @@ class OfficialLearningDomains {
     'mit sloan',
     'ted-ed',
     'ted ed',
+    'ielts liz',
+    'e2 ielts',
+    'ielts advantage',
   };
 
   static bool isAllowedDoc(String host) {

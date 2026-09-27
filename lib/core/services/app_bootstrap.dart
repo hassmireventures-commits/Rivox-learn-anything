@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 
 import '../../data/local/isar_service.dart';
 import '../../data/local/repositories/learner_repository.dart';
+import '../../data/local/repositories/profile_repository.dart';
+import '../../data/remote/auth/auth_service.dart';
 import '../../firebase_options.dart';
 import 'ad_service.dart';
 import 'ads_init_service.dart';
@@ -52,6 +54,24 @@ Future<void> initializeOptionalServices() async {
               .setAnalyticsCollectionEnabled(profile.helpImproveOptIn);
         } catch (_) {
           // Best-effort — a failure here must not block the rest of startup.
+        }
+
+        try {
+          final user = await AuthService().restoreSession();
+          if (user != null) {
+            final profiles = ProfileRepository(IsarService.instance);
+            final existing = await profiles.getProfile();
+            if (existing != null &&
+                (existing.authUid == null || existing.authUid!.isEmpty)) {
+              await profiles.saveProfile(
+                existing.name,
+                authUid: user.uid,
+                authEmail: user.email,
+              );
+            }
+          }
+        } catch (_) {
+          // Sign-in restore is best-effort. Learning data stays on device.
         }
 
         AppLogger.crashSink = (tag, message, {error, stack, extras}) {

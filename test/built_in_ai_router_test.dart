@@ -34,6 +34,47 @@ void main() {
         type: DioExceptionType.badResponse,
       );
       expect(BuiltInAiRouter.isRetryableModelError(e401), isFalse);
+
+      final timedOut = DioException(
+        requestOptions: RequestOptions(path: '/chat/completions'),
+        type: DioExceptionType.connectionTimeout,
+      );
+      expect(BuiltInAiRouter.isRetryableModelError(timedOut), isTrue);
+
+      final opaque = DioException(
+        requestOptions: RequestOptions(path: '/chat/completions'),
+        type: DioExceptionType.badResponse,
+        response: Response(
+          requestOptions: RequestOptions(path: '/chat/completions'),
+          statusCode: 400,
+          data: {'error': 'The model is temporarily unavailable'},
+        ),
+      );
+      expect(BuiltInAiRouter.isRetryableModelError(opaque), isTrue);
+    });
+
+    test('withModelFallback continues after an opaque model failure', () async {
+      final tried = <String>[];
+      final result = await BuiltInAiRouter.withModelFallback<String>(
+        configuredModel: BuiltInAiRouter.primaryModel,
+        attempt: (model) async {
+          tried.add(model);
+          if (tried.length == 1) {
+            throw DioException(
+              requestOptions: RequestOptions(path: '/chat/completions'),
+              type: DioExceptionType.badResponse,
+              response: Response(
+                requestOptions: RequestOptions(path: '/chat/completions'),
+                statusCode: 400,
+                data: {'error': 'The model is temporarily unavailable'},
+              ),
+            );
+          }
+          return 'ok';
+        },
+      );
+      expect(result, 'ok');
+      expect(tried.length, greaterThan(1));
     });
   });
 }

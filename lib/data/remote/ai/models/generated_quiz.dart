@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'question_stimulus.dart';
+
 class GeneratedQuiz {
   const GeneratedQuiz({required this.questions});
 
@@ -26,6 +28,7 @@ class GeneratedQuestion {
     required this.type,
     this.explanation,
     this.referencesJson,
+    this.stimulusJson,
   });
 
   final String text;
@@ -34,6 +37,7 @@ class GeneratedQuestion {
   final String type;
   final String? explanation;
   final String? referencesJson;
+  final String? stimulusJson;
 
   factory GeneratedQuestion.fromJson(Map<String, dynamic> json) {
     final text = json['text']?.toString() ??
@@ -43,7 +47,7 @@ class GeneratedQuestion {
       throw const FormatException('Question text is required');
     }
 
-    final type = (json['type']?.toString() ?? 'mcq').toLowerCase();
+    final type = _canonicalType(json['type']?.toString() ?? 'mcq');
     final isOpen = type == 'short_answer' || type == 'behavioral' || type == 'open';
 
     final optionsRaw = json['options'];
@@ -122,6 +126,12 @@ class GeneratedQuestion {
       }
     }
 
+    final stimulus = QuestionStimulus.fromMap(
+      json['stimulus'] is Map
+          ? Map<String, dynamic>.from(json['stimulus'] as Map)
+          : null,
+    );
+
     return GeneratedQuestion(
       text: text.trim(),
       options: options,
@@ -129,7 +139,18 @@ class GeneratedQuestion {
       type: isOpen ? (type == 'behavioral' ? 'behavioral' : 'short_answer') : type,
       explanation: explanation,
       referencesJson: referencesJson,
+      stimulusJson: stimulus?.toJson(),
     );
+  }
+
+  static String _canonicalType(String raw) {
+    final type = raw.trim().toLowerCase().replaceAll(RegExp(r'[\s/-]+'), '_');
+    return switch (type) {
+      'true_false' || 'truefalse' || 'boolean' || 'tf' => 'true_false',
+      'fill_blank' || 'fill_in_the_blank' || 'fillblank' || 'cloze' => 'fill_blank',
+      'multiple_choice' || 'multiplechoice' => 'mcq',
+      _ => type.isEmpty ? 'mcq' : type,
+    };
   }
 
   static List<String> _optionsFromLetterMap(Map<dynamic, dynamic> raw) {

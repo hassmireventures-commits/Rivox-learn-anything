@@ -20,6 +20,7 @@ import '../../../data/local/repositories/learner_repository.dart';
 import '../../../data/local/repositories/quiz_repository.dart';
 import '../../../data/remote/ai/interview_rubric_scorer.dart';
 import '../../../shared/widgets/app_card.dart';
+import 'question_stimulus_view.dart';
 import '../../career/presentation/interview_voice_input_bar.dart';
 import '../../career/presentation/voice_interview_theme.dart';
 import '../../../core/constants/interview_persona.dart';
@@ -704,113 +705,130 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
             ],
             const SizedBox(height: 20),
             Expanded(
-              child: AppCard(
-                color: _voiceInterview ? VoiceInterviewTheme.surfaceElevated : null,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Semantics(
-                      header: true,
-                      child: Text(
-                        question.text,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: _voiceInterview
-                                  ? VoiceInterviewTheme.questionText
-                                  : null,
-                              height: 1.35,
-                            ),
+              child: SingleChildScrollView(
+                child: AppCard(
+                  color: _voiceInterview ? VoiceInterviewTheme.surfaceElevated : null,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (question.stimulusJson != null &&
+                          question.stimulusJson!.trim().isNotEmpty)
+                        QuestionStimulusView(
+                          key: ValueKey('stimulus-$_index'),
+                          raw: question.stimulusJson,
+                        ),
+                      if (question.type == 'true_false' ||
+                          question.type == 'fill_blank')
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            question.type == 'true_false'
+                                ? l10n.questionTypeTrueFalse
+                                : l10n.questionTypeFillBlank,
+                            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                          ),
+                        ),
+                      Semantics(
+                        header: true,
+                        child: Text(
+                          question.text,
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: _voiceInterview
+                                    ? VoiceInterviewTheme.questionText
+                                    : null,
+                                height: 1.35,
+                              ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Expanded(
-                      child: isOpen
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                if (_voiceInterview)
-                                  InterviewVoiceInputBar(
-                                    stt: ref.read(whisperSttServiceProvider),
-                                    persona: persona,
-                                    darkTheme: true,
-                                    onTranscript: _setVoiceTranscript,
-                                    onSpeechMetrics: _setVoiceSpeechMetrics,
-                                    onRecordingStart: () =>
-                                        ref.read(interviewTtsServiceProvider).stop(),
-                                  )
-                                else
-                                  Expanded(
-                                    child: Semantics(
-                                      label: l10n.quizOpenAnswerLabel,
-                                      textField: true,
-                                      child: TextField(
-                                        controller: _controllerFor(_index),
-                                        maxLines: 8,
-                                        minLines: 5,
-                                        textCapitalization: TextCapitalization.sentences,
-                                        textInputAction: TextInputAction.done,
-                                        onEditingComplete: _dismissKeyboard,
-                                        onChanged: (v) => _textAnswers[_index] = v,
-                                        decoration: InputDecoration(
-                                          labelText: l10n.quizOpenAnswerLabel,
-                                          hintText: context.l10n.careerShortAnswerHint,
-                                          alignLabelWithHint: true,
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(14),
-                                          ),
-                                        ),
-                                      ),
+                      const SizedBox(height: 20),
+                      if (isOpen)
+                        _voiceInterview
+                            ? InterviewVoiceInputBar(
+                                stt: ref.read(whisperSttServiceProvider),
+                                persona: persona,
+                                darkTheme: true,
+                                onTranscript: _setVoiceTranscript,
+                                onSpeechMetrics: _setVoiceSpeechMetrics,
+                                onRecordingStart: () =>
+                                    ref.read(interviewTtsServiceProvider).stop(),
+                              )
+                            : Semantics(
+                                label: l10n.quizOpenAnswerLabel,
+                                textField: true,
+                                child: TextField(
+                                  controller: _controllerFor(_index),
+                                  maxLines: 8,
+                                  minLines: 5,
+                                  textCapitalization: TextCapitalization.sentences,
+                                  textInputAction: TextInputAction.done,
+                                  onEditingComplete: _dismissKeyboard,
+                                  onChanged: (v) => _textAnswers[_index] = v,
+                                  decoration: InputDecoration(
+                                    labelText: l10n.quizOpenAnswerLabel,
+                                    hintText: context.l10n.careerShortAnswerHint,
+                                    alignLabelWithHint: true,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(14),
                                     ),
                                   ),
-                              ],
-                            )
-                          : ListView.separated(
-                              itemCount: options.length,
-                              separatorBuilder: (_, _) => const SizedBox(height: 10),
-                              itemBuilder: (context, i) {
-                                final selected = _selectedIndex == i;
-                                return Semantics(
-                                  button: true,
-                                  selected: selected,
-                                  label: l10n.quizOptionSemanticLabel(i + 1, options[i]),
-                                  child: Material(
-                                    color: selected
-                                        ? AppTheme.seedColor.withValues(alpha: 0.12)
-                                        : Theme.of(context).colorScheme.surfaceContainerHighest,
+                                ),
+                              )
+                      else
+                        for (var i = 0; i < options.length; i++) ...[
+                          if (i > 0) const SizedBox(height: 10),
+                          Builder(
+                            builder: (context) {
+                              final selected = _selectedIndex == i;
+                              return Semantics(
+                                button: true,
+                                selected: selected,
+                                label: l10n.quizOptionSemanticLabel(i + 1, options[i]),
+                                child: Material(
+                                  color: selected
+                                      ? AppTheme.seedColor.withValues(alpha: 0.12)
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: InkWell(
                                     borderRadius: BorderRadius.circular(16),
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(16),
-                                      onTap: () => _selectOption(i),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 18,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              selected
-                                                  ? Icons.radio_button_checked_rounded
-                                                  : Icons.radio_button_off_rounded,
-                                              color: selected ? AppTheme.seedColor : null,
+                                    onTap: () => _selectOption(i),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 14,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            selected
+                                                ? Icons.radio_button_checked_rounded
+                                                : Icons.radio_button_off_rounded,
+                                            color: selected ? AppTheme.seedColor : null,
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Text(
+                                              options[i],
+                                              style: Theme.of(context).textTheme.titleMedium,
                                             ),
-                                            const SizedBox(width: 12),
-                                            Expanded(
-                                              child: Text(
-                                                options[i],
-                                                style: Theme.of(context).textTheme.titleMedium,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                );
-                              },
-                            ),
-                    ),
-                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                    ],
+                  ),
                 ),
               ),
             ),

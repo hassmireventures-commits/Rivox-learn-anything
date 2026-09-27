@@ -48,7 +48,11 @@ class LocalMlcProvider implements AiProvider {
       if (AiOutputGate.needsStrictRetry(
         content,
         validateContent: (text) =>
-            QuizJsonParser.accepts(text, expectedCount: request.questionCount),
+            QuizJsonParser.accepts(
+              text,
+              expectedCount: request.questionCount,
+              questionType: request.questionType,
+            ),
       )) {
         content = await _channel.generate(
           prompt: AiOutputGate.adaptUserPrompt(userPrompt, 'local-mlc'),
