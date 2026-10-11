@@ -1,5 +1,37 @@
 ﻿# Enhancements Log
 
+## 2026-10-11 - AI tutor repositioning: store listing, website, competitor analysis
+
+- **Type:** enhancement
+- **Area:** aso, hosting, seo, content
+- **Files:** `docs/store/LISTING.md`, `docs/store/featureGraphic_ai_tutor.png`, `docs/reviews/COMPETITOR_ANALYSIS_2026-10-11.md`, `docs/BACKLOG.md`, `docs/reviews/AGENTIC_PIVOT_MOSCOW_2026-10-02.md`, `hosting/rivox/index.html`, `hosting/index.html`, `hosting/blog/index.html`, `hosting/sitemap.xml`, `hosting/assets/rivox_ai_tutor_feature.png`, five new `hosting/blog/*/index.html`
+- **Problem / Goal:** About 900 Play Store visitors and 75 installs. The listing and site still said "AI quiz generator" while the new graphic says "AI Tutor / Study Planner". Need web presence for AI tutor and agentic searches.
+- **Solution:** New title, short description (lengths counted), full description, screenshot order, and Play Console steps in LISTING.md. Rivox page retitled "AI Tutor and Study Planner" with new hero, five new feature cards (tutor chat, self-fixing plan, any skill, forgiving streak, answer from the notification), two new FAQ entries in both HTML and FAQ schema, `featureList` in the app schema, and the new graphic as og/twitter image. `/rivox` was missing from the sitemap and is now in it. Five posts: what an agentic AI tutor is, AI tutor app vs ChatGPT, what "agentic" should mean, learning any skill with an AI plan, streaks that forgive a bad day. Each has FAQ schema, one mid-article Display unit, and a Play closer. Research is cited by author and year only where it is well established (Roediger and Karpicke 2006, Cepeda et al. 2006). Competitor analysis covers Duolingo, Coursera, Khan, Quizlet, general assistants' study modes, NotebookLM, and speaking apps, with items to verify marked.
+- **Regression risks:** Play Console changes (title, screenshots, experiments, custom listings) are manual and not done. Competitor features marked "verify" must be checked before marketing use. The Rivox page now links its stylesheet absolutely (`/styles.css`), same file as before.
+- **Verified:** Sitemap parses (24 URLs). No em-dashes in new or edited pages. Not deployed (`firebase deploy --only hosting` not run).
+
+## 2026-10-02 — Cleaner chat composer and sign-in error
+
+- **Type:** enhancement
+- **Area:** chat, onboarding
+- **Files:** `lib/features/chat/presentation/chat_screen.dart`, `lib/features/chat/presentation/chat_turn_text.dart`, `lib/features/onboarding/presentation/welcome_screen.dart`, `test/chat_turn_text_test.dart`
+- **Problem / Goal:** The new chat controls were a row of large icons, and a sent file pasted its full text into the bubble. The Google failure on the welcome card was a paragraph about certificates.
+- **Solution:** Attach, scan, the field, and send or stop sit in one rounded bar. A file shows as a name chip in the composer and on the bubble, and the bubble shows the question. Edit and Resend sit under the latest message only. Older messages open the same actions on a long press. Edit changes the question and keeps the file. The welcome error is one sentence, and the Google button has its own spinner.
+- **Regression risks:** The stored message still contains the file text, clipped at 8,000 characters, so later replies can use it. A message that already begins with "Attached " is shown as a file chip. Stop still does not refund a chat use that already started.
+- **Verified:** `flutter test test/chat_turn_text_test.dart` and `flutter analyze` on the chat and welcome screens, no issues. Not checked on a device.
+
+## 2026-10-02 — Chat can attach a file or scan, then edit, stop, or resend
+
+- **Type:** enhancement
+- **Area:** chat
+- **Files:** `lib/features/chat/presentation/chat_screen.dart`, `lib/data/local/repositories/chat_repository.dart`
+- **Problem / Goal:** Chat was a single text box. A sent turn could not be stopped, edited, or sent again, and a page or photo could not be included.
+- **Solution:** The composer can attach a txt, md, or pdf, or open the existing camera scan and attach the reviewed text. Stop drops the in-flight reply and leaves the message so it can be edited or resent. A reply that finishes after Stop is deleted and not shown. Edit replaces that turn, deletes later turns, and asks again. Resend asks again from that turn.
+- **Regression risks:** Stop does not refund a chat-quota use that already started. An attachment is clipped at 8,000 characters. The camera scan still returns text with Navigator.pop, which the library upload already depends on.
+- **Verified:** `flutter analyze` on the chat screen and repository, no issues. Not checked on a device.
+
+
+
 ## 2026-09-19 (Phase 5+6) — B35 Daily Pack video chapters; B39 learning path map view
 
 - **Type:** feature (backlog B35, B39)

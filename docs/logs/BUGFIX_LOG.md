@@ -1,5 +1,85 @@
 # Bug Fix Log
 
+## 2026-10-11 - Built-in AI fallback model was retired (HTTP 410)
+
+- **Type:** bugfix
+- **Area:** ai
+- **Files:** `lib/core/services/built_in_ai_config.dart`, `docs/BUILT_IN_AI.md`
+- **Problem / Goal:** `nvidia/nemotron-3-nano-30b-a3b` reached end of life on 2026-09-01. Whenever the primary Built-in model failed, the fallback also failed, so learners saw "Built-in AI models are temporarily unavailable".
+- **Solution:** Fallback is `nvidia/nemotron-3.5-lightning-30b-a3b`. Verified live: JSON in `content` with thinking disabled, about 4s for a 2-question quiz.
+- **Regression risks:** Lightning matches the router's Nemotron handling (reasoning-channel rules, larger token cap). Learners whose stored provider row still names the old model skip it as before (410 is retryable).
+- **Verified:** Live curl probes; `test/nvidia_services_test.dart` pins the new id.
+
+## 2026-10-11 - Photo bytes that are not an image crashed instead of showing a message
+
+- **Type:** bugfix
+- **Area:** chat
+- **Files:** `lib/core/services/nvidia/image_prep.dart`
+- **Problem / Goal:** `image.decodeImage` throws (RangeError) on non-image bytes rather than returning null, which would have surfaced as a raw error.
+- **Solution:** Decode failures return null, so the learner sees "That file is not an image Rivox can read."
+- **Verified:** `test/nvidia_services_test.dart` (non-images return null).
+
+## 2026-10-11 - IELTS "Advanced English" module quiz came back about a 1900s car
+
+- **Type:** bugfix
+- **Area:** ai, quiz
+- **Files:** `lib/core/services/learning_context.dart`, `lib/data/remote/ai/learning_orchestrator.dart`, `lib/core/services/open_knowledge/open_knowledge_service.dart`, `test/learning_context_test.dart`
+- **Problem / Goal:** Goal IELTS, module "Advanced English". The quiz asked where the Advance automobile was made and cited Wikipedia "Advance (English automobile)". The module title was used alone: Wikipedia's top search hit was taken without a relevance check, and the IELTS paper rules did not apply because the title named no IELTS section.
+- **Solution:** Goal, path, and module are composed before any lookup or prompt. A module quiz whose title does not already name the goal is generated as "Advanced English (IELTS)", which turns on the IELTS rules and skips encyclopedia lookups. The prompt gets a LEARNING CONTEXT block: read the module as a step toward the goal, never as a product, vehicle, brand, or place, and ignore reference text about another sense. Wikipedia lookups for ordinary topics now take the first of five hits whose title is about the topic's own words (parenthetical disambiguators ignored), or none.
+- **Regression risks:** Module quiz titles in history now include the goal in brackets. A module whose real subject shares no words with any Wikipedia title gets no encyclopedia context (it was never safe to guess). Quick quizzes typed by the learner keep their exact wording.
+- **Verified:** `test/learning_context_test.dart` (the reported case, plus Python, photosynthesis, squat vs housing). Full suite passes. Not checked against a live model.
+
+## 2026-10-11 - Google Sign-In fails on Play installs ("[16] Cancelled")
+
+- **Type:** bugfix (diagnosis; fix is a console step)
+- **Area:** auth
+- **Files:** `lib/data/remote/auth/auth_service.dart`, `docs/BACKLOG.md` (B54)
+- **Problem / Goal:** The Google button showed the "did not finish" line without signing in.
+- **Solution:** Root cause is configuration. `google-services.json` registers only the upload key SHA-1 (F9:E4:96:62:...:93:A0) for `com.aiquiz.ai_quiz_app`. Play installs are signed with the Play App Signing key, so Credential Manager rejects the request and reports a cancel. The service now logs the exact Google code and description with that hint. Owner steps are in BACKLOG B54.
+- **Regression risks:** None in code.
+- **Resolved (same day):** Play app signing SHA-1 `EB:BE:87:8E:66:F1:79:53:9B:E2:CF:B3:22:95:03:3F:9B:A7:70:F0` (from Play's `deployment_cert.der`) and the debug SHA-1 were added in Firebase; the new `google-services.json` (three certificate hashes, `com.hassmire.rivox` removed) is in `android/app/`. The app's web client id did not change.
+- **Verified:** SHA-1s computed with keytool from the upload keystore, the debug keystore, and Play's certificates, and matched against `google-services.json`. Owner confirmed Google sign-in works on the Play Store install.
+
+## 2026-10-11 - Chat "Open History" showed a blank screen; composer buttons misaligned
+
+- **Type:** bugfix
+- **Area:** chat, navigation
+- **Files:** `lib/core/router/app_navigation.dart`, `lib/core/services/agentic/proposed_action_runner.dart`, `lib/shared/navigation/recommendation_navigation.dart`, `lib/shared/widgets/next_session_card.dart`, `lib/features/chat/presentation/chat_screen.dart`, `test/app_navigation_test.dart`
+- **Problem / Goal:** Tapping a chat chip for History (also Home or Learn) showed the bottom bar with an empty body. The runner pushed a bottom-nav tab route from `/chat`, which builds a second shell around the same branch navigator key. In the composer, the 36px attach and scan buttons, the text field, and the 40px send button were bottom-aligned in one row, so they sat on different lines. The runner also used `aiRequestPipelineProvider` without importing it, so the app did not compile.
+- **Solution:** `openAppRoute` switches tabs with `go` for `/dashboard`, `/learn`, `/history` and pushes everything else. The runner, recommendation payload routes, and next-session routes use it. For a tab switch, Undo reopens the screen the learner came from (chat). The composer is two rows: a full-width text field, then a toolbar where every button is a fixed 40x40 box on one centre line. Added the missing provider import.
+- **Regression risks:** After a chat chip opens a tab, chat is closed. Undo reopens it, but the system back button does not return to chat. If the learner started from a tab with nothing pushed on top, there is no Undo.
+- **Verified:** `test/app_navigation_test.dart` failed with the old `push` (no tab body) and passes with `openAppRoute`. Full `flutter analyze` (0 errors) and full `flutter test` pass. Not checked on a device.
+
+## 2026-10-02 — Google account picker closed without signing in
+
+- **Type:** bugfix
+- **Area:** auth, onboarding
+- **Files:** `lib/data/remote/auth/auth_service.dart`, `lib/features/onboarding/presentation/welcome_screen.dart`, `test/google_sign_in_cancel_test.dart`
+- **Problem / Goal:** Choosing a Google account did not sign the learner in. The button first ran a lightweight sign-in, which on Android opens its own account sheet and reports a configuration failure as a cancel. That cancel was ignored, so the screen went back to idle with no error. Firebase also never received a web client id, so the ID token could be missing.
+- **Solution:** The Google button only uses an existing Firebase user, then one account sheet. Google is initialized with the Firebase web client id. A plain "user canceled the selector" stays quiet. Any other cancel, including the "[16] Cancelled by user" configuration failure, is shown as one short line: try again or continue with email. A missing ID token uses that same line. Launch no longer opens the lightweight account sheet. The Google button shows its own spinner, so the email button does not spin while Google is in progress.
+- **Regression risks:** A learner who is not already in Firebase Auth must tap Google again; the app will not restore them from Credential Manager alone. Dismissing the sheet with "User canceled the selector" still shows no error. Cloud backup stays off.
+- **Verified:** `flutter test test/google_sign_in_cancel_test.dart`. Not checked on a device.
+
+## 2026-09-27 — Answer check covers every closed question type
+
+- **Type:** bugfix
+- **Area:** quiz
+- **Files:** `lib/data/remote/ai/stimulus_answer_check.dart`, `lib/data/remote/ai/prompt_builder.dart`, `lib/data/remote/ai/language_exam_prompt.dart`, `lib/data/local/repositories/quiz_repository.dart`, `test/question_stimulus_test.dart`
+- **Problem / Goal:** The chart and transcript repair skipped true/false, fill-in-the-blank, and cue cards, and it kept a key it could not prove.
+- **Solution:** Multiple choice, true/false, yes/no, Not Given, and fill-in-the-blank all use the same check for a chart, table, passage, transcript, or cue. A comparison or a named value is calculated. A blank keeps its sentence and takes the value the figure shows. An option the text does not contain is replaced only when one other option is supported. If the key cannot be proved, the item is dropped from a new quiz, removed before play, or left unscored on a finished quiz so a learner is not marked wrong for it.
+- **Regression risks:** A paraphrase whose words are not in the passage is dropped rather than shown with an unproved key. Not Given is used only when that option exists and the statement is not in the text. Open interview answers are still not auto-marked. A finished quiz can show a higher score when a broken item is withdrawn.
+- **Verified:** `flutter test test/question_stimulus_test.dart test/language_exam_prompt_test.dart`.
+
+## 2026-09-27 — Stimulus questions with a key the material does not support
+
+- **Type:** bugfix
+- **Area:** quiz
+- **Files:** `lib/data/remote/ai/stimulus_answer_check.dart`, `lib/data/remote/ai/quiz_json_parser.dart`, `lib/data/remote/ai/prompt_builder.dart`, `lib/data/remote/ai/language_exam_prompt.dart`, `lib/data/local/repositories/quiz_repository.dart`, `lib/features/quiz/presentation/quiz_play_screen.dart`, `lib/features/quiz/presentation/results_screen.dart`, `test/question_stimulus_test.dart`
+- **Problem / Goal:** A chart item was only a caption ("the graph shows London and Cairo") and marked 8°C correct when 22°C was also on the chart. A listening item marked "the upcoming event" correct when the transcript was about a new restaurant.
+- **Solution:** A chart or table that does not ask a question is rewritten into a highest-value question, and the key is set to that value. A question that names one label keeps that label's value. A passage or transcript whose marked option shares no words with the text, while exactly one other option does, switches to that option. Saved quizzes are corrected when opened, and a finished score is recounted. New quizzes are corrected as they are parsed. The prompt now requires a real question whose key is the only option the material supports.
+- **Regression risks:** True/false and Not Given items are left alone. A tie for the highest chart value is dropped on a new quiz rather than given an arbitrary key. Cue cards are not retargeted. An already finished quiz can show a higher score after it is opened again. Streak points already awarded are not recalculated.
+- **Verified:** `flutter test test/question_stimulus_test.dart`.
+
 ## 2026-09-27 — Live probe quiz scored 0 when Built-in AI returned an opaque error
 
 - **Type:** bugfix

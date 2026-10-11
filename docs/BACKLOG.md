@@ -52,6 +52,21 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 | B44 | Screen-time-aware streak nudge via Android UsageStatsManager | backlog (proposed 2026-09-07) | gamification, platform, retention | Could have |
 | B45 | R8/AGP optimisation: enable optimised resource shrinking + upgrade AGP to 9.0+ | backlog (proposed 2026-09-09) | android, build, platform | Must have |
 | B46 | Show passage, chart, table, or spoken transcript on questions that need them | done (2026-09-27) | quiz | Should have |
+| B47 | Connect goal, path, and module before any generation (no wrong-sense content) | done (2026-10-11) | ai, quiz, agentic | Must have |
+| B48 | Self-healing chat agent: edit the learning path and replace a broken quiz | done (2026-10-11) | chat, agentic, learn | Must have |
+| B49 | In-chat quiz forms, quick replies, Markdown replies | done (2026-10-11) | chat, agentic | Must have |
+| B50 | Answer a daily quick question from the notification | done (2026-10-11, Android) | notifications, retention | Must have |
+| B51 | Streak freezes, XP and levels, streak-saver nudge | done (2026-10-11) | gamification, retention | Must have |
+| B52 | Adapt practice and wording to any field (fitness, DIY, art, game dev, coding, ...) | done (2026-10-11, v1) | agentic, personalization | Must have |
+| B53 | In-app video finder and player (no hand-off to the YouTube app) | done (2026-10-11) | learn, video | Must have |
+| B54 | Google Sign-In on Play installs: register Play App Signing SHA-1 | done (2026-10-11, verified on a Play install) | auth, platform | Must have |
+| B55 | ASO repositioning as "AI Tutor and Study Planner" | done (2026-10-11, listing copy; Play Console steps pending) | aso, marketing | Must have |
+| B56 | Website: AI-tutor positioning and agentic-era articles | done (2026-10-11) | hosting, seo, content | Should have |
+| B57 | Leagues lite: weekly XP board (self first, friends later) | backlog (proposed 2026-10-11) | gamification | Could have |
+| B58 | Shareable path completion card | backlog (proposed 2026-10-11) | gamification, sharing | Should have |
+| B59 | NVIDIA multimodal tutor: photo questions, voice input, read-aloud, semantic RAG, safety guard, cloud OCR fallback | done (2026-10-11) | ai, chat, library | Must have |
+| B60 | Move NVIDIA calls behind a server proxy; rotate shared keys | backlog (proposed 2026-10-11) | ai, security, infra | Must have (before scale) |
+| B61 | Clear the semantic vector cache on source delete and Reset app | backlog (proposed 2026-10-11) | library, privacy | Should have |
 
 ---
 
@@ -583,3 +598,79 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
 - **Shipped:** Optional `stimulus` on generated questions, stored as `Question.stimulusJson`. Kinds: passage, transcript, chart, table, cue. The play screen and the expanded result show it only when present. Transcripts have a listen button that reads the text aloud on the device. Charts are drawn from the numbers in the stimulus. Questions with no stimulus are unchanged. Quizzes already saved do not gain a chart until they are generated again.
 - **Still out of scope:** Real audio files and picture charts. Listening is the transcript, read by on-device speech.
 - **Source:** User screenshot of quiz results, 2026-09-27. [FEATURES_LOG](logs/FEATURES_LOG.md).
+
+---
+
+## 2026-10-11 pass: AI tutor repositioning and agentic upgrades (B47 to B58)
+
+Source: owner feedback 2026-10-11 (hallucinated IELTS module quiz, chat agent that could only point to History, Google sign-in failing on Play installs, YouTube still leaving the app, Play Store conversion at about 8%, new "AI Tutor / Study Planner" feature graphic). Competitor framing: [COMPETITOR_ANALYSIS_2026-10-11](reviews/COMPETITOR_ANALYSIS_2026-10-11.md).
+
+### B47 - Connect goal, path, and module before any generation
+
+- **Status:** done (2026-10-11)
+- **Area:** ai, quiz, agentic
+- **MoSCoW:** Must have
+- **Why it exists:** An IELTS path module titled "Advanced English" produced a quiz about the Advance automobile. The module title was sent alone to Wikipedia, whose top hit was "Advance (English automobile)", and the language-exam rules did not apply because the title named no IELTS section.
+- **Shipped:** `LearningContext` composes goal, path focus, and module before lookup and prompting. A module quiz becomes "Advanced English (IELTS)", which also turns on the IELTS paper rules; the prompt says to read the module in the goal's sense and ignore reference text about another sense. `OpenKnowledgeService` now takes the first Wikipedia hit whose title is about the topic's own words, not the top hit.
+- **Still out of scope:** Module notes and resources still use the module title on its own.
+
+### B48 - Self-healing chat agent
+
+- **Status:** done (2026-10-11)
+- **Area:** chat, agentic, learn
+- **MoSCoW:** Must have
+- **Why it exists:** The chat found a bad quiz but could only say "open History". The agent must fix what it finds.
+- **Shipped:** Chat sees the active path (numbered modules, current one marked) and recent quizzes with ids. `editPath` (add, remove, rename, move; max 6 ops) is applied immediately with Undo (`LearningPlanEditor`, snapshot-based, never fewer than one module, progress pointer follows the learner's module). `fixQuiz` replaces a broken quiz after one tap with the corrected topic, keeping its module link, and deletes the broken one only after the replacement exists.
+- **Still out of scope:** Undo after an app restart (the card still shows what changed). Editing exam syllabi and career skill matrices.
+
+### B49 - In-chat quiz forms
+
+- **Status:** done (2026-10-11). See FEATURES_LOG.
+
+### B50 - Daily quick question from the notification
+
+- **Status:** done (2026-10-11, Android)
+- **Shipped:** One question a day from the learner's missed answers (then recent quizzes), three options, A/B/C buttons. Works with the app closed (background handler); the result replaces the question. Answers count toward the streak and XP. Settings > Reminders: on/off and the hour. Default on.
+- **Still out of scope:** iOS action buttons (needs a Darwin category); feeding answers into spaced repetition.
+
+### B51 - Streak freezes, XP, levels, streak saver
+
+- **Status:** done (2026-10-11)
+- **Shipped:** `Progression` computes streak (with freezes: one per 7-day run, max 2, auto-applied to a single missed day), XP, and levels from stored history only. One-row strip on Home. Evening nudge when the streak is at risk, naming the weakest topic.
+
+### B52 - Adapt to any field
+
+- **Status:** done (2026-10-11, v1)
+- **Shipped:** `LearningDomains` classifies the goal (language, exam, coding, game dev, art, music, fitness, DIY, cooking, business, academic, general). Quiz, path, and chat prompts get the field's practice style (form cues and safety for fitness, tool and safety scenarios for DIY, code reading for coding, and so on). Chat starters and the Home strip icon follow the field. No new screens.
+- **Still out of scope:** Field-specific starter paths (see competitor analysis, next bets).
+
+### B53 - In-app video finder and player
+
+- **Status:** done (2026-10-11)
+- **Shipped:** `/video?q=` screen finds embeddable, on-topic videos and plays them in the existing in-app player, with alternatives and a "not relevant" button. Chat's video chip and every missing or failed module video use it.
+- **Config:** `YOUTUBE_API_KEY` (YouTube Data API v3) is set in `tool/.local_dart_defines.json` and as a GitHub secret (2026-10-11, verified with a live search). Release builds use the official API. A build without it falls back to the public results page, which can break and is outside the API terms.
+
+### B54 - Google Sign-In on Play installs
+
+- **Status:** done 2026-10-11 (config). Firebase now lists three Android OAuth clients for `com.aiquiz.ai_quiz_app`: upload key `f9e49662...`, debug `af13999a...`, and the Play app signing key `ebbe878e66f179539be2cfb32295033f9ba770f0` (from `deployment_cert.der`, Google-generated, valid 2026-07-27 to 2056). New `google-services.json` installed; the web client id used by the app is unchanged. `com.hassmire.rivox` was removed from Firebase. Verified by the owner on a Play Store install the same day.
+- **Previous status:** blocked on a Firebase Console step (owner)
+- **Why:** `google-services.json` lists one Android certificate for `com.aiquiz.ai_quiz_app`: F9:E4:96:62:...:93:A0, the upload key. Play installs are re-signed with the Play App Signing key, so Credential Manager rejects the request and reports "[16] Cancelled". Debug builds (AF:13:99:9A:...:46:0D) are also unregistered.
+- **Fix:** Play Console > Test and release > App integrity > App signing: copy the **app signing key** SHA-1 (and SHA-256). Firebase Console > Project settings > Android app `com.aiquiz.ai_quiz_app` > Add fingerprint (also add the debug SHA-1). Download the new `google-services.json` into `android/app/`, rebuild. No code change needed; the app now logs the exact Google error code with this hint.
+
+### B55 - ASO as "AI Tutor and Study Planner"
+
+- **Status:** done (listing copy 2026-10-11); Play Console steps pending. See `docs/store/LISTING.md`.
+
+### B56 - Website: AI tutor positioning and agentic-era articles
+
+- **Status:** done (2026-10-11). See ENHANCEMENTS_LOG.
+
+### B57 - Leagues lite
+
+- **Status:** backlog (proposed 2026-10-11) | **MoSCoW:** Could have
+- **Idea:** Weekly XP compared with your own last four weeks first (no accounts), friends board later on top of B13 accounts.
+
+### B58 - Shareable path completion card
+
+- **Status:** backlog (proposed 2026-10-11) | **MoSCoW:** Should have
+- **Idea:** When a path completes, a share image (reuse B28 export) with path title, modules, and streak. Clearly not an accredited certificate.

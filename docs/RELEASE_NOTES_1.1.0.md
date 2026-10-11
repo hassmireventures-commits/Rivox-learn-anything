@@ -1,3 +1,141 @@
+# Rivox 1.1.0 (build 17)
+
+**Release date:** 2026-10-11
+**Version:** 1.1.0
+**Version code:** 17
+**Package:** `com.aiquiz.ai_quiz_app`
+
+Upload this AAB to Play. Builds 14, 15, and 16 are already assigned; do not upload them again.
+
+Build command: `flutter build appbundle --release --dart-define-from-file=tool/.local_dart_defines.json` (upload keystore via `android/key.properties`).
+
+## What's new in build 17 (since build 16)
+
+Play Console "What's new" text (under 500 characters):
+
+```
+Rivox is now your AI tutor.
+- Ask about a photo, speak your question, or have replies read aloud
+- Quizzes right inside the chat, and the tutor fixes your plan when something is off
+- Answer a daily quick question straight from the notification
+- Streak freezes, XP and levels
+- Lessons adapt to any skill: exams, coding, fitness, art, DIY and more
+- Videos play inside the app
+- Google sign-in fixed
+```
+
+### Fixes
+- Google sign-in on Play Store installs (Play app signing key registered in Firebase)
+- Opening History, Home, or Learn from chat no longer shows a blank screen
+- Module quizzes stay on the goal (an IELTS "Advanced English" module no longer produces a quiz about a car)
+- Built-in AI backup model replaced (the old one was retired by NVIDIA)
+- Notification buttons that do not open the app now work (also fixes reminder Snooze and Dismiss)
+
+### Tutor and chat
+- In-chat quiz forms with instant feedback, quick-reply suggestions, Markdown replies, Copy and Listen
+- The tutor can add, remove, rename, or reorder path modules (with Undo) and replace a broken quiz
+- "+" menu: ask about a photo (camera or gallery), scan pages, or upload a file; mic button for voice questions
+- Chat messages pass an extra safety check
+
+### Learning
+- Library search matches by meaning, not only shared words
+- Camera scans fall back to AI OCR when the on-device read is unclear
+- Daily quick question, streak freezes, XP and levels, evening streak reminder when at risk
+- Practice style adapts to the learner's field
+
+### Privacy
+- Privacy policy updated (2026-10-11): NVIDIA processes chat safety checks, library search, photos, and voice. Update the Play Data safety form to match before publishing.
+
+---
+
+# Rivox 1.1.0 (build 16)
+
+**Release date:** 2026-10-02
+**Version code:** 16
+
+## What's new (since build 15)
+
+### Chat
+- Attach a text file or a PDF, or scan a page with the camera, and ask about it in the same message
+- Edit the latest message, stop a reply that is still coming in, or send that message again
+- A file shows as its name on the message. The question stays readable
+
+### Accounts
+- Google sign-in opens one account sheet. If sign-in does not finish, the welcome screen says to try again or continue with email
+
+### Still in this version from build 15
+- IELTS, NEET, JEE Main, UPSC, SSC, and bank practice uses a real task: a passage, chart, table, or conversation
+- Answer keys are checked against that material
+
+## Play Store release notes (paste)
+
+```
+Chat can take a text file, a PDF, or a camera scan. You can edit a message, stop a reply, or send it again.
+
+Google sign-in uses one account sheet. If it does not finish, try again or continue with email.
+
+Practice for IELTS, NEET, JEE Main, UPSC, SSC, and bank tests uses a real task: a passage, chart, table, or conversation. The answer is checked against that material.
+```
+
+## Build artifacts
+
+| Artifact | Path |
+|----------|------|
+| App Bundle (AAB) | `build/app/outputs/bundle/release/app-release.aab` (101.6MB — upload this file to Play Console) |
+
+## Build command
+
+```powershell
+cd "d:\Documents\App projects\learn-anything\learn-anything"
+flutter build appbundle --release --dart-define-from-file=tool/.local_dart_defines.json
+```
+
+---
+
+# Rivox 1.1.0 (build 15)
+
+**Release date:** 2026-09-27
+**Version:** 1.1.0
+**Version code:** 15
+**Package:** `com.aiquiz.ai_quiz_app`
+
+Upload this AAB to Play. Build 14 is already assigned; do not upload it again.
+
+## What's new (since build 14)
+
+### Competitive exams
+- IELTS, NEET, JEE Main, UPSC, SSC, banking, and other named exams or certifications get paper-style practice: a task from the syllabus, not a quiz about the exam name, fees, or dates
+- A question that needs a passage, chart, table, or conversation shows that material on the question and on the results
+- Listening practice reads the transcript aloud on the device
+- Multiple choice, true/false, and fill-in-the-blank can appear in one quiz when mixed is selected
+- The marked answer has to follow the chart or the text. A key that the material does not support is corrected or that item is not scored against you
+
+### Accounts
+- Google sign-in is restored on the same install, without the account picker every launch
+
+## Play Store release notes (paste)
+
+```
+Practice for competitive exams the way the paper is written. IELTS, NEET, JEE Main, UPSC, SSC, and bank tests now use a real task: a passage, chart, table, or conversation, then a question about that material.
+
+Answer keys are checked against the chart or the text. Mixed quizzes can include multiple choice, true or false, and fill-in-the-blank.
+```
+
+## Build artifacts
+
+| Artifact | Path |
+|----------|------|
+| App Bundle (AAB) | `build/app/outputs/bundle/release/app-release.aab` (101.6MB — upload this file to Play Console) |
+
+## Build command
+
+```powershell
+cd "d:\Documents\App projects\learn-anything\learn-anything"
+flutter build appbundle --release --dart-define-from-file=tool/.local_dart_defines.json
+```
+
+---
+
 # Rivox 1.1.0 (build 14)
 
 **Release date:** 2026-09-19
