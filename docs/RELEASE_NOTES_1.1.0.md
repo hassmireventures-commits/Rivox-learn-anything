@@ -1,11 +1,39 @@
-# Rivox 1.1.0 (build 17)
+# Rivox 1.1.0 (build 18)
 
 **Release date:** 2026-10-11
 **Version:** 1.1.0
-**Version code:** 17
+**Version code:** 18
 **Package:** `com.aiquiz.ai_quiz_app`
 
-Upload this AAB to Play. Builds 14, 15, and 16 are already assigned; do not upload them again.
+Upload this AAB to Play. It contains everything in build 17 below plus the R8 optimisation. If build 17 was never uploaded, skip it and upload this one; version codes only need to increase.
+
+Build command: `flutter build appbundle --release --dart-define-from-file=tool/.local_dart_defines.json` (upload keystore via `android/key.properties`).
+
+## What's new in build 18 (since build 17)
+
+- Play Console recommendation "Improve your app's memory and performance with R8 optimisation" (backlog B45, part 1): Android Gradle Plugin 8.11.1 to 8.13.2, and `android.r8.optimizedResourceShrinking=true` so R8 shrinks code and resources together. No app code changed.
+
+Play Console "What's new" text (use this whether or not build 17 was uploaded; 450 characters):
+
+```
+Rivox is now your AI tutor.
+- Ask about a photo, speak your question, or have replies read aloud
+- Quizzes right inside the chat, and the tutor fixes your plan when something is off
+- Answer a daily quick question straight from the notification
+- Streak freezes, XP and levels
+- Lessons adapt to any skill: exams, coding, fitness, art, DIY and more
+- Videos play inside the app
+- Faster and lighter
+- Google sign-in fixed
+```
+
+---
+
+# Rivox 1.1.0 (build 17)
+
+**Version code:** 17
+
+Builds 14, 15, and 16 are already assigned; do not upload them again.
 
 Build command: `flutter build appbundle --release --dart-define-from-file=tool/.local_dart_defines.json` (upload keystore via `android/key.properties`).
 

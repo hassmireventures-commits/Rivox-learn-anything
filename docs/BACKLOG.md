@@ -50,7 +50,7 @@ Agents: read this file with `docs/PROJECT_LOG.md` before starting a listed item.
 | B42 | Realtime conversational voice interview (Gemini Live-style) | backlog (proposed 2026-09-07) | career, ai, voice | Won't have (this cycle) |
 | B43 | Lock-screen "answer to unlock" gamification | backlog (proposed 2026-09-07) | gamification, platform | Won't have (not feasible) |
 | B44 | Screen-time-aware streak nudge via Android UsageStatsManager | backlog (proposed 2026-09-07) | gamification, platform, retention | Could have |
-| B45 | R8/AGP optimisation: enable optimised resource shrinking + upgrade AGP to 9.0+ | backlog (proposed 2026-09-09) | android, build, platform | Must have |
+| B45 | R8/AGP optimisation: enable optimised resource shrinking + upgrade AGP to 9.0+ | partial (2026-10-11: AGP 8.13.2 + optimized resource shrinking, build 18; AGP 9 still open) | android, build, platform | Must have |
 | B46 | Show passage, chart, table, or spoken transcript on questions that need them | done (2026-09-27) | quiz | Should have |
 | B47 | Connect goal, path, and module before any generation (no wrong-sense content) | done (2026-10-11) | ai, quiz, agentic | Must have |
 | B48 | Self-healing chat agent: edit the learning path and replace a broken quiz | done (2026-10-11) | chat, agentic, learn | Must have |
@@ -579,7 +579,8 @@ Grounded in two inputs: (1) this repo's own `docs/reviews/*` (billion-dollar-roa
 
 ### B45 — R8/AGP optimisation: enable optimised resource shrinking + upgrade AGP to 9.0+
 
-- **Status:** backlog (proposed 2026-09-09)
+- **Status:** partial. Part 1 done 2026-10-11 (build 18): optimised resource shrinking needs AGP 8.12+ (Android docs, "enable app optimization"), so AGP 8.11.1 went to 8.13.2 (Flutter supports up to 9.2; Gradle 8.14 already meets 8.13's minimum) and `android.r8.optimizedResourceShrinking=true` was added to `android/gradle.properties`. Checked first that no Android resource is loaded only by name from Dart (notification sounds use system URIs; `@mipmap/ic_launcher` is also referenced from the manifest). Part 2, AGP 9.x, is still open; there the property is the default and can be removed.
+- **Previous status:** backlog (proposed 2026-09-09)
 - **Area:** android, build, platform
 - **MoSCoW:** Must have
 - **Why it exists:** Play Console's "App optimisation" panel — the same panel that flagged low obfuscation and was fixed in build 8/9 (see `docs/logs/BUGFIX_LOG.md`, 2026-09-08 entry) — separately recommends two further changes to reduce memory usage and improve performance: (1) "Optimised resource shrinking isn't enabled" and (2) "Upgrade your Android Gradle plug-in to version 9.0 or higher." Confirmed current state against `android/settings.gradle.kts` and `android/gradle/wrapper/gradle-wrapper.properties`: AGP `8.11.1`, Gradle `8.14`, Kotlin `2.2.20` — all three already flagged by Flutter's own build output this session as versions "support...will soon be dropped," so this aligns with (and gives a concrete deadline-driven reason for) an upgrade Flutter was already nudging toward. `android/app/build.gradle.kts` already sets `isShrinkResources = true`, but that's the older/basic resource shrinker, not AGP's newer "optimised" shrinking mode Play Console is asking for specifically.
