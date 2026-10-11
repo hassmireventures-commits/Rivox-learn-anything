@@ -1,5 +1,7 @@
 import 'package:isar_community/isar.dart';
 
+import '../../../core/services/notification_quick_question.dart';
+import '../../../core/services/progression.dart';
 import '../isar_service.dart';
 import '../models/daily_stat.dart';
 import '../models/quiz_session.dart';
@@ -18,6 +20,9 @@ class DashboardStats {
     required this.difficultyDistribution,
     required this.topicBreakdown,
     required this.recentQuizzes,
+    this.freezesBanked = 0,
+    this.activeToday = false,
+    this.xp = 0,
   });
 
   final int quizzesAttempted;
@@ -32,6 +37,18 @@ class DashboardStats {
   final Map<String, int> difficultyDistribution;
   final Map<String, int> topicBreakdown;
   final List<QuizSession> recentQuizzes;
+
+  /// Streak freezes banked (one per 7-day run, max 2), see [Progression].
+  final int freezesBanked;
+
+  /// Any learning activity today (quiz or quick question).
+  final bool activeToday;
+
+  /// Total XP from quizzes and quick questions.
+  final int xp;
+
+  bool get streakAtRisk => currentStreak > 0 && !activeToday;
+  LevelState get level => Progression.level(xp);
 }
 
 class WeeklyPoint {
@@ -82,15 +99,32 @@ class StatsRepository {
         .sortByCompletedAtDesc()
         .findAll();
 
+    // Quick questions answered from a notification count as a study day and
+    // earn XP, same as a quiz (see Progression).
+    final quickLog = await QuickQuestionLog.read();
+    final quickDays = quickLog
+        .map((e) => DateTime.tryParse(e['at']?.toString() ?? ''))
+        .whereType<DateTime>();
+    final streak = Progression.streak([...completed.map((q) => q.completedAt!), ...quickDays]);
+    final xp = Progression.xp(
+      quizzesCompleted: completed.length,
+      correctAnswers: completed.fold<int>(0, (s, q) => s + (q.correctCount ?? 0)),
+      quickAnswers: quickLog.length,
+      quickCorrect: quickLog.where((e) => e['correct'] == true).length,
+    );
+
     if (completed.isEmpty) {
       return DashboardStats(
+        freezesBanked: streak.freezesBanked,
+        activeToday: streak.activeToday,
+        xp: xp,
         quizzesAttempted: 0,
         accuracy: 0,
         averageScore: 0,
         topicsCovered: 0,
         totalQuestionsSolved: 0,
-        currentStreak: 0,
-        longestStreak: 0,
+        currentStreak: streak.current,
+        longestStreak: streak.longest,
         weeklyActivity: _emptyWeek(),
         activityTrend: _emptyTrend(),
         difficultyDistribution: const {},
@@ -114,7 +148,6 @@ class StatsRepository {
       topicBreakdown[q.topic] = (topicBreakdown[q.topic] ?? 0) + 1;
     }
 
-    final streaks = _computeStreaks(completed);
     final weekly = _weeklyActivity(completed);
     final trend = _activityTrend(completed);
     final recent = completed.take(5).toList();
@@ -125,56 +158,17 @@ class StatsRepository {
       averageScore: averageScore,
       topicsCovered: topics,
       totalQuestionsSolved: totalQuestions,
-      currentStreak: streaks.$1,
-      longestStreak: streaks.$2,
+      currentStreak: streak.current,
+      longestStreak: streak.longest,
+      freezesBanked: streak.freezesBanked,
+      activeToday: streak.activeToday,
+      xp: xp,
       weeklyActivity: weekly,
       activityTrend: trend,
       difficultyDistribution: difficultyDistribution,
       topicBreakdown: topicBreakdown,
       recentQuizzes: recent,
     );
-  }
-
-  (int, int) _computeStreaks(List<QuizSession> completed) {
-    final days = completed
-        .map((q) => q.completedAt!)
-        .map((d) => DateTime(d.year, d.month, d.day))
-        .toSet()
-        .toList()
-      ..sort();
-
-    if (days.isEmpty) return (0, 0);
-
-    var longest = 1;
-    var currentRun = 1;
-    for (var i = 1; i < days.length; i++) {
-      final diff = days[i].difference(days[i - 1]).inDays;
-      if (diff == 1) {
-        currentRun++;
-        longest = currentRun > longest ? currentRun : longest;
-      } else if (diff > 1) {
-        currentRun = 1;
-      }
-    }
-
-    final today = DateTime.now();
-    final todayDate = DateTime(today.year, today.month, today.day);
-    final yesterday = todayDate.subtract(const Duration(days: 1));
-    final lastDay = days.last;
-
-    int currentStreak = 0;
-    if (lastDay == todayDate || lastDay == yesterday) {
-      currentStreak = 1;
-      for (var i = days.length - 1; i > 0; i--) {
-        if (days[i].difference(days[i - 1]).inDays == 1) {
-          currentStreak++;
-        } else {
-          break;
-        }
-      }
-    }
-
-    return (currentStreak, longest);
   }
 
   List<WeeklyPoint> _weeklyActivity(List<QuizSession> completed) {

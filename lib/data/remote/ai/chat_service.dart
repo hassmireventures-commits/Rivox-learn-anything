@@ -10,7 +10,11 @@ import '../../../core/services/llm_manager.dart';
 import '../../../core/services/open_knowledge/open_knowledge_models.dart';
 import '../../../core/services/open_knowledge/open_knowledge_service.dart';
 import '../../local/models/chat_message.dart';
+import '../../../core/personalization/learning_domain.dart';
+import '../../../core/services/agentic/learning_plan_editor.dart';
+import '../../../core/services/nvidia/content_safety_service.dart';
 import '../../local/repositories/chat_repository.dart';
+import '../../local/repositories/learner_repository.dart';
 import '../../local/repositories/quiz_repository.dart';
 import 'ai_output_gate.dart';
 import 'chat_reply_result.dart';
@@ -33,15 +37,25 @@ class ChatService {
     required AiRequestPipeline aiPipeline,
     required ChatRepository chatRepository,
     required QuizRepository quizRepository,
+    LearnerRepository? learnerRepository,
+    ContentSafetyService? safety,
   })  : _llm = llmManager,
         _pipeline = aiPipeline,
         _chatRepository = chatRepository,
-        _quizRepository = quizRepository;
+        _quizRepository = quizRepository,
+        _learnerRepository = learnerRepository,
+        _safety = safety ?? ContentSafetyService();
+
+  final ContentSafetyService _safety;
 
   final LlmManager _llm;
   final AiRequestPipeline _pipeline;
   final ChatRepository _chatRepository;
   final QuizRepository _quizRepository;
+
+  /// Optional so tests and older call sites keep working; without it the
+  /// agent simply gets no learning-plan section and cannot edit the path.
+  final LearnerRepository? _learnerRepository;
 
   /// Most-recent completed quizzes folded into learning-history context.
   static const int kLearningHistoryRecentQuizzes = 5;
@@ -144,14 +158,74 @@ class ChatService {
       'yourself, you cannot verify a specific video exists. Set "videoTopic" '
       'only, and the app builds a real, working YouTube search link from it.'
       '\n\n'
+      'IN-CHAT QUIZ: you MAY write a short multiple-choice check right inside '
+      'the chat with "action":"inlineQuiz". The app renders it as an '
+      'interactive form the learner answers in place, with instant feedback. '
+      'Use it when the learner says things like "quiz me", "test me", "check '
+      'my understanding", "ask me a question", or right after you explained '
+      'a concept and they agree to a quick check. Prefer it over proposeQuiz '
+      'for quick checks; use proposeQuiz only when they want a full, saved '
+      'quiz (many questions, a set difficulty, or "make/generate a quiz"). '
+      'Rules: 1 to ${ChatInlineQuiz.maxQuestions} questions (default 3), 3 or '
+      '4 options each, exactly one clearly correct option, no "all of the '
+      'above", "answerIndex" is the 0-based index of the correct option, '
+      'and "explanation" is one sentence on why it is correct. Only ask what '
+      'you are confident is factually right; base it on the conversation, '
+      'their recent mistakes, or reference material when relevant. "reply" '
+      'is a one-line lead-in ("Here are 3 quick questions on recursion."), '
+      'never the questions or answers themselves. When the conversation '
+      'shows an in-chat quiz result, use it: explain misses, adapt.'
+      '\n\n'
+      'FIXING THE LEARNER\'S PLAN (you are a self-healing agent: when you '
+      'find a mistake, fix it, never just send the learner somewhere to fix '
+      'it themselves). The "Learning plan" section below lists their active '
+      'path with numbered modules and their recent quizzes with ids. '
+      '(1) "action":"editPath" with "pathEdit": {"reason": "...", "ops": '
+      '[...]} changes the path; the app applies it immediately and offers '
+      'Undo. ops: {"op":"remove","module":N}, {"op":"add","title":"...",'
+      '"summary":"one line","module":N} (inserted at position N; omit '
+      'module to append), {"op":"rename","module":N,"title":"..."}, '
+      '{"op":"move","module":N,"toModule":M}. Module numbers are the ones '
+      'shown in the list, counted before any of your ops. Use it when the '
+      'learner asks to add, drop, rename or reorder modules, or when a '
+      'module is clearly off-goal, duplicated, or mislabeled (for example '
+      'a module title so vague it produced off-topic content: rename it to '
+      'say exactly what it means for their goal, e.g. "Advanced English" in '
+      'an IELTS path becomes "Advanced English for IELTS: vocabulary and '
+      'grammar"). Max ${PathEditPlan.maxOps} ops; keep at least one module. '
+      '(2) "action":"fixQuiz" with "fixQuizId" (an id from the list, '
+      'exactly) and "quizTopic" (the corrected, unambiguous topic tied to '
+      'their goal) when the learner says a quiz was irrelevant, wrong, or '
+      'about the wrong thing. The app removes that quiz from history and '
+      'builds a correct replacement after one tap. You may combine (1) and '
+      '(2) in one reply: put the quiz fix in "action" and the path edit in '
+      '"pathEdit". "reply" says plainly what you changed and why, in one or '
+      'two sentences. Never claim a fix you did not put in these fields, '
+      'and never invent module numbers or quiz ids.'
+      '\n\n'
+      'SUGGESTIONS: optionally add "suggestions", up to '
+      '${ChatSuggestedReplies.max} short follow-ups (under 60 characters '
+      'each) the LEARNER might send next, written in their voice (e.g. '
+      '"Give me an example", "Quiz me on this", "Explain it more simply"). '
+      'Make them specific to the conversation; omit the field when nothing '
+      'useful fits.'
+      '\n\n'
       'Respond with a single valid JSON object only, in this exact shape: '
       '{"reply": "...", "action": "none"|"proposeQuiz"|"proposePath"|'
-      '"suggestVideo"|"navigate", "quizTopic": "...", "quizQuestionCount": 15, '
-      '"quizDifficulty": "easy"|"medium"|"hard", "pathTopic": "...", '
-      '"pathModuleCount": 6, "videoTopic": "...", "navigateTo": "..."}. '
-      'Use "action":"none" and omit the quiz*/path*/video*/navigateTo fields '
-      'for ordinary answers. Omit whichever fields do not apply to your '
-      'chosen action. No markdown, no extra keys, no text outside the JSON.';
+      '"suggestVideo"|"navigate"|"inlineQuiz"|"editPath"|"fixQuiz", '
+      '"quizTopic": "...", '
+      '"quizQuestionCount": 15, "quizDifficulty": "easy"|"medium"|"hard", '
+      '"pathTopic": "...", "pathModuleCount": 6, "videoTopic": "...", '
+      '"navigateTo": "...", "inlineQuiz": {"topic": "...", "questions": '
+      '[{"question": "...", "options": ["...", "...", "..."], '
+      '"answerIndex": 0, "explanation": "..."}]}, "pathEdit": {"reason": '
+      '"...", "ops": [...]}, "fixQuizId": "...", "suggestions": ["..."]}. '
+      'Use "action":"none" and omit the quiz*/path*/video*/navigateTo/'
+      'inlineQuiz/pathEdit/fixQuizId fields for ordinary answers. Omit '
+      'whichever fields do not '
+      'apply to your chosen action. "reply" may use light Markdown (bold, '
+      'short bullet lists, inline code) when it genuinely helps. No extra '
+      'keys, no text outside the JSON.';
 
   /// Sends the learner's latest turn (already persisted by the caller — this
   /// service only reads history, it does not write messages) and returns the
@@ -175,6 +249,10 @@ class ChatService {
     if (firewallResult.blocked) {
       throw TopicNotAllowedException(firewallResult.reason ?? 'Message not allowed.');
     }
+    // Second guard (NVIDIA Nemotron content safety) catches harmful asks the
+    // keyword firewall misses. Started now, awaited just before the model
+    // call, so it overlaps retrieval instead of adding latency. Fails open.
+    final safetyFuture = _safety.checkUserMessage(latestUserMessage);
 
     await _pipeline.ensureTokenBudget();
 
@@ -200,6 +278,7 @@ class ChatService {
       // network round-trip on a topic that isn't really a topic.
       final ragFuture = _pipeline.buildRag(ctx);
       final learningHistoryFuture = _buildLearningHistorySummary();
+      final learningPlanFuture = buildLearningPlanSummary();
       final looksLikeTopic = ctx.topic.trim().split(RegExp(r'\s+')).length >= 3;
       final openKnowledgeFuture = looksLikeTopic
           ? OpenKnowledgeService()
@@ -209,7 +288,15 @@ class ChatService {
           : Future.value(const <OpenKnowledgeHit>[]);
 
       rag = await ragFuture;
-      final learningHistory = await learningHistoryFuture;
+      final safety = await safetyFuture;
+      if (!safety.safe) {
+        throw const TopicNotAllowedException(
+          "I can't help with that one. Ask me anything about what you're learning.",
+        );
+      }
+      final learningHistory = [await learningHistoryFuture, await learningPlanFuture]
+          .whereType<String>()
+          .join('\n\n');
       final openKnowledgeHits = await openKnowledgeFuture;
       final openKnowledgeBlock = openKnowledgeHits.isEmpty
           ? ''
@@ -298,6 +385,12 @@ class ChatService {
     for (final m in history) {
       final label = m.role == 'user' ? 'User' : 'Assistant';
       buffer.writeln('$label: ${m.text}');
+      // The quiz card itself lives in contextRef, not in the text; without
+      // this the model cannot see what it asked or how the learner did.
+      if (m.role != 'user') {
+        final quiz = ChatInlineQuiz.fromContextRef(m.contextRef);
+        if (quiz != null) buffer.writeln(quiz.toHistorySummary());
+      }
     }
     buffer.writeln();
     buffer.writeln('Respond to the last User message above.');
@@ -332,6 +425,58 @@ class ChatService {
         }
       }
       return buffer.toString();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Most-recent quizzes listed with ids, so the agent can name one to fix.
+  static const int kLearningPlanRecentQuizzes = 6;
+
+  /// The learner's active path (numbered modules, current one marked) and
+  /// recent quizzes with ids. This is what lets the chat agent repair the
+  /// plan itself ("editPath"/"fixQuiz") instead of only pointing at screens.
+  /// Best-effort: null on any failure or when there is nothing to show.
+  Future<String?> buildLearningPlanSummary() async {
+    try {
+      final buffer = StringBuffer('Learning plan (editable by you, see FIXING THE LEARNER\'S PLAN):');
+      var hasContent = false;
+      final repo = _learnerRepository;
+      if (repo != null) {
+        final profile = await repo.getOrCreateProfile();
+        final domain = LearningDomains.profileForGoal([profile.goalContext, ...repo.goalsOf(profile)]);
+        buffer.writeln(
+          '\nLearner\'s field: ${domain.label}. Adapt explanations, examples, and '
+          'in-chat quiz style to it. ${domain.promptGuidance}',
+        );
+        hasContent = true;
+        final path = await repo.primaryActivePath();
+        if (path != null) {
+          final steps = await repo.rawPathSteps(path);
+          final title = path.title.replaceFirst(RegExp(r'^Path:\s*'), '');
+          buffer.writeln('\nActive path: "$title"');
+          for (var i = 0; i < steps.length; i++) {
+            final marker = i < path.currentIndex
+                ? ' (done)'
+                : i == path.currentIndex
+                    ? ' (current)'
+                    : '';
+            buffer.writeln('  ${i + 1}. ${steps[i]['title']}$marker');
+          }
+          hasContent = true;
+        }
+      }
+      final recent = await _quizRepository.getRecent(limit: kLearningPlanRecentQuizzes);
+      if (recent.isNotEmpty) {
+        buffer.writeln('Recent quizzes (id: topic, score):');
+        for (final s in recent) {
+          final pct = s.accuracy != null ? '${s.accuracy!.round()}%' : 'unscored';
+          final module = s.moduleIndex != null ? ', module ${s.moduleIndex! + 1}' : '';
+          buffer.writeln('  ${s.uuid}: "${s.topic}", $pct$module');
+        }
+        hasContent = true;
+      }
+      return hasContent ? buffer.toString().trimRight() : null;
     } catch (_) {
       return null;
     }
@@ -373,13 +518,29 @@ class ChatService {
   }) {
     final reply = parseReply(raw);
     ChatProposedAction? action;
+    ChatInlineQuiz? inlineQuiz;
+    PathEditPlan? pathEdit;
+    var suggestions = const <String>[];
     try {
       final normalized = AiOutputGate.normalizeJsonText(raw);
       if (normalized != null) {
         final decoded = jsonDecode(normalized);
         if (decoded is Map) {
+          suggestions = ChatSuggestedReplies.normalize(decoded[ChatSuggestedReplies.contextKey]);
           final kind = decoded['action']?.toString();
-          if (kind == 'proposeQuiz') {
+          // Accepted even without the "inlineQuiz" action tag: models
+          // sometimes fill the object but leave "action":"none".
+          inlineQuiz = ChatInlineQuiz.fromJson(decoded[ChatInlineQuiz.contextKey]);
+          // Like inlineQuiz, accepted alongside any action (a quiz fix and
+          // a path edit often come together).
+          pathEdit = PathEditPlan.fromJson(decoded[ChatReplyResult.pathEditKey]);
+          if (kind == 'fixQuiz') {
+            final quizId = decoded['fixQuizId']?.toString().trim();
+            final topic = decoded['quizTopic']?.toString().trim();
+            if (quizId != null && quizId.isNotEmpty && topic != null && topic.isNotEmpty) {
+              action = ChatProposedAction.fixQuiz(topic: topic, quizId: quizId);
+            }
+          } else if (kind == 'proposeQuiz') {
             final topic = decoded['quizTopic']?.toString().trim();
             if (topic != null && topic.isNotEmpty) {
               action = ChatProposedAction.quiz(
@@ -415,6 +576,13 @@ class ChatService {
     } catch (_) {
       action = null;
     }
-    return ChatReplyResult(reply: reply, action: action, sources: sources);
+    return ChatReplyResult(
+      reply: reply,
+      action: action,
+      inlineQuiz: inlineQuiz,
+      pathEdit: pathEdit,
+      suggestions: suggestions,
+      sources: sources,
+    );
   }
 }

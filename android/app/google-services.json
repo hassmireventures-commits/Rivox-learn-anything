@@ -22,41 +22,21 @@
           }
         },
         {
-          "client_id": "943316506839-d51lt20minfqo8qil96k4mq2vl78inl7.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
+          "client_id": "943316506839-e9q8mjn3u1gufgepkb8vo2p2kqnbtf49.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aiquiz.ai_quiz_app",
+            "certificate_hash": "af13999ae9ff28b68b326bfcb620f71af663460d"
+          }
+        },
         {
-          "current_key": "AIzaSyB4T5XCQAQwhp9qgiv4ZeKMwG10kIfcOH8"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "943316506839-d51lt20minfqo8qil96k4mq2vl78inl7.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "943316506839-1v6sdv94vkpd5a0vhu2nvulkv71bnffo.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.aiquiz.aiQuizApp"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:943316506839:android:75e5370816acebcfd4b892",
-        "android_client_info": {
-          "package_name": "com.hassmire.rivox"
-        }
-      },
-      "oauth_client": [
+          "client_id": "943316506839-j5bddd20o5elotniog42rq78ir6mnmqh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aiquiz.ai_quiz_app",
+            "certificate_hash": "ebbe878e66f179539be2cfb32295033f9ba770f0"
+          }
+        },
         {
           "client_id": "943316506839-d51lt20minfqo8qil96k4mq2vl78inl7.apps.googleusercontent.com",
           "client_type": 3

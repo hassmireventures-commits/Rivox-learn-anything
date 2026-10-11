@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/providers/app_providers.dart';
+import '../../../core/router/app_navigation.dart';
 import '../../../data/local/models/recommendation.dart';
 import 'study_path_navigation.dart';
 
@@ -29,7 +30,7 @@ Future<void> openRecommendation(
   final route = payload?['route'] as String?;
   if (route != null && route.isNotEmpty) {
     if (!context.mounted) return;
-    context.push(route);
+    openAppRoute(context, route);
     await repo.actOnRecommendation(item.uuid);
     return;
   }

@@ -78,6 +78,7 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen>
     final repo = ref.read(quizRepositoryProvider);
     final session = await repo.getSession(widget.quizId);
     final questions = await repo.getQuestions(widget.quizId);
+    await repo.reconcileStimulusAnswers(questions: questions, session: session);
     List<QuizSession> trend = const [];
     List<String> citationLabels = const [];
     if (session?.quizKind == QuizKind.mock) {

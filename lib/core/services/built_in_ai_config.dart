@@ -12,7 +12,10 @@ class BuiltInAiConfig {
   static const String baseUrl = 'https://integrate.api.nvidia.com/v1';
   static const String defaultModel = 'meta/llama-3.2-11b-vision-instruct';
   /// Fallback when primary NIM model fails or returns unusable output.
-  static const String fallbackModel = 'nvidia/nemotron-3-nano-30b-a3b';
+  /// nemotron-3-nano-30b-a3b reached end of life on 2026-09-01 (410), which
+  /// silently broke the fallback. Lightning verified 2026-10-11: JSON in
+  /// `content` with thinking disabled, about 4s for a 2-question quiz.
+  static const String fallbackModel = 'nvidia/nemotron-3.5-lightning-30b-a3b';
 
   static const String _apiKeyDefine = String.fromEnvironment('BUILT_IN_AI_API_KEY');
 

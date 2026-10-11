@@ -36,9 +36,11 @@ import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/recent_quiz_activity_card.dart';
 import '../../../shared/widgets/stat_tile.dart';
 import '../../../shared/widgets/dashboard/achievement_badges.dart';
+import '../../../shared/widgets/dashboard/progression_strip.dart';
 import '../../../shared/widgets/dashboard/dashboard_section_header.dart';
 import '../../../shared/widgets/dashboard/geometric_wavy_header.dart';
 import '../../../shared/widgets/dashboard/horizontal_feature_card.dart';
+import '../../../shared/widgets/next_session_card.dart';
 
 /// Shown once on Home, only once onboarding has actually finished and the
 /// learner has genuinely reached this screen, never during onboarding
@@ -60,6 +62,7 @@ class DashboardScreen extends ConsumerWidget {
     final learnerProfileAsync = ref.watch(learnerProfileProvider);
     final dailyGoal = learnerProfileAsync.asData?.value.dailyMinutesGoal ?? 15;
     final decision = ref.watch(nextDecisionProvider);
+    final nextSessionAsync = ref.watch(nextSessionProvider);
     final providersAsync = ref.watch(aiProvidersProvider);
     final rateLimitAsync = ref.watch(activeRateLimitProvider);
     // Sensible default used while personalization is loading or on error so the
@@ -108,6 +111,7 @@ class DashboardScreen extends ConsumerWidget {
               ref.invalidate(dashboardStatsProvider);
               ref.invalidate(personalizationProvider);
               ref.invalidate(nextDecisionProvider);
+              ref.invalidate(nextSessionProvider);
               ref.invalidate(providerUsageProvider);
               ref.invalidate(activeRateLimitProvider);
               ref.invalidate(aiStudyPulseProvider);
@@ -203,6 +207,18 @@ class DashboardScreen extends ConsumerWidget {
                                   },
                                 );
                               },
+                              loading: () => const SizedBox.shrink(),
+                              error: (_, _) => const SizedBox.shrink(),
+                            ),
+                            const SizedBox(height: AppTheme.cardGap),
+                            const ProgressionStrip(),
+                            nextSessionAsync.when(
+                              data: (session) => Column(
+                                children: [
+                                  const SizedBox(height: AppTheme.cardGap),
+                                  NextSessionCard(session: session),
+                                ],
+                              ),
                               loading: () => const SizedBox.shrink(),
                               error: (_, _) => const SizedBox.shrink(),
                             ),

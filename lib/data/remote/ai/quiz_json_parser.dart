@@ -3,6 +3,7 @@ import 'dart:convert';
 import '../../../core/error/app_exception.dart';
 import 'ai_output_gate.dart';
 import 'models/generated_quiz.dart';
+import 'stimulus_answer_check.dart';
 
 class QuizJsonParser {
   static bool accepts(
@@ -96,9 +97,31 @@ class QuizJsonParser {
     final seen = <String>{};
     final out = <GeneratedQuestion>[];
     for (final q in questions) {
-      final key = _questionKey(q.text);
+      final aligned = StimulusAnswerCheck.align(
+        text: q.text,
+        options: q.options,
+        correctIndex: q.correctIndex,
+        type: q.type,
+        stimulusJson: q.stimulusJson,
+        explanation: q.explanation,
+      );
+      if (aligned.drop) continue;
+      final text = aligned.changed ? aligned.text : q.text;
+      final key = _questionKey(text);
       if (key.isEmpty || seen.add(key)) {
-        out.add(q);
+        out.add(
+          aligned.changed
+              ? GeneratedQuestion(
+                  text: aligned.text,
+                  options: q.options,
+                  correctIndex: aligned.correctIndex,
+                  type: q.type,
+                  explanation: aligned.explanation,
+                  referencesJson: q.referencesJson,
+                  stimulusJson: q.stimulusJson,
+                )
+              : q,
+        );
       }
     }
     return out;

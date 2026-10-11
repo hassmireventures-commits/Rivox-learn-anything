@@ -6,6 +6,7 @@ import '../services/ai_status_service.dart';
 import '../services/daily_quiz_scheduler.dart';
 import '../services/home_widget_service.dart';
 import '../services/learner_memory_scheduler.dart';
+import '../services/notification_service.dart';
 import '../utils/calendar_day.dart';
 import 'app_providers.dart';
 import 'study_minutes_provider.dart';
@@ -14,6 +15,7 @@ import 'study_minutes_provider.dart';
 void invalidateHomeProviders(WidgetRef ref) {
   ref.invalidate(personalizationProvider);
   ref.invalidate(nextDecisionProvider);
+  ref.invalidate(nextSessionProvider);
   ref.invalidate(aiStudyPulseProvider);
   ref.invalidate(dashboardStatsProvider);
   ref.invalidate(todaysDailyQuizOfferProvider);
@@ -21,10 +23,19 @@ void invalidateHomeProviders(WidgetRef ref) {
   ref.read(todayStudyProgressProvider.notifier).refresh();
   ref.read(learningDataEpochProvider.notifier).state++;
   unawaited(
-    ref
-        .read(dashboardStatsProvider.future)
-        .then((stats) => HomeWidgetService.updateStreak(stats.currentStreak))
-        .catchError((_) {}),
+    ref.read(dashboardStatsProvider.future).then((stats) async {
+      await HomeWidgetService.updateStreak(stats.currentStreak);
+      String? weakest;
+      try {
+        final ui = await ref.read(personalizationProvider.future);
+        weakest = ui.weakTopics.isNotEmpty ? ui.weakTopics.first : ui.goalContextLabel;
+      } catch (_) {}
+      await NotificationService.instance.scheduleStreakSaver(
+        streak: stats.currentStreak,
+        activeToday: stats.activeToday,
+        focus: weakest,
+      );
+    }).catchError((_) {}),
   );
 }
 

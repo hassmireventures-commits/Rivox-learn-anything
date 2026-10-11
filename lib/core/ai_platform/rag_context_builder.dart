@@ -47,6 +47,9 @@ class RagContextBuilder {
       sourceTypes: sourceTypes,
       limit: 10,
       maxTokens: tokenBudget,
+      // Consent to send library text was checked above, so the semantic
+      // (NVIDIA embeddings) stage may run; it falls back locally on failure.
+      semantic: true,
     );
     if (chunks.isEmpty) return RagContext(mode: mode, promptBlock: '', chunkIds: const []);
 

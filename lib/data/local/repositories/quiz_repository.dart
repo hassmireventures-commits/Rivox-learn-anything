@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../../../core/constants/quiz_kind.dart';
 import '../../remote/ai/models/generated_quiz.dart';
 import '../../remote/ai/models/quiz_generation_request.dart';
+import '../../remote/ai/stimulus_answer_check.dart';
 import '../isar_service.dart';
 import '../models/question.dart';
 import '../models/quiz_session.dart';
@@ -135,6 +136,81 @@ class QuizRepository {
 
   Future<List<Question>> getQuestions(String quizUuid) async {
     return _db.questions.filter().quizUuidEqualTo(quizUuid).sortByOrderIndex().findAll();
+  }
+
+  /// Fixes a stored key that contradicts its chart or transcript, then
+  /// rewrites the saved score when the quiz is already finished.
+  Future<void> reconcileStimulusAnswers({
+    required List<Question> questions,
+    QuizSession? session,
+  }) async {
+    var changed = false;
+    final withdrawn = <Question>[];
+    for (final q in questions) {
+      if (q.type == 'short_answer' || q.type == 'behavioral') continue;
+      List<String> options;
+      try {
+        options = (jsonDecode(q.optionsJson) as List).map((e) => e.toString()).toList();
+      } catch (_) {
+        continue;
+      }
+      final aligned = StimulusAnswerCheck.align(
+        text: q.text,
+        options: options,
+        correctIndex: q.correctIndex,
+        type: q.type,
+        stimulusJson: q.stimulusJson,
+        explanation: q.explanation,
+      );
+      if (aligned.drop) {
+        final answered = q.userAnswer != null && q.userAnswer!.trim().isNotEmpty;
+        if (answered && q.isCorrect != true) {
+          q.isCorrect = true;
+          q.explanation =
+              'This item was not scored. The answer key did not follow the material.';
+          changed = true;
+        } else if (!answered) {
+          withdrawn.add(q);
+        }
+        continue;
+      }
+      if (!aligned.changed) continue;
+      q.text = aligned.text;
+      q.correctIndex = aligned.correctIndex;
+      q.explanation = aligned.explanation;
+      final selected = int.tryParse(q.userAnswer ?? '');
+      if (q.userAnswer != null && q.userAnswer!.isNotEmpty) {
+        q.isCorrect = selected != null && selected == aligned.correctIndex;
+      }
+      changed = true;
+    }
+    if (withdrawn.isNotEmpty) {
+      questions.removeWhere(withdrawn.contains);
+      if (session != null) session.questionCount = questions.length;
+      changed = true;
+    }
+    if (!changed) return;
+
+    if (session != null && session.completedAt != null) {
+      final correct = questions.where((q) => q.isCorrect == true).length;
+      final accuracy = questions.isEmpty ? 0.0 : (correct / questions.length) * 100;
+      session
+        ..score = correct
+        ..correctCount = correct
+        ..wrongCount = questions.length - correct
+        ..accuracy = accuracy
+        ..scorePercent = accuracy;
+    }
+
+    await _db.writeTxn(() async {
+      if (withdrawn.isNotEmpty) {
+        await _db.questions.deleteAll(withdrawn.map((q) => q.id).toList());
+      }
+      await _db.questions.putAll(questions);
+      if (session != null && (session.completedAt != null || withdrawn.isNotEmpty)) {
+        await _db.quizSessions.put(session);
+      }
+    });
   }
 
   /// All-time wrongly-answered questions (most-recent quiz first), for

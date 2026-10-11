@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
@@ -6,6 +7,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../core/ai_platform/ai_consent_gate.dart';
 import '../../../core/error/app_exception.dart';
 import '../isar_service.dart';
 import '../models/document_chunk.dart';
@@ -261,6 +263,12 @@ class KnowledgeRepository {
       await _db.writeTxn(() async {
         await _db.knowledgeSources.put(source);
       });
+      // Pre-embed for semantic search in the background, only if the learner
+      // allowed library text to be sent to an AI provider. Best effort.
+      await AiConsentGate.instance.load();
+      if (AiConsentGate.instance.canSendChunksToProvider()) {
+        unawaited(_vectorStore.warmSemantic(sourceUuid));
+      }
     } catch (e) {
       source
         ..status = 'failed'

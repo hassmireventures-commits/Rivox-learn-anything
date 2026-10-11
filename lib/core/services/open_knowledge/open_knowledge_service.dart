@@ -76,7 +76,12 @@ class OpenKnowledgeService {
       }
       if (brand.isNotEmpty) await add(_wikidata.findEntity(brand));
     } else {
-      await add(_wikipedia.findArticle(trimmed));
+      // Top search hit alone is not enough: "Advanced English" returned
+      // "Advance (English automobile)". Take the first hit whose title is
+      // actually about the topic's words, or nothing.
+      final candidates = await _wikipedia.searchArticles(trimmed, limit: 5);
+      final fit = candidates.where((h) => articleFitsTopic(trimmed, h.title)).firstOrNull;
+      if (fit != null) await add(Future.value(fit));
     }
 
     if (_isBiomedical(lower)) {
@@ -124,6 +129,32 @@ $lines
       return (title: hit.title, extract: hit.summary, url: hit.url!);
     }
     return null;
+  }
+
+  static const Set<String> _titleStopWords = {
+    'the', 'and', 'for', 'with', 'from', 'into', 'its', 'are', 'how', 'what',
+  };
+
+  static Set<String> _titleTokens(String text) => text
+      .toLowerCase()
+      .split(RegExp(r'[^a-z0-9+#]+'))
+      .where((w) => w.length >= 3 && !_titleStopWords.contains(w))
+      .map((w) => w.length > 4 && w.endsWith('s') ? w.substring(0, w.length - 1) : w)
+      .toSet();
+
+  /// True when a Wikipedia [title] is about the [topic]'s own words. The
+  /// parenthetical disambiguator ("(English automobile)") is ignored for the
+  /// match, so only the article's real subject counts: at least half of its
+  /// words must appear in the topic (whole words, plural-insensitive).
+  /// "Advance (English automobile)" vs "Advanced English" -> false;
+  /// "Python (programming language)" vs "Python basics" -> true.
+  static bool articleFitsTopic(String topic, String title) {
+    final core = title.replaceAll(RegExp(r'\([^)]*\)'), ' ');
+    final coreTokens = _titleTokens(core);
+    if (coreTokens.isEmpty) return false;
+    final topicTokens = _titleTokens(topic);
+    final shared = coreTokens.where(topicTokens.contains).length;
+    return shared >= 1 && shared * 2 >= coreTokens.length;
   }
 
   static bool _isBiomedical(String lower) =>

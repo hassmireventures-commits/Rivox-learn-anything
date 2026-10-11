@@ -6,6 +6,7 @@ import 'package:isar_community/isar.dart';
 import '../local/isar_service.dart';
 import '../local/models/document_chunk.dart';
 import '../local/models/embedding_chunk.dart';
+import 'semantic_index.dart';
 
 class RetrievedChunk {
   const RetrievedChunk({
@@ -29,10 +30,29 @@ class RetrievedChunk {
 
 /// Local vector store for topics and document chunks (hash embeddings, offline-safe).
 class KnowledgeVectorStore {
-  KnowledgeVectorStore(this._isarService);
+  KnowledgeVectorStore(this._isarService, {SemanticIndex? semantic}) : _semantic = semantic;
 
   final IsarService _isarService;
+  final SemanticIndex? _semantic;
   static const _dims = 32;
+
+  /// Most chunks re-scored semantically per query (best local matches first,
+  /// so short libraries are fully covered).
+  static const int maxSemanticCandidates = 200;
+  static const Duration semanticTimeout = Duration(seconds: 10);
+
+  /// Nemotron cosine below this is treated as unrelated.
+  static const double minSemanticScore = 0.15;
+
+  /// Background semantic indexing of one source's chunks after upload.
+  Future<void> warmSemantic(String sourceUuid) async {
+    final index = _semantic;
+    if (index == null || !EmbeddingService.isAvailable) return;
+    final chunks = await _db.documentChunks.filter().sourceUuidEqualTo(sourceUuid).findAll();
+    await index.warmUp(
+      chunks.map((c) => SemanticCandidate(chunkId: c.chunkId, text: c.text)).toList(),
+    );
+  }
 
   Isar get _db => _isarService.db;
 
@@ -122,17 +142,55 @@ class KnowledgeVectorStore {
     int limit = 8,
     int maxTokens = 3000,
     int priorityReserve = 4,
+    bool semantic = false,
   }) async {
     final q = embedText(query);
-    final all = await _db.documentChunks.where().findAll();
+    final all = (await _db.documentChunks.where().findAll())
+        .where((c) => sourceUuids == null || sourceUuids.contains(c.sourceUuid))
+        .toList();
+    final hashScores = <String, double>{
+      for (final chunk in all)
+        chunk.chunkId: _cosine(
+          q,
+          (jsonDecode(chunk.vectorJson) as List).map((e) => (e as num).toDouble()).toList(),
+        ),
+    };
+
+    // Semantic stage (NVIDIA embeddings). Only when the caller has already
+    // cleared consent to send library text to a provider. Any failure or
+    // slowness falls back to the local hash scores below, unchanged.
+    Map<String, double> semanticScores = const {};
+    final index = _semantic;
+    if (semantic && index != null && EmbeddingService.isAvailable && all.isNotEmpty) {
+      final candidates = [...all]
+        ..sort((a, b) => (hashScores[b.chunkId] ?? 0).compareTo(hashScores[a.chunkId] ?? 0));
+      try {
+        semanticScores = await index
+            .score(
+              query,
+              candidates
+                  .take(maxSemanticCandidates)
+                  .map((c) => SemanticCandidate(chunkId: c.chunkId, text: c.text))
+                  .toList(),
+            )
+            .timeout(semanticTimeout);
+      } catch (_) {
+        semanticScores = const {};
+      }
+    }
+
     final scored = <RetrievedChunk>[];
     for (final chunk in all) {
-      if (sourceUuids != null && !sourceUuids.contains(chunk.sourceUuid)) continue;
-      final vector = (jsonDecode(chunk.vectorJson) as List)
-          .map((e) => (e as num).toDouble())
-          .toList();
-      var score = _cosine(q, vector);
-      if (score <= 0.05) continue;
+      final sem = semanticScores[chunk.chunkId];
+      var score = sem ?? hashScores[chunk.chunkId] ?? 0;
+      if (sem != null) {
+        if (sem < minSemanticScore) continue;
+      } else {
+        if (score <= 0.05) continue;
+        // Unembedded chunks only compete on word overlap; keep them below
+        // comparable semantic matches when a semantic pass ran.
+        if (semanticScores.isNotEmpty) score *= 0.6;
+      }
       final type = sourceTypes?[chunk.sourceUuid];
       score *= _typeBoost(type);
       scored.add(

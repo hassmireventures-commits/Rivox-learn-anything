@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../core/locale/app_localizations_ext.dart';
+import '../../../core/ai_platform/ai_consent_gate.dart';
+import '../../../core/services/nvidia/cloud_ocr_service.dart';
 import '../../../core/services/ocr_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/primary_button.dart';
@@ -14,7 +16,13 @@ import '../../../shared/widgets/primary_button.dart';
 /// text is handed back to the caller for Library ingestion. Pops with the
 /// final, learner-edited text (a `String`), or `null` if cancelled.
 class CameraScanScreen extends StatefulWidget {
-  const CameraScanScreen({super.key});
+  const CameraScanScreen({super.key, this.returnImage = false});
+
+  /// When true, pops with `imageResultPrefix + path` of the first photo
+  /// (no OCR), for "ask the tutor about this photo".
+  final bool returnImage;
+
+  static const String imageResultPrefix = 'image:';
 
   @override
   State<CameraScanScreen> createState() => _CameraScanScreenState();
@@ -28,6 +36,9 @@ class _CameraScanScreenState extends State<CameraScanScreen> {
   bool _initializing = true;
   _CameraInitError? _error;
   bool _reviewing = false;
+
+  /// The review text came from cloud OCR (shown so the learner knows).
+  bool _usedCloudOcr = false;
   bool _processingOcr = false;
   String? _ocrError;
   late final TextEditingController _textController;
@@ -93,14 +104,43 @@ class _CameraScanScreenState extends State<CameraScanScreen> {
       _processingOcr = true;
       _ocrError = null;
     });
+    if (widget.returnImage) {
+      // Photo-for-the-tutor mode: hand back the image itself; the caller
+      // reads it with the vision model instead of plain OCR.
+      Navigator.of(context).pop('${CameraScanScreen.imageResultPrefix}${_capturedPaths.first}');
+      return;
+    }
     final ocr = OcrService();
     try {
-      final text = await ocr.recognizePages(List.of(_capturedPaths));
+      final pages = List.of(_capturedPaths);
+      var text = '';
+      try {
+        text = await ocr.recognizePages(pages);
+      } catch (_) {
+        text = '';
+      }
+      // Self-healing OCR: on-device ML Kit first (private, offline). When it
+      // reads too little (handwriting, a table, a blurry page), retry with
+      // NVIDIA Nemotron Parse, only if the learner allowed sending study
+      // material to an AI provider.
+      var usedCloud = false;
+      if (CloudOcrService.onDeviceLooksWeak(text, pages: pages.length) && CloudOcrService.isAvailable) {
+        await AiConsentGate.instance.load();
+        if (AiConsentGate.instance.canSendChunksToProvider()) {
+          final cloud = await CloudOcrService().recognizePages(pages);
+          if (cloud.trim().length > text.trim().length) {
+            text = cloud;
+            usedCloud = true;
+          }
+        }
+      }
       if (!mounted) return;
+      if (text.trim().isEmpty) throw const FormatException('no text');
       _textController.text = text;
       setState(() {
         _reviewing = true;
         _processingOcr = false;
+        _usedCloudOcr = usedCloud;
       });
     } catch (_) {
       if (mounted) {
@@ -148,6 +188,21 @@ class _CameraScanScreenState extends State<CameraScanScreen> {
                   _textController.text.trim().isEmpty ? l10n.cameraScanEmptyText : l10n.cameraScanReviewHint,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
+                if (_usedCloudOcr) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.auto_fix_high_rounded, size: 16, color: Theme.of(context).colorScheme.primary),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'The on-device scan was unclear, so this was read with AI OCR. Check it before saving.',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 12),
                 Expanded(
                   child: TextField(

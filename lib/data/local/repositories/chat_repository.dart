@@ -28,6 +28,27 @@ class ChatRepository {
     });
   }
 
+  Future<void> saveMessage(ChatMessage message) async {
+    await _db.writeTxn(() async {
+      await _db.chatMessages.put(message);
+    });
+  }
+
+  Future<void> deleteMessage(ChatMessage message) async {
+    await _db.writeTxn(() async {
+      await _db.chatMessages.delete(message.id);
+    });
+  }
+
+  /// Drops every turn newer than [createdAt], keeping that turn itself.
+  Future<void> deleteAfter(DateTime createdAt) async {
+    final newer = await _db.chatMessages.filter().createdAtGreaterThan(createdAt).findAll();
+    if (newer.isEmpty) return;
+    await _db.writeTxn(() async {
+      await _db.chatMessages.deleteAll(newer.map((m) => m.id).toList());
+    });
+  }
+
   /// All chat messages (not just the windowed [getHistory] result), for B13
   /// cloud backup (Phase 2).
   Future<List<Map<String, dynamic>>> exportMessages() async {

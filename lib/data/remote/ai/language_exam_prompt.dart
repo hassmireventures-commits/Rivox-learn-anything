@@ -48,9 +48,9 @@ Spread the set across Reading, Listening, Writing, and Speaking. Do not make the
 
 How to write each item. Put the material in "stimulus" and keep "text" as the task only:
 ${request.questionType == 'mixed' ? 'The requested format is mixed. Include type "mcq", type "true_false" (options ["True","False"] or ["True","False","Not Given"]), and type "fill_blank" (a sentence with _____). Do not make the whole paper multiple choice.\n' : ''}
-- Reading: stimulus {"kind":"passage","title":"Reading","body":"50–90 word passage"}. text asks one real item (True/False/Not Given, matching heading, or detail). The correct option must follow only from that passage.
-- Listening: stimulus {"kind":"transcript","title":"Conversation","body":"4–8 lines with speaker names"}. text asks for a detail, number, spelling, or speaker purpose. The app reads body aloud.
-- Chart or table: stimulus kind "chart" or "table" with the actual numbers. text asks about that figure. Do not describe a figure that is not in stimulus.
+- Reading: stimulus {"kind":"passage","title":"Reading","body":"50–90 word passage"}. text asks one real item (True/False/Not Given, matching heading, detail, or a fill-in blank). The correct option must follow only from that passage, whichever type it is. True only if the passage states it. Not Given only if the passage is silent. Never mark a detail the passage does not contain.
+- Listening: stimulus {"kind":"transcript","title":"Conversation","body":"4–8 lines with speaker names"}. text asks for a detail, number, spelling, or the main topic, and ends with "?". The correct option must be something the speakers actually say. The app reads body aloud.
+- Chart or table: stimulus kind "chart" or "table" with the actual numbers. text ends with "?" and asks which value is higher or what one named label shows. Do not use the figure title as the question. The correct option must be a label or number that is in the figure.
 - Writing: stimulus {"kind":"cue","title":"Task 2","body":"the essay question or chart task"}. text asks which option is the best thesis or overview for THAT task.
 - Speaking: stimulus {"kind":"cue","title":"Cue card","body":"the Part 2 card"}. text asks which answer develops the bullet points.
 

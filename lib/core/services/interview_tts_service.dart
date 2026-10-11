@@ -22,5 +22,13 @@ class InterviewTtsService {
 
   Future<void> stop() => _tts.stop();
 
+  /// Called when speech finishes, is cancelled, or errors (chat's Listen
+  /// button uses it to flip back from "Stop").
+  void onDone(void Function() callback) {
+    _tts.setCompletionHandler(callback);
+    _tts.setCancelHandler(callback);
+    _tts.setErrorHandler((_) => callback());
+  }
+
   Future<void> dispose() => _tts.stop();
 }

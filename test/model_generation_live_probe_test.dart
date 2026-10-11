@@ -273,7 +273,6 @@ class _ModelProbe {
     required int maxTokens,
     String? modelOverride,
   }) async {
-    final activeModel = modelOverride ?? model;
     try {
       final first = await _complete(
         system: system,

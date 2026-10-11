@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -82,6 +83,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   String? _goalModeError;
 
   bool _authBusy = false;
+  bool _googleBusy = false;
   bool _authIsSignUp = false;
   bool _obscurePassword = true;
   String? _authError;
@@ -219,17 +221,31 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   }
 
   String _mapAuthError(AppLocalizations l10n, Object e) {
+    if (e is GoogleSignInException) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        return 'Google sign-in did not finish. Try again, or continue with email.';
+      }
+      final detail = e.description?.trim();
+      if (detail != null && detail.isNotEmpty) return detail;
+      return l10n.authSignInError;
+    }
     if (e is FirebaseAuthException) {
       return switch (e.code) {
         'invalid-email' => l10n.authInvalidEmailError,
         'weak-password' => l10n.authWeakPasswordError,
         'email-already-in-use' => l10n.authEmailInUseError,
-        'user-not-found' || 'wrong-password' || 'invalid-credential' =>
-          l10n.authSignInError,
+        'invalid-credential' => _googleTokenMessage(e) ?? l10n.authSignInError,
+        'user-not-found' || 'wrong-password' => l10n.authSignInError,
         _ => l10n.authSignInError,
       };
     }
     return l10n.authSignInError;
+  }
+
+  String? _googleTokenMessage(FirebaseAuthException e) {
+    final message = e.message ?? '';
+    if (!message.contains('sign-in token')) return null;
+    return 'Google sign-in did not finish. Try again, or continue with email.';
   }
 
   void _onAuthSuccess(User user, {String? fallbackName}) {
@@ -240,6 +256,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     }
     setState(() {
       _authBusy = false;
+      _googleBusy = false;
       _signedInEmail = user.email;
     });
     _advancePage();
@@ -249,12 +266,18 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     final l10n = context.l10n;
     setState(() {
       _authBusy = true;
+      _googleBusy = true;
       _authError = null;
     });
     try {
       final user = await ref.read(authServiceProvider).signInWithGoogle();
       if (user == null) {
-        if (mounted) setState(() => _authBusy = false);
+        if (mounted) {
+          setState(() {
+            _authBusy = false;
+            _googleBusy = false;
+          });
+        }
         return;
       }
       _onAuthSuccess(user);
@@ -263,6 +286,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         setState(() {
           _authError = _mapAuthError(l10n, e);
           _authBusy = false;
+          _googleBusy = false;
         });
       }
     }
@@ -728,7 +752,13 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         onPressed: _authBusy ? null : _handleGoogleSignIn,
-                        icon: const GoogleLogoIcon(size: 20),
+                        icon: _googleBusy
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const GoogleLogoIcon(size: 20),
                         label: Text(l10n.authContinueWithGoogle),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
@@ -819,7 +849,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                     const SizedBox(height: 16),
                     PrimaryButton(
                       label: _authIsSignUp ? l10n.authCreateAccountButton : l10n.authSignInButton,
-                      isLoading: _authBusy,
+                      isLoading: _authBusy && !_googleBusy,
                       onPressed: _authBusy ? null : _handleEmailAuth,
                     ),
                     const SizedBox(height: 8),

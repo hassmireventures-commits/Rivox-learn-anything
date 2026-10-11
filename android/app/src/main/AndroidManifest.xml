@@ -48,6 +48,9 @@
             android:value="ca-app-pub-5325876102788151~7079657044"/>
         <!-- flutter_local_notifications: deliver scheduled alarms + reschedule after reboot -->
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <!-- Required for notification action buttons that do not open the app
+             (quick-question A/B/C answers, reminder Snooze/Dismiss). -->
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver" />
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
