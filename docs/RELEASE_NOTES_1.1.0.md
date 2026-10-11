@@ -1,11 +1,41 @@
-# Rivox 1.1.0 (build 17)
+# Rivox 1.1.0 (build 18)
 
 **Release date:** 2026-10-11
 **Version:** 1.1.0
-**Version code:** 17
+**Version code:** 18
 **Package:** `com.aiquiz.ai_quiz_app`
 
-Upload this AAB to Play. Builds 14, 15, and 16 are already assigned; do not upload them again.
+Upload this AAB to Play. It contains everything in build 17 below plus the R8 optimisation. If build 17 was never uploaded, skip it and upload this one; version codes only need to increase.
+
+Build command: `flutter build appbundle --release --dart-define-from-file=tool/.local_dart_defines.json` (upload keystore via `android/key.properties`).
+
+**AAB:** `build/app/outputs/bundle/release/app-release.aab`, 103.8 MB (build 17: 104.7 MB), built 2026-10-11 from branch `build/r8-optimized-shrinking`. Verified: package `com.aiquiz.ai_quiz_app`, versionCode 18, versionName 1.1.0, signed with the upload key (SHA-1 `F9:E4:96:62:50:49:88:1E:63:CC:5B:94:04:9D:A1:D5:4D:5E:93:A0`). Android resources 1.55 MB (1,114 files) to 0.50 MB (245 files); dex 11.07 to 10.89 MB; native libraries unchanged (108.9 MB uncompressed). Launch-test on a phone before rollout: a resource removed by mistake only shows at runtime.
+
+## What's new in build 18 (since build 17)
+
+- Play Console recommendation "Improve your app's memory and performance with R8 optimisation" (backlog B45, part 1): Android Gradle Plugin 8.11.1 to 8.13.2, and `android.r8.optimizedResourceShrinking=true` so R8 shrinks code and resources together. No app code changed.
+
+Play Console "What's new" text (use this whether or not build 17 was uploaded; 450 characters):
+
+```
+Rivox is now your AI tutor.
+- Ask about a photo, speak your question, or have replies read aloud
+- Quizzes right inside the chat, and the tutor fixes your plan when something is off
+- Answer a daily quick question straight from the notification
+- Streak freezes, XP and levels
+- Lessons adapt to any skill: exams, coding, fitness, art, DIY and more
+- Videos play inside the app
+- Faster and lighter
+- Google sign-in fixed
+```
+
+---
+
+# Rivox 1.1.0 (build 17)
+
+**Version code:** 17
+
+Builds 14, 15, and 16 are already assigned; do not upload them again.
 
 Build command: `flutter build appbundle --release --dart-define-from-file=tool/.local_dart_defines.json` (upload keystore via `android/key.properties`).
 
