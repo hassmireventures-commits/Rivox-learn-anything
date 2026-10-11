@@ -87,6 +87,7 @@ class _ReminderSetupSheetState extends ConsumerState<ReminderSetupSheet> {
       languageCode: mounted ? Localizations.localeOf(context).languageCode : null,
     );
     await ExamNotificationScheduler.instance.reschedule();
+    await NotificationService.instance.scheduleQuickQuestions();
     if (mounted) setState(() => _prefs = next);
   }
 
@@ -384,6 +385,43 @@ class _ReminderSetupSheetState extends ConsumerState<ReminderSetupSheet> {
                 ),
               ),
             ],
+            const SizedBox(height: 12),
+            AppCard(
+              child: Column(
+                children: [
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    secondary: const Icon(Icons.quiz_outlined),
+                    title: const Text('Daily quick question'),
+                    subtitle: const Text(
+                      'One question from your recent mistakes. Answer A, B or C right from the notification.',
+                    ),
+                    value: _prefs.quickQuestionEnabled,
+                    onChanged: (v) => _save(_prefs.copyWith(quickQuestionEnabled: v)),
+                  ),
+                  if (_prefs.quickQuestionEnabled)
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.schedule_rounded),
+                      title: const Text('Arrives at'),
+                      trailing: Text(
+                        MaterialLocalizations.of(context).formatTimeOfDay(
+                          TimeOfDay(hour: _prefs.quickQuestionHour, minute: 0),
+                        ),
+                      ),
+                      onTap: () async {
+                        final picked = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay(hour: _prefs.quickQuestionHour, minute: 0),
+                        );
+                        if (picked != null) {
+                          await _save(_prefs.copyWith(quickQuestionHour: picked.hour));
+                        }
+                      },
+                    ),
+                ],
+              ),
+            ),
             if (_goalMode == 'exam_prep') ...[
               const SizedBox(height: 12),
               AppCard(

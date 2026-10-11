@@ -23,6 +23,7 @@ import '../../features/learn/presentation/path_detail_screen.dart';
 import '../../features/learn/presentation/resource_webview_args.dart';
 import '../../features/learn/presentation/resource_webview_screen.dart';
 import '../../features/learn/presentation/saved_articles_screen.dart';
+import '../../features/learn/presentation/video_search_screen.dart';
 import '../../features/onboarding/presentation/splash_screen.dart';
 import '../../features/onboarding/presentation/welcome_screen.dart';
 import '../../features/quiz/presentation/create_quiz_screen.dart';
@@ -310,11 +311,21 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/library/scan',
-      pageBuilder: (context, state) => _pushPage(child: const CameraScanScreen(), state: state),
+      pageBuilder: (context, state) => _pushPage(
+        child: CameraScanScreen(returnImage: state.uri.queryParameters['photo'] == '1'),
+        state: state,
+      ),
     ),
     GoRoute(
       path: '/support',
       pageBuilder: (context, state) => _pushPage(child: const SupportScreen(), state: state),
+    ),
+    GoRoute(
+      path: '/video',
+      pageBuilder: (context, state) => _pushPage(
+        child: VideoSearchScreen(topic: (state.uri.queryParameters['q'] ?? '').trim()),
+        state: state,
+      ),
     ),
     GoRoute(
       path: '/chat',

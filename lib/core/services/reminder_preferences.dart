@@ -36,6 +36,8 @@ class ReminderPreferences {
     this.reminderMinute = 0,
     this.alarmSound = 'alarm',
     this.dailyQuizFrequency = 1,
+    this.quickQuestionEnabled = true,
+    this.quickQuestionHour = 13,
     Set<int>? activeDays,
     Map<int, ReminderTime>? perDayTimes,
   })  : activeDays = activeDays ?? {1, 2, 3, 4, 5, 6, 7},
@@ -64,6 +66,13 @@ class ReminderPreferences {
   /// Alarm / reminder sound id: alarm | urgent.
   final String alarmSound;
 
+  /// One-question "answer from the notification" check-in, once a day.
+  /// On by default; Settings > Reminders turns it off.
+  final bool quickQuestionEnabled;
+
+  /// Hour (24-h) the quick question arrives.
+  final int quickQuestionHour;
+
   /// How many daily quizzes to offer per day (1-3).
   final int dailyQuizFrequency;
 
@@ -85,6 +94,8 @@ class ReminderPreferences {
     int? reminderMinute,
     String? alarmSound,
     int? dailyQuizFrequency,
+    bool? quickQuestionEnabled,
+    int? quickQuestionHour,
     Set<int>? activeDays,
     Map<int, ReminderTime>? perDayTimes,
   }) {
@@ -98,6 +109,8 @@ class ReminderPreferences {
       reminderMinute: reminderMinute ?? this.reminderMinute,
       alarmSound: alarmSound ?? this.alarmSound,
       dailyQuizFrequency: (dailyQuizFrequency ?? this.dailyQuizFrequency).clamp(1, 3),
+      quickQuestionEnabled: quickQuestionEnabled ?? this.quickQuestionEnabled,
+      quickQuestionHour: (quickQuestionHour ?? this.quickQuestionHour).clamp(0, 23),
       activeDays: activeDays ?? Set.of(this.activeDays),
       perDayTimes: perDayTimes ?? Map.of(this.perDayTimes),
     );
@@ -113,6 +126,8 @@ class ReminderPreferences {
         'reminderMinute': reminderMinute,
         'alarmSound': alarmSound,
         'dailyQuizFrequency': dailyQuizFrequency,
+        'quickQuestionEnabled': quickQuestionEnabled,
+        'quickQuestionHour': quickQuestionHour,
         'activeDays': activeDays.toList(),
         'perDayTimes': perDayTimes.map(
           (k, v) => MapEntry(k.toString(), v.toJson()),
@@ -147,6 +162,8 @@ class ReminderPreferences {
       reminderMinute: json['reminderMinute'] as int? ?? 0,
       alarmSound: _normalizeAlarmSound(json['alarmSound'] as String?),
       dailyQuizFrequency: ((json['dailyQuizFrequency'] as num?)?.toInt() ?? 1).clamp(1, 3),
+      quickQuestionEnabled: json['quickQuestionEnabled'] as bool? ?? true,
+      quickQuestionHour: ((json['quickQuestionHour'] as num?)?.toInt() ?? 13).clamp(0, 23),
       activeDays: activeDays,
       perDayTimes: perDayTimes,
     );

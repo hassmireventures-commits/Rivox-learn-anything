@@ -11,6 +11,9 @@ import '../../../core/network/network_service.dart';
 import '../../../core/services/built_in_ai_config.dart';
 import '../../../core/services/built_in_ai_quota.dart';
 import '../../../core/services/goal_topic_resolver.dart';
+import '../../../core/personalization/learning_domain.dart';
+import '../../../core/services/learning_context.dart';
+import '../../local/models/learner_profile.dart';
 import '../../../core/services/skill_articles.dart';
 import 'language_exam_prompt.dart';
 import '../../../core/services/open_knowledge/open_knowledge_service.dart';
@@ -41,37 +44,9 @@ import 'models/quiz_generation_request.dart';
 import 'path_json_parser.dart';
 import 'resource_link_validator.dart';
 import 'path_prompt_builder.dart';
+import 'orchestrator_decision.dart';
+export 'orchestrator_decision.dart';
 import 'youtube_transcript_fetcher.dart';
-
-enum LearningAction {
-  generateQuiz,
-  suggestPath,
-  summarizeWeaknesses,
-  remedialQuiz,
-  encourageBreak,
-  followUp,
-  openPathModule,
-}
-
-class OrchestratorDecision {
-  const OrchestratorDecision({
-    required this.action,
-    required this.reason,
-    this.topic,
-    this.questionCount = 10,
-    this.difficulty = 'medium',
-    this.pathId,
-    this.moduleIndex,
-  });
-
-  final LearningAction action;
-  final String reason;
-  final String? topic;
-  final int questionCount;
-  final String difficulty;
-  final String? pathId;
-  final int? moduleIndex;
-}
 
 class LearningOrchestrator {
   LearningOrchestrator({
@@ -275,7 +250,10 @@ class LearningOrchestrator {
       language: languageName,
       moduleCount: moduleCount,
       ragContextBlock: rag.promptBlock,
-      topicResolutionBlock: topicResolution.resolutionBlock,
+      topicResolutionBlock: [
+        _domainGuidance([profile.goalContext, ...goals, effectiveFocus]),
+        topicResolution.resolutionBlock,
+      ].where((s) => s.isNotEmpty).join('\n'),
     );
 
     final sw = Stopwatch()..start();
@@ -400,8 +378,22 @@ class LearningOrchestrator {
     }
     await aiPipeline.ensureTokenBudget();
 
-    final topicResolution = await _resolveTopicForGeneration(firewallResult.sanitized);
+    // Connect goal -> path -> module BEFORE any lookup or prompt, so an
+    // ambiguous module title ("Advanced English") is never grounded or
+    // generated on its own (see LearningContext).
+    final learningContext = await _composeLearningContext(
+      topic: firewallResult.sanitized,
+      profile: profile,
+      pathId: pathId,
+      isModule: pathId != null || quizKind == QuizKind.module,
+    );
+    final topicResolution = await _resolveTopicForGeneration(learningContext.generationTopic);
     final effectiveTopic = topicResolution.topic;
+    final contextBlock = [
+      learningContext.promptBlock,
+      _domainGuidance([learningContext.goal, learningContext.pathFocus, learningContext.topic]),
+      topicResolution.resolutionBlock,
+    ].where((s) => s.isNotEmpty).join('\n');
 
     final enabledSources = await knowledgeRepository.enabledSourceUuids(profile.goalMode);
     final sourceTypes = await knowledgeRepository.enabledSourceTypes(profile.goalMode);
@@ -515,7 +507,7 @@ class LearningOrchestrator {
       examType: profile.examType,
       examName: profile.goalContext.isNotEmpty ? profile.goalContext : null,
       syllabusUnitTitles: syllabusUnitTitles ?? const [],
-      topicResolutionBlock: topicResolution.resolutionBlock,
+      topicResolutionBlock: contextBlock,
     );
 
     await telemetry.emit('quiz_started', {
@@ -740,6 +732,40 @@ $sourceBlock
     final t = q.type.toLowerCase();
     if (t == 'short_answer' || t == 'behavioral' || t == 'open') return true;
     return q.options.length == 1 && q.options.first == '__open__';
+  }
+
+  /// "PRACTICE STYLE" block for the learner's domain (fitness, DIY, art,
+  /// coding, ...), so generation adapts to any kind of skill. Empty for the
+  /// general domain only when there is no text to classify.
+  static String _domainGuidance(Iterable<String> texts) {
+    final nonEmpty = texts.where((t) => t.trim().isNotEmpty).toList();
+    if (nonEmpty.isEmpty) return '';
+    final profile = LearningDomains.profileForGoal(nonEmpty);
+    return 'PRACTICE STYLE (${profile.label}): ${profile.promptGuidance}';
+  }
+
+  Future<LearningContext> _composeLearningContext({
+    required String topic,
+    required LearnerProfile profile,
+    String? pathId,
+    bool isModule = false,
+  }) async {
+    final goals = learnerRepository.goalsOf(profile);
+    final goal = profile.goalContext.trim().isNotEmpty
+        ? profile.goalContext.trim()
+        : (goals.isNotEmpty ? goals.first : '');
+    String? pathTitle;
+    if (pathId != null) {
+      try {
+        pathTitle = (await learnerRepository.getPath(pathId))?.title;
+      } catch (_) {}
+    }
+    return LearningContext.compose(
+      topic: topic,
+      goal: goal,
+      pathTitle: pathTitle,
+      isModule: isModule,
+    );
   }
 
   Future<({String topic, String resolutionBlock})> _resolveTopicForGeneration(

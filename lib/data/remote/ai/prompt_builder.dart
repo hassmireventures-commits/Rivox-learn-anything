@@ -110,6 +110,8 @@ MANDATORY (must satisfy every line — wrong counts are rejected):
 - chart: {"kind":"chart","title":"Average temperature","unit":"°C","points":[{"label":"London","value":8},{"label":"Cairo","value":22}]}
 - table: {"kind":"table","title":"Weekend visitors","columns":["Place","Saturday"],"rows":[["Museum","120"]]}
 - Never write "see the chart", "the table below", "listen to the audio", or "read the passage" unless that material is inside stimulus. The app draws charts and tables and reads transcripts aloud. Do not invent an audio file or an image.
+- This applies to every closed type: mcq, true_false, and fill_blank. "text" must be a question and must end with "?" (a fill_blank stem ends with the blank, a true_false stem is the claim). Do not paste the chart title or the passage as the question.
+- correctIndex must be the only option the stimulus supports, for every type. If the speakers discuss a restaurant, do not mark an upcoming event, False, or a blank about an event. If a chart has two values, ask which is higher or ask for one named label. A question that both values answer is invalid and will be rejected.
 $libraryNote$goalsNote$resolutionNote$inputKindNote$specificityNote$competitiveNote$languageExamNote$skillPracticeNote$consistencyNote$beginnerNote
 $explanationInstruction
 $refsInstruction

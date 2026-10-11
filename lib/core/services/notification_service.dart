@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,10 @@ import 'package:url_launcher/url_launcher.dart';
 import '../locale/app_localizations_ext.dart';
 import '../../l10n/app_localizations.dart';
 import '../../data/local/isar_service.dart';
+import '../../data/local/models/question.dart';
 import '../../data/local/models/quiz_session.dart';
+import '../../data/local/repositories/quiz_repository.dart';
+import 'notification_quick_question.dart';
 import 'daily_content_service.dart';
 import 'daily_content_scheduler.dart';
 import 'notification_history_store.dart';
@@ -144,6 +148,8 @@ class NotificationService {
     await _plugin.initialize(
       settings: InitializationSettings(android: android, iOS: ios),
       onDidReceiveNotificationResponse: _onNotificationTap,
+      // Answer buttons on the quick question work with the app closed.
+      onDidReceiveBackgroundNotificationResponse: quickQuestionBackgroundHandler,
     );
 
     const qotdChannel = AndroidNotificationChannel(
@@ -183,6 +189,14 @@ class NotificationService {
     await androidPlugin?.createNotificationChannel(generationChannel);
     await androidPlugin?.createNotificationChannel(dailyContentChannel);
     await androidPlugin?.createNotificationChannel(supportNagChannel);
+    await androidPlugin?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        kQuickQuestionChannelId,
+        'Quick question',
+        description: 'One question a day you can answer from the notification',
+        importance: Importance.high,
+      ),
+    );
     await _deleteObsoleteAndroidChannels();
 
     _initialized = true;
@@ -190,6 +204,147 @@ class NotificationService {
     await _ensureCurrentSoundChannels();
     await scheduleDailyReminder();
     await scheduleSupportNag();
+    await scheduleQuickQuestions();
+  }
+
+  /// Schedules the next [QuickQuestionIds.daysAhead] daily quick questions,
+  /// each a different question from the learner's own missed answers (then
+  /// any answered question). Content is fixed when scheduled, so this runs on
+  /// every app start and whenever the setting changes to stay fresh. Cancels
+  /// everything when the setting is off or there is nothing to ask yet.
+  Future<void> scheduleQuickQuestions() async {
+    if (!_initialized) return;
+    for (var d = 0; d < QuickQuestionIds.daysAhead; d++) {
+      await _plugin.cancel(id: QuickQuestionIds.base + d);
+    }
+    final prefs = ReminderPreferencesStore.instance.current;
+    if (!prefs.quickQuestionEnabled) return;
+
+    final List<QuickQuestion> pool;
+    try {
+      pool = await _quickQuestionPool();
+    } catch (_) {
+      return;
+    }
+    if (pool.isEmpty) return;
+
+    tz.TZDateTime now;
+    try {
+      now = tz.TZDateTime.now(tz.local);
+    } catch (_) {
+      return;
+    }
+    var at = tz.TZDateTime(tz.local, now.year, now.month, now.day, prefs.quickQuestionHour);
+    if (!at.isAfter(now)) at = at.add(const Duration(days: 1));
+
+    for (var d = 0; d < QuickQuestionIds.daysAhead && d < pool.length; d++) {
+      final q = pool[d];
+      await _plugin.zonedSchedule(
+        id: QuickQuestionIds.base + d,
+        title: 'Quick question',
+        body: q.body,
+        scheduledDate: at.add(Duration(days: d)),
+        notificationDetails: NotificationDetails(
+          android: AndroidNotificationDetails(
+            kQuickQuestionChannelId,
+            'Quick question',
+            channelDescription: 'One question a day you can answer from the notification',
+            importance: Importance.high,
+            priority: Priority.high,
+            styleInformation: BigTextStyleInformation(q.body),
+            actions: [
+              for (var i = 0; i < q.options.length; i++)
+                AndroidNotificationAction(
+                  QuickQuestion.actionIdFor(i),
+                  QuickQuestion.letters[i],
+                  showsUserInterface: false,
+                  cancelNotification: true,
+                ),
+            ],
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        payload: q.toPayload(),
+      );
+    }
+  }
+
+  static const streakSaverId = 6200;
+
+  /// Hour (24-h) the streak-saver nudge fires if the learner has a live
+  /// streak and nothing done today.
+  static const streakSaverHour = 20;
+
+  /// Personalized streak-saver: "Your 6-day streak ends at midnight. One
+  /// quick question on {focus} keeps it." Scheduled for this evening only
+  /// when the streak is at risk; cancelled as soon as there is activity
+  /// today (Home refreshes call this after every stats recompute). Follows
+  /// the daily-reminder switch, so learners who turned reminders off are
+  /// not nudged.
+  Future<void> scheduleStreakSaver({
+    required int streak,
+    required bool activeToday,
+    String? focus,
+  }) async {
+    if (!_initialized) return;
+    await _plugin.cancel(id: streakSaverId);
+    final prefs = ReminderPreferencesStore.instance.current;
+    if (streak <= 0 || activeToday) return;
+    if (!prefs.dailyReminderEnabled && !prefs.quickQuestionEnabled) return;
+    tz.TZDateTime now;
+    try {
+      now = tz.TZDateTime.now(tz.local);
+    } catch (_) {
+      return;
+    }
+    final at = tz.TZDateTime(tz.local, now.year, now.month, now.day, streakSaverHour, 30);
+    if (!at.isAfter(now)) return;
+    final what = (focus == null || focus.trim().isEmpty) ? '' : ' on ${focus.trim()}';
+    final body = 'Your $streak-day streak ends at midnight. One quick question$what keeps it alive.';
+    await _plugin.zonedSchedule(
+      id: streakSaverId,
+      title: streak >= 7 ? 'Protect your $streak-day streak' : 'Keep your streak going',
+      body: body,
+      scheduledDate: at,
+      notificationDetails: NotificationDetails(
+        android: AndroidNotificationDetails(
+          kQuickQuestionChannelId,
+          'Quick question',
+          channelDescription: 'One question a day you can answer from the notification',
+          importance: Importance.high,
+          priority: Priority.high,
+          styleInformation: BigTextStyleInformation(body),
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      payload: '/chat',
+    );
+  }
+
+  Future<List<QuickQuestion>> _quickQuestionPool() async {
+    final repo = QuizRepository(IsarService.instance);
+    final random = Random();
+    final out = <QuickQuestion>[];
+    final seen = <String>{};
+    void addFrom(Iterable<Question> source) {
+      for (final q in source) {
+        if (out.length >= QuickQuestionIds.daysAhead) return;
+        if (!seen.add(q.text.trim().toLowerCase())) continue;
+        final quick = QuickQuestion.fromQuestion(q, random: random);
+        if (quick != null) out.add(quick);
+      }
+    }
+
+    // Missed questions first: answering them again is the retrieval
+    // practice that actually moves retention.
+    addFrom(await repo.getWrongQuestions(limit: 30));
+    if (out.length < QuickQuestionIds.daysAhead) {
+      final recent = await repo.getRecent(limit: 5);
+      for (final s in recent) {
+        addFrom((await repo.getQuestions(s.uuid)).toList()..shuffle(random));
+      }
+    }
+    return out;
   }
 
   /// Legacy unsuffixed channels kept the first-registered (often silent) sound.
@@ -237,6 +392,12 @@ class NotificationService {
   }
 
   Future<void> _handleNotificationTap(NotificationResponse response) async {
+    if (await handleQuickQuestionResponse(_plugin, response)) return;
+    if (response.payload?.startsWith(QuickQuestion.payloadPrefix) ?? false) {
+      // Body tapped instead of an answer button: open chat for a proper go.
+      await _navigateFromNotification('/chat');
+      return;
+    }
     if (response.actionId == 'dismiss') {
       await dismissStudyReminderNotification(response.id);
       return;

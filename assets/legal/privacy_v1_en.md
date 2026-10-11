@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Last updated:** July 28, 2026
+**Last updated:** October 11, 2026
 
 Rivox ("the App") is published by Hassmire Ventures. This Privacy Policy explains how the App handles information when you use it.
 
@@ -25,9 +25,18 @@ When you generate quizzes, learning paths, or other AI features, the App sends p
 - The provider's privacy policy and terms govern their handling of that data.
 - You control which provider is used and can remove API keys at any time.
 
+Built-in AI and some supporting features use NVIDIA AI services (NVIDIA API catalog), sent directly from your device, whichever provider you selected for generation:
+
+- **Chat safety check:** each chat message is screened by an NVIDIA safety model before a reply is written.
+- **Library search:** if you allowed library content to be sent to AI providers, excerpts of your uploaded documents are converted to search vectors by NVIDIA. The vectors are stored only on your device.
+- **Photos and scans:** a photo you choose to ask about in chat is sent to NVIDIA to be read. A camera scan is read on your device first and is sent to NVIDIA only if the on-device result is unclear and you allowed library content to be sent to AI providers.
+- **Voice input:** recordings you make for voice answers or voice questions are sent to NVIDIA for transcription.
+
+We do not keep copies of photos, recordings, or text on our servers. NVIDIA's terms and privacy policy govern their handling.
+
 ## 4. What we do not collect
 
-We do not collect email addresses, phone numbers, government IDs, payment information, precise location, contacts, or photos through the App's core features.
+We do not collect email addresses, phone numbers, government IDs, payment information, precise location, or contacts. Photos and voice recordings you choose to send are processed as described in section 3 and are not stored by us.
 
 ## 5. Optional analytics
 

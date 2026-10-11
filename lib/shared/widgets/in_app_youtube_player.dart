@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -109,10 +110,17 @@ class _InAppYoutubePlayerState extends State<InAppYoutubePlayer> {
     super.dispose();
   }
 
+  /// No usable id (or it failed to play): find one in-app rather than
+  /// leaving Rivox. Falls back to the YouTube app only if the in-app route
+  /// is unavailable (e.g. this widget is hosted outside the app router).
   Future<void> _searchYouTube() async {
-    final query = Uri.encodeComponent('${widget.title} tutorial');
-    final uri = Uri.parse('https://www.youtube.com/results?search_query=$query');
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+    try {
+      await GoRouter.of(context).push('/video?q=${Uri.encodeQueryComponent(widget.title)}');
+    } catch (_) {
+      final query = Uri.encodeComponent('${widget.title} tutorial');
+      final uri = Uri.parse('https://www.youtube.com/results?search_query=$query');
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 
   @override

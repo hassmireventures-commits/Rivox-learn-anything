@@ -133,6 +133,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
     final repo = ref.read(quizRepositoryProvider);
     final session = await repo.getSession(widget.quizId);
     var questions = await repo.getQuestions(widget.quizId);
+    await repo.reconcileStimulusAnswers(questions: questions, session: session);
     if (_voiceInterview) {
       questions = questions.where(_isOpenQuestion).toList();
     }

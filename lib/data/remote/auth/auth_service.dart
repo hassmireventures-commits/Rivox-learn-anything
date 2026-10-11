@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../../../core/services/app_logger.dart';
+
 /// Thin wrapper around Firebase Auth + Google Sign-In for B13 cloud backup
 /// (Phase 1: auth + opt-in plumbing only — no backup/restore yet).
 ///
@@ -13,6 +15,21 @@ import 'package:google_sign_in/google_sign_in.dart';
 /// Targets the current `google_sign_in` major (7.x), which replaced the old
 /// synchronous `GoogleSignIn()` constructor + `.signIn()` API with an async
 /// `GoogleSignIn.instance.initialize()` singleton followed by `.authenticate()`.
+/// Web OAuth client (client_type 3) from `google-services.json`. Android
+/// Credential Manager needs this to return an ID token Firebase can accept.
+/// An OAuth client id is public; it is not an API secret.
+const kGoogleWebClientId =
+    '943316506839-d51lt20minfqo8qil96k4mq2vl78inl7.apps.googleusercontent.com';
+
+/// True when the learner dismissed the account sheet. A configuration failure
+/// is also reported as canceled, but its message is not a plain user dismiss.
+bool googleSignInWasUserDismiss(GoogleSignInException error) {
+  if (error.code != GoogleSignInExceptionCode.canceled) return false;
+  final description = (error.description ?? '').toLowerCase();
+  if (description.isEmpty) return true;
+  return description.contains('user cancel');
+}
+
 class AuthService {
   AuthService({FirebaseAuth? firebaseAuth}) : _authOverride = firebaseAuth;
 
@@ -35,7 +52,7 @@ class AuthService {
 
   Future<void> _ensureGoogleSignInInitialized() async {
     if (_googleSignInInitialized) return;
-    await GoogleSignIn.instance.initialize();
+    await GoogleSignIn.instance.initialize(serverClientId: kGoogleWebClientId);
     _googleSignInInitialized = true;
   }
 
@@ -45,18 +62,7 @@ class AuthService {
   /// install.
   Future<User?> restoreSession() async {
     if (Firebase.apps.isEmpty) return null;
-    final existing = _auth.currentUser;
-    if (existing != null) return existing;
-    try {
-      await _ensureGoogleSignInInitialized();
-      final pending = GoogleSignIn.instance.attemptLightweightAuthentication();
-      if (pending == null) return null;
-      final account = await pending;
-      if (account == null) return null;
-      return _firebaseUserFor(account);
-    } catch (_) {
-      return _auth.currentUser;
-    }
+    return _auth.currentUser;
   }
 
   /// Signs in with Google and exchanges the resulting ID token for a Firebase
@@ -66,15 +72,29 @@ class AuthService {
   /// show an error.
   Future<User?> signInWithGoogle() async {
     if (Firebase.apps.isEmpty) return null;
-    final restored = await restoreSession();
-    if (restored != null) return restored;
+    final existing = _auth.currentUser;
+    if (existing != null) return existing;
     await _ensureGoogleSignInInitialized();
 
     final GoogleSignInAccount account;
     try {
       account = await GoogleSignIn.instance.authenticate();
-    } on GoogleSignInException catch (e) {
-      if (e.code == GoogleSignInExceptionCode.canceled) return null;
+    } on GoogleSignInException catch (e, st) {
+      if (googleSignInWasUserDismiss(e)) return null;
+      // A canceled code with a non-dismiss description ("[16] Cancelled by
+      // user", "[10] Developer error") is almost always configuration: the
+      // installed build's signing SHA-1 is not on the Android OAuth client.
+      // Play Store installs are signed with the Play App Signing key, whose
+      // SHA-1 differs from the upload key. Logged with that hint so a
+      // device log or crash report names the real cause.
+      AppLogger.error(
+        'AuthService',
+        'Google sign-in failed: code=${e.code.name} description=${e.description}. '
+            'If this is a Play install, add the Play App Signing SHA-1 (Play Console > '
+            'App integrity) to the Firebase Android app and download google-services.json again.',
+        e,
+        st,
+      );
       rethrow;
     }
 
@@ -83,6 +103,12 @@ class AuthService {
 
   Future<User?> _firebaseUserFor(GoogleSignInAccount account) async {
     final idToken = account.authentication.idToken;
+    if (idToken == null || idToken.isEmpty) {
+      throw FirebaseAuthException(
+        code: 'invalid-credential',
+        message: 'Google did not return a sign-in token.',
+      );
+    }
     final credential = GoogleAuthProvider.credential(idToken: idToken);
     final userCredential = await _auth.signInWithCredential(credential);
     return userCredential.user;

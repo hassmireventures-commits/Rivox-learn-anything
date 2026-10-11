@@ -465,6 +465,42 @@ class LearnerRepository {
     return _db.learningPaths.filter().uuidEqualTo(uuid).findFirst();
   }
 
+  /// Raw step maps for [path] (the same shape [savePath] stores), falling
+  /// back to title-only steps for legacy paths without a steps file.
+  Future<List<Map<String, dynamic>>> rawPathSteps(LearningPath path) async {
+    final stored = await PathStepsStorage.instance.loadSteps(path.uuid);
+    if (stored.isNotEmpty) return stored;
+    return pathTopics(path)
+        .map((t) => <String, dynamic>{
+              'title': t,
+              'summary': '',
+              'difficulty': 'medium',
+              'estimatedMinutes': 15,
+            })
+        .toList();
+  }
+
+  /// Rewrites a path's modules in place (agent edits and their undo):
+  /// steps file, ordered topic list, and progress pointer together, so the
+  /// path never ends up with a topic list and steps that disagree.
+  Future<void> replacePathStructure(
+    String uuid, {
+    required List<Map<String, dynamic>> steps,
+    required int currentIndex,
+    String? status,
+  }) async {
+    final path = await getPath(uuid);
+    if (path == null) return;
+    path
+      ..topicsJson = jsonEncode(steps.map((s) => s['title']?.toString() ?? 'Module').toList())
+      ..currentIndex = currentIndex.clamp(0, steps.length);
+    if (status != null) path.status = status;
+    await PathStepsStorage.instance.saveSteps(uuid, steps);
+    await _db.writeTxn(() async {
+      await _db.learningPaths.put(path);
+    });
+  }
+
   List<String> pathTopics(LearningPath path) {
     final list = jsonDecode(path.topicsJson);
     if (list is! List) return [];

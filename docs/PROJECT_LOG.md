@@ -16,6 +16,15 @@ Master index for all changes. **Agents must read this file and the relevant sect
 
 | Date | Type | Title | Log |
 |------|------|-------|-----|
+| 2026-10-02 | feature | Agentic pivot Must-haves M1–M5 (next session, action bus, preflight) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
+| 2026-10-02 | release | Rivox 1.1.0 (build 16): chat files and Google sign-in AAB — see [RELEASE_NOTES_1.1.0.md](RELEASE_NOTES_1.1.0.md) | (n/a) |
+| 2026-10-02 | enhancement | Cleaner chat composer and sign-in error | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
+| 2026-10-02 | enhancement | Chat attach, scan, edit, stop, and resend | [ENHANCEMENTS_LOG](logs/ENHANCEMENTS_LOG.md) |
+| 2026-10-02 | bugfix | Google account picker closed without signing in | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
+| 2026-09-27 | release | Rivox 1.1.0 (build 15): competitive-exam practice AAB — see [RELEASE_NOTES_1.1.0.md](RELEASE_NOTES_1.1.0.md) | (n/a) |
+| 2026-09-27 | bugfix | Answer check covers every closed question type | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
+| 2026-09-27 | bugfix | Stimulus answer key contradicted the chart or transcript | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
+| 2026-09-27 | feature | IELTS, NEET, JEE Main, and UPSC practice posts (B25) | [FEATURES_LOG](logs/FEATURES_LOG.md) |
 | 2026-09-27 | bugfix | Live probe quiz scored 0 on an opaque Built-in AI error | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-27 | bugfix | Quiz card gap, mixed question formats, remembered Google sign-in | [BUGFIX_LOG](logs/BUGFIX_LOG.md) |
 | 2026-09-27 | feature | Show passage, chart, table, or transcript on questions that need them (B46) | [FEATURES_LOG](logs/FEATURES_LOG.md) |

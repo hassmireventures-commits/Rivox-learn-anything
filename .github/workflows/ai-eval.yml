@@ -45,3 +45,20 @@ jobs:
       - name: Fallback model alone (informational only)
         continue-on-error: true
         run: flutter test test/model_generation_live_probe_test.dart --plain-name "fallback model" --dart-define=BUILT_IN_AI_API_KEY=${{ secrets.BUILT_IN_AI_API_KEY }}
+      # Vision, OCR, embeddings, and safety (NVIDIA). Informational: catches
+      # a retired model (like the 2026-09-01 Nemotron nano end of life) the
+      # morning after it happens, without failing on free-tier slowness.
+      - name: NVIDIA services (informational only)
+        continue-on-error: true
+        env:
+          BUILT_IN_AI_API_KEY: ${{ secrets.BUILT_IN_AI_API_KEY }}
+          NVIDIA_VISION_API_KEY: ${{ secrets.NVIDIA_VISION_API_KEY }}
+          NVIDIA_EMBED_API_KEY: ${{ secrets.NVIDIA_EMBED_API_KEY }}
+          NVIDIA_OCR_API_KEY: ${{ secrets.NVIDIA_OCR_API_KEY }}
+          NVIDIA_SAFETY_API_KEY: ${{ secrets.NVIDIA_SAFETY_API_KEY }}
+          NVIDIA_SPARE_API_KEY: ${{ secrets.NVIDIA_SPARE_API_KEY }}
+        run: |
+          jq -n 'env | {BUILT_IN_AI_API_KEY, NVIDIA_VISION_API_KEY, NVIDIA_EMBED_API_KEY,
+                        NVIDIA_OCR_API_KEY, NVIDIA_SAFETY_API_KEY, NVIDIA_SPARE_API_KEY}
+                 | map_values(. // "")' > nvidia_defines.json
+          flutter test test/nvidia_live_probe_test.dart --dart-define-from-file=nvidia_defines.json

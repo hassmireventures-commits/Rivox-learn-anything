@@ -2,6 +2,68 @@
 
 Copy into Play Console. Hosted legal URLs must match live pages before production.
 
+## 2026-10-11 ASO revision: AI Tutor and Study Planner (current, use this)
+
+**Why:** about 900 store visitors and 75 installs is roughly 8% conversion. The listing still sold "AI quiz generator" while the new feature graphic (`docs/store/featureGraphic_ai_tutor.png`, 1024x500, "AI TUTOR / STUDY PLANNER"; the older `featureGraphic.png` is the previous "Learn Anything" art) and the product now lead with the agentic tutor. Listing and creative must say the same thing in the first two seconds. Lengths below were counted programmatically. No emoji (house style).
+
+**Title (30 max):** `Rivox: AI Tutor & Study Plan` (28)
+Alternative for an experiment: `Rivox AI Tutor: Study Planner` (29)
+
+**Short description (80 max):** `AI tutor that builds your study plan, quizzes you daily and fixes weak spots.` (77)
+Alternative: `Personal AI tutor and study planner: quizzes, flashcards and mock exams daily.` (78)
+
+**Full description:**
+
+```
+Rivox is your personal AI tutor. Tell it what you want to learn and it builds the plan, runs your daily sessions, quizzes you, and fixes the plan when something is off.
+
+Learn anything: IELTS, NEET, JEE, UPSC, coding, game development, drawing, guitar, fitness, cooking, DIY, a new job. Rivox adapts how it teaches to the skill: exam-style papers for exams, code-reading checks for programming, form cues and safety for workouts, tool and safety steps for DIY.
+
+YOUR AI TUTOR, NOT JUST A CHATBOT
+- Plans your study path module by module around your goal and exam date
+- Quizzes you right inside the chat and explains every miss
+- Fixes its own mistakes: ask it to add, drop, or rename a module, or replace a bad quiz, and it does it (with Undo)
+- One clear "next session" every day, so you never wonder what to study
+
+PRACTICE THAT STICKS
+- AI quizzes on any topic: multiple choice, true/false, fill in the blank
+- Spaced-repetition flashcards built from your mistakes
+- A daily quick question you can answer straight from the notification
+- Mock exams with timers and review
+- Voice interview practice with AI scoring
+
+STAY ON A STREAK
+- Daily streak with streak freezes that cover a missed day
+- XP and levels, badges, and a home-screen streak widget
+- A gentle evening nudge only when your streak is at risk
+
+LEARN FROM YOUR OWN MATERIAL
+- Upload notes, PDFs, resumes, or job descriptions, or scan a page with the camera
+- Quizzes and paths grounded in what you uploaded
+- Watch lesson videos inside the app
+
+AI ON YOUR TERMS
+- Built-in AI works immediately with a free daily allowance
+- Or connect your own OpenAI, Gemini, or Claude key for unlimited use
+- Local-first: your progress and keys stay on your phone
+
+Start free. Pick a goal. Your tutor takes it from there.
+```
+
+**Screenshot order (captions five words or fewer):**
+1. Chat tutor fixing a plan: "A tutor that fixes itself"
+2. Home with streak strip and Next session: "Know what to study today"
+3. In-chat quiz card answered: "Quiz me, right here"
+4. Notification quick question with A/B/C: "Learn in ten seconds"
+5. Path view: "Your plan, built for you"
+6. Exam mock or voice interview: "Exam and interview ready"
+
+**Play Console steps (manual):**
+- Store listing experiment: icon or first screenshot, one variable, 50/50, at least 7 days, keep the winner.
+- Custom store listings by search intent: "IELTS preparation", "NEET JEE practice", "coding interview prep", "learn any skill". Each with screenshot 1 matching the intent.
+- In-app review prompt after a positive moment only (perfect in-chat quiz, 7-day streak), never after an error. Not built yet.
+- Re-check the Data safety form: notification answers are stored on device only.
+
 **2026-08-29 ASO revision:** the 2026-08-29 SEO audit found "Rivox" and "Learn
 Anything" both collide with unrelated existing products in search (see
 `docs/logs/FEATURES_LOG.md`). Retitled/re-described below to lead with

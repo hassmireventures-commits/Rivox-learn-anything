@@ -23,12 +23,15 @@ import '../../data/remote/ai/learning_orchestrator.dart';
 import '../../data/remote/analytics/anon_analytics_sync.dart';
 import '../../data/secure/secure_key_storage.dart';
 import '../../data/vector/knowledge_vector_store.dart';
+import '../../data/vector/semantic_index.dart';
 import '../healing/circuit_breaker.dart';
 import '../healing/health_monitor.dart';
 import '../theme/app_theme.dart';
 import '../personalization/ui_personalization_controller.dart';
 import '../services/ai_engine_mode_store.dart';
 import '../services/demo_quiz_service.dart';
+import '../services/agentic/learner_session_action.dart';
+import '../services/agentic/learner_session_planner.dart';
 import '../services/generation_job_service.dart';
 import '../services/llm_manager.dart';
 import '../services/quiz_of_the_day_service.dart';
@@ -93,6 +96,7 @@ final chatServiceProvider = Provider<ChatService>((ref) {
     aiPipeline: ref.watch(aiRequestPipelineProvider),
     chatRepository: ref.watch(chatRepositoryProvider),
     quizRepository: ref.watch(quizRepositoryProvider),
+    learnerRepository: ref.watch(learnerRepositoryProvider),
   );
 });
 
@@ -145,7 +149,7 @@ final recommendationEngineProvider = Provider<RecommendationEngine>((ref) {
 });
 
 final vectorStoreProvider = Provider<KnowledgeVectorStore>((ref) {
-  return KnowledgeVectorStore(ref.watch(isarServiceProvider));
+  return KnowledgeVectorStore(ref.watch(isarServiceProvider), semantic: SemanticIndex());
 });
 
 final llmManagerProvider = Provider<LlmManager>((ref) {
@@ -271,6 +275,20 @@ final playerIdProvider = FutureProvider<String>((ref) async {
 
 final nextDecisionProvider = FutureProvider<OrchestratorDecision>((ref) async {
   return ref.watch(learningOrchestratorProvider).decideNext();
+});
+
+final nextSessionProvider = FutureProvider<LearnerSessionAction>((ref) async {
+  ref.watch(generationJobServiceProvider);
+  final job = ref.read(generationJobServiceProvider);
+  final ui = await ref.watch(personalizationProvider.future);
+  final due = await ref.watch(flashcardsDueCountProvider(ui.goalMode).future);
+  final decision = await ref.watch(nextDecisionProvider.future);
+  return LearnerSessionPlanner.plan(
+    job: job,
+    flashcardsDue: due,
+    orchestrator: decision,
+    ui: ui,
+  );
 });
 
 final providerUsageProvider = FutureProvider<List<ProviderUsage>>((ref) async {
