@@ -55,3 +55,6 @@ app.*.map.json
 
 # Local dart-defines (Built-in AI key etc.)
 /tool/.local_dart_defines.json
+
+# Kotlin build cache created by AGP 8.13+
+/android/.kotlin/
